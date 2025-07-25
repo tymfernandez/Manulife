@@ -10,3 +10,5 @@ Core features include:
 - Anonymous application form with referral code tracking
 - Real-time data storage via Supabase with CRUD capabilities
 - Simple UI for tracking recruitment and client inquiries
+
+- Life Champions.
