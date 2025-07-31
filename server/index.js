@@ -7,7 +7,7 @@ app.get('/api', (c) => {
   return c.json({ message: 'RES Server is running!' });
 });
 
-const port = process.env.PORT || 5000;
+const port = process.env.PORT || 3000;
 serve({ fetch: app.fetch, port }, () => {
   console.log(`Server running on port ${port}`);
 });
