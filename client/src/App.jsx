@@ -1,7 +1,36 @@
 import { useState } from 'react';
+import { useRecruitmentData } from './hooks/useRecruitmentData';
 
 function App() {
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const { regionHeads, branchHeads, unitHeads, unitHeadAssociates, financialAdvisors, loading, error } = useRecruitmentData();
+
+  if (loading) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <div className="text-center">
+          <div className="w-8 h-8 bg-green-600 rounded animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading dashboard...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <div className="text-center">
+          <p className="text-red-600 mb-2">Error: {error}</p>
+          <button 
+            onClick={() => window.location.reload()} 
+            className="bg-green-600 text-white px-4 py-2 rounded"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex h-screen bg-gray-50">
@@ -66,16 +95,15 @@ function App() {
         {/* Dashboard Content */}
         <main className="flex-1 overflow-auto p-6 bg-[#f8fffe]">
           {/* KPI Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 mb-8">
             <div className="bg-white rounded-lg shadow-sm p-6 border">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600 mb-1">Total Recruits</p>
-                  <p className="text-3xl font-bold text-gray-800">324</p>
-                  <p className="text-sm text-green-600 mt-1">+12% this month</p>
+                  <p className="text-sm text-gray-600 mb-1">Region Head</p>
+                  <p className="text-3xl font-bold text-gray-800">{regionHeads}</p>
                 </div>
                 <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                  <span className="text-2xl">👥</span>
+                  <span className="text-2xl">🎆</span>
                 </div>
               </div>
             </div>
@@ -83,12 +111,11 @@ function App() {
             <div className="bg-white rounded-lg shadow-sm p-6 border">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600 mb-1">New Recruits This Month</p>
-                  <p className="text-3xl font-bold text-gray-800">45</p>
-                  <p className="text-sm text-green-600 mt-1">+8% this month</p>
+                  <p className="text-sm text-gray-600 mb-1">Branch Head</p>
+                  <p className="text-3xl font-bold text-gray-800">{branchHeads}</p>
                 </div>
                 <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                  <span className="text-2xl">➕</span>
+                  <span className="text-2xl">🏢</span>
                 </div>
               </div>
             </div>
@@ -96,23 +123,35 @@ function App() {
             <div className="bg-white rounded-lg shadow-sm p-6 border">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600 mb-1">Total Financial Advisors</p>
-                  <p className="text-3xl font-bold text-gray-800">189</p>
-                </div>
-                <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                  <span className="text-2xl">💼</span>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-white rounded-lg shadow-sm p-6 border">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-gray-600 mb-1">Total Unit Heads</p>
-                  <p className="text-3xl font-bold text-gray-800">28</p>
+                  <p className="text-sm text-gray-600 mb-1">Unit Head</p>
+                  <p className="text-3xl font-bold text-gray-800">{unitHeads}</p>
                 </div>
                 <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
                   <span className="text-2xl">📈</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-lg shadow-sm p-6 border">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-600 mb-1">Unit Head Associate</p>
+                  <p className="text-3xl font-bold text-gray-800">{unitHeadAssociates}</p>
+                </div>
+                <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                  <span className="text-2xl">🤝</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-lg shadow-sm p-6 border">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-600 mb-1">Financial Advisor</p>
+                  <p className="text-3xl font-bold text-gray-800">{financialAdvisors}</p>
+                </div>
+                <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                  <span className="text-2xl">💼</span>
                 </div>
               </div>
             </div>
