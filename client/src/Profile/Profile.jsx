@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useAuth } from "../lib/AuthContext";
+import { useAuth } from "../lib/authContext";
 import { Link } from "react-router-dom";
 
 const Profile = () => {

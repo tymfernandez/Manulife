@@ -1,9 +1,9 @@
 import { createBrowserRouter, Navigate, Outlet } from "react-router-dom";
-import { useAuth } from "./lib/AuthContext";
-import SignIn from "./UserAuth/Login/SignIn";
-import SignUp from "./UserAuth/Signup/SignUp";
+import { useAuth } from "./lib/authContext";
+import SignIn from "./UserAuth/Login/signIn";
+import SignUp from "./UserAuth/Signup/signUp";
 import Dashboard from "./Dashboard/dashboard";
-import Profile from "./Profile/Profile";
+import Profile from "./Profile/profile";
 import ApplicationForm from "./ApplicationForm/applicationForm";
 
 const ProtectedRoute = () => {
