@@ -1,9 +1,18 @@
 require('dotenv').config();
 const { Hono } = require('hono');
 const { serve } = require('@hono/node-server');
+const { cors } = require('hono/cors');
 const supabase = require('./supabase');
+const { submitApplication } = require('./routes/Applications');
 
 const app = new Hono();
+
+// Enable CORS for client requests
+app.use('/*', cors({
+  origin: 'http://localhost:5174',
+  allowMethods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowHeaders: ['Content-Type'],
+}));
 
 app.get('/api', (c) => {
   return c.json({ message: 'RES Server is running!', supabase: 'connected' });
@@ -12,6 +21,8 @@ app.get('/api', (c) => {
 app.get('/api/health', (c) => {
   return c.json({ status: 'healthy', timestamp: new Date().toISOString() });
 });
+
+app.post('/api/Applications', submitApplication);
 
 const port = process.env.PORT || 5173;
 serve({ fetch: app.fetch, port }, () => {
