@@ -1,5 +1,4 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import { supabase } from "./supabaseClient";
 
 const AuthContext = createContext();
 
@@ -12,44 +11,81 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     const getSession = async () => {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-
-      setUser(session?.user ?? null);
-      setLoading(false); // ✅ done loading
+      try {
+        const response = await fetch('http://localhost:3000/api/auth/session');
+        const result = await response.json();
+        setUser(result.success && result.session ? result.session.user : null);
+      } catch (error) {
+        setUser(null);
+      } finally {
+        setLoading(false);
+      }
     };
 
     getSession();
-
-    const { data: listener } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
-        setUser(session?.user ?? null);
-        setLoading(false); // ✅ also done loading
-      }
-    );
-
-    return () => {
-      listener.subscription.unsubscribe();
-    };
   }, []);
 
-  const signUp = async (email, password, additionalData) => {
-    const { data, error } = await supabase.auth.signUp({ email, password });
-    if (!error && data.user) {
-      await supabase.from("profiles").insert({
-        id: data.user.id,
-        full_name: additionalData.fullName,
-        contact_number: additionalData.contactNumber,
-        email: email,
+  const signUp = async (email, password, additionalData = {}) => {
+    try {
+      const response = await fetch('http://localhost:3000/api/auth/signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email,
+          password,
+          fullName: additionalData.fullName || '',
+          contactNumber: additionalData.contactNumber || ''
+        })
       });
+      
+      if (!response.ok) {
+        throw new Error(`Server error: ${response.status}`);
+      }
+      
+      const result = await response.json();
+      return result.success ? { data: result.data, error: null } : { data: null, error: { message: result.message } };
+    } catch (error) {
+      return { data: null, error: { message: error.message } };
     }
-    return { data, error };
   };
 
-  const signIn = (email, password) =>
-    supabase.auth.signInWithPassword({ email, password });
-  const signOut = () => supabase.auth.signOut();
+  const signIn = async (email, password) => {
+    try {
+      const response = await fetch('http://localhost:3000/api/auth/signin', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
+      
+      if (!response.ok) {
+        throw new Error(`Server error: ${response.status}`);
+      }
+      
+      const result = await response.json();
+      if (result.success && result.data.user) {
+        setUser(result.data.user);
+        return { data: result.data, error: null };
+      }
+      return { data: null, error: { message: result.message } };
+    } catch (error) {
+      return { data: null, error: { message: error.message } };
+    }
+  };
+  const signOut = async () => {
+    try {
+      const response = await fetch('http://localhost:3000/api/auth/signout', {
+        method: 'POST'
+      });
+      const result = await response.json();
+      if (result.success) {
+        setUser(null);
+        return { error: null };
+      }
+      return { error: { message: result.message } };
+    } catch (error) {
+      return { error: { message: error.message } };
+    }
+  };
 
   return (
     <AuthContext.Provider

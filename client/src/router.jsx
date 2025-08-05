@@ -2,8 +2,9 @@ import { createBrowserRouter, Navigate, Outlet } from "react-router-dom";
 import { useAuth } from "./lib/AuthContext";
 import SignIn from "./UserAuth/Login/SignIn";
 import SignUp from "./UserAuth/Signup/SignUp";
-import Dashboard from "./Dashboard/Dashboard";
+import Dashboard from "./Dashboard/dashboard";
 import Profile from "./Profile/Profile";
+import ApplicationForm from "./ApplicationForm/applicationForm";
 
 const ProtectedRoute = () => {
   const { user, loading } = useAuth();
@@ -74,6 +75,16 @@ export const router = createBrowserRouter([
       {
         index: true,
         element: <Profile />,
+      },
+    ],
+  },
+  {
+    path: "/application-form",
+    element: <ProtectedRoute />,
+    children: [
+      {
+        index: true,
+        element: <ApplicationForm />,
       },
     ],
   },

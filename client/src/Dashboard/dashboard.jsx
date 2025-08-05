@@ -13,6 +13,16 @@ export default function Dashboard() {
             Profile
           </Link>
           <span className="text-white">Welcome, {user?.email}</span>
+
+          {/* This is the link to the application form for debugging purposes only*/}
+          <Link
+            to="/application-form"
+            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors"
+          >
+            Application Form
+          </Link>
+
+          
           <button
             onClick={signOut}
             className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition-colors"

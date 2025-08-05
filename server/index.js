@@ -4,6 +4,8 @@ const { serve } = require('@hono/node-server');
 const { cors } = require('hono/cors');
 const supabase = require('./supabase');
 const { submitApplication } = require('./routes/Applications');
+const { signUp, signIn, signOut } = require('./routes/auth');
+const { getSession } = require('./routes/session');
 
 const app = new Hono();
 
@@ -23,8 +25,12 @@ app.get('/api/health', (c) => {
 });
 
 app.post('/api/Applications', submitApplication);
+app.post('/api/auth/signup', signUp);
+app.post('/api/auth/signin', signIn);
+app.post('/api/auth/signout', signOut);
+app.get('/api/auth/session', getSession);
 
-const port = process.env.PORT || 5173;
+const port = process.env.PORT || 3000;
 serve({ fetch: app.fetch, port }, () => {
   console.log(`Server running on port ${port}`);
 });
