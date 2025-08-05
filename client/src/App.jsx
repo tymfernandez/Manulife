@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useRecruitmentData } from './hooks/useRecruitmentData';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
 
 function App() {
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -157,11 +158,98 @@ function App() {
             </div>
           </div>
 
-          {/* Chart Placeholder */}
-          <div className="bg-white rounded-lg shadow-sm p-6 border">
-            <h3 className="text-lg font-semibold text-gray-800 mb-4">Recruitment Over Time</h3>
-            <div className="h-64 bg-gray-100 rounded-lg flex items-center justify-center">
-              <p className="text-gray-500">Chart will be displayed here</p>
+          {/* Charts Section */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Monthly Recruitment Trend */}
+            <div className="bg-white rounded-lg shadow-sm p-6 border">
+              <h3 className="text-lg font-semibold text-gray-800 mb-4">Monthly Recruitment Trend</h3>
+              <ResponsiveContainer width="100%" height={250}>
+                <LineChart data={[
+                  { month: 'Jan', recruits: 12 },
+                  { month: 'Feb', recruits: 19 },
+                  { month: 'Mar', recruits: 15 },
+                  { month: 'Apr', recruits: 25 },
+                  { month: 'May', recruits: 22 },
+                  { month: 'Jun', recruits: 30 },
+                  { month: 'Jul', recruits: 28 },
+                  { month: 'Aug', recruits: 35 },
+                  { month: 'Sep', recruits: 32 },
+                  { month: 'Oct', recruits: 40 },
+                  { month: 'Nov', recruits: 38 },
+                  { month: 'Dec', recruits: 45 }
+                ]}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                  <XAxis dataKey="month" stroke="#6b7280" fontSize={12} />
+                  <YAxis stroke="#6b7280" fontSize={12} />
+                  <Tooltip 
+                    contentStyle={{ 
+                      backgroundColor: '#f8fffe', 
+                      border: '1px solid #16a34a',
+                      borderRadius: '8px'
+                    }}
+                  />
+                  <Line 
+                    type="monotone" 
+                    dataKey="recruits" 
+                    stroke="#16a34a" 
+                    strokeWidth={3}
+                    dot={{ fill: '#16a34a', strokeWidth: 2, r: 4 }}
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+
+            {/* Daily Recruitment (Last 7 Days) */}
+            <div className="bg-white rounded-lg shadow-sm p-6 border">
+              <h3 className="text-lg font-semibold text-gray-800 mb-4">Daily Recruits (Last 7 Days)</h3>
+              <ResponsiveContainer width="100%" height={250}>
+                <BarChart data={[
+                  { day: 'Mon', recruits: 3 },
+                  { day: 'Tue', recruits: 5 },
+                  { day: 'Wed', recruits: 2 },
+                  { day: 'Thu', recruits: 8 },
+                  { day: 'Fri', recruits: 6 },
+                  { day: 'Sat', recruits: 4 },
+                  { day: 'Sun', recruits: 7 }
+                ]}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                  <XAxis dataKey="day" stroke="#6b7280" fontSize={12} />
+                  <YAxis stroke="#6b7280" fontSize={12} />
+                  <Tooltip 
+                    contentStyle={{ 
+                      backgroundColor: '#f8fffe', 
+                      border: '1px solid #16a34a',
+                      borderRadius: '8px'
+                    }}
+                  />
+                  <Bar dataKey="recruits" fill="#16a34a" radius={[4, 4, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+
+          {/* Yearly Summary */}
+          <div className="mt-6 bg-white rounded-lg shadow-sm p-6 border">
+            <h3 className="text-lg font-semibold text-gray-800 mb-4">Yearly Recruitment Summary</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="text-center">
+                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                  <span className="text-2xl font-bold text-green-600">324</span>
+                </div>
+                <p className="text-sm text-gray-600">Total This Year</p>
+              </div>
+              <div className="text-center">
+                <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                  <span className="text-2xl font-bold text-blue-600">27</span>
+                </div>
+                <p className="text-sm text-gray-600">Average Per Month</p>
+              </div>
+              <div className="text-center">
+                <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                  <span className="text-2xl font-bold text-purple-600">+18%</span>
+                </div>
+                <p className="text-sm text-gray-600">Growth vs Last Year</p>
+              </div>
             </div>
           </div>
         </main>
