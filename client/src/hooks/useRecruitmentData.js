@@ -18,9 +18,9 @@ export const useRecruitmentData = () => {
 
   const fetchRecruitmentData = async () => {
     try {
-      const { data: recruits, error } = await supabase
-        .from('recruits')
-        .select('role');
+      const { data: applications, error } = await supabase
+        .from('Applications')
+        .select('position');
 
       if (error) {
         // If table doesn't exist, use fallback data
@@ -40,11 +40,11 @@ export const useRecruitmentData = () => {
       }
 
       const roleCounts = {
-        regionHeads: recruits?.filter(r => r.role === 'Region Head').length || 0,
-        branchHeads: recruits?.filter(r => r.role === 'Branch Head').length || 0,
-        unitHeads: recruits?.filter(r => r.role === 'Unit Head').length || 0,
-        unitHeadAssociates: recruits?.filter(r => r.role === 'Unit Head Associate').length || 0,
-        financialAdvisors: recruits?.filter(r => r.role === 'Financial Advisor').length || 0,
+        regionHeads: applications?.filter(a => a.position === 'Region Head').length || 0,
+        branchHeads: applications?.filter(a => a.position === 'Branch Head').length || 0,
+        unitHeads: applications?.filter(a => a.position === 'Unit Head').length || 0,
+        unitHeadAssociates: applications?.filter(a => a.position === 'Unit Head Associate').length || 0,
+        financialAdvisors: applications?.filter(a => a.position === 'Financial Advisor').length || 0,
       };
 
       setData({
