@@ -64,11 +64,11 @@ function App() {
           </div>
           <div className="flex items-center px-6 py-3 hover:bg-slate-600 cursor-pointer">
             <span className="text-white text-lg flex-shrink-0">👤</span>
-            {!isCollapsed && <span className="ml-3 font-medium">Users</span>}
+            {!isCollapsed && <span className="ml-3 font-medium">Profile</span>}
           </div>
           <div className="flex items-center px-6 py-3 hover:bg-slate-600 cursor-pointer">
-            <span className="text-white text-lg flex-shrink-0">📄</span>
-            {!isCollapsed && <span className="ml-3 font-medium">Logs</span>}
+            <span className="text-white text-lg flex-shrink-0">⚙️</span>
+            {!isCollapsed && <span className="ml-3 font-medium">Settings</span>}
           </div>
         </nav>
       </div>
