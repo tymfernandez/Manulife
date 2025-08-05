@@ -10,24 +10,29 @@ export const AuthProvider = ({ children }) => {
   const [userProfile, setUserProfile] = useState(null)
   const [loading, setLoading] = useState(true)
 
-  useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      setUser(session?.user ?? null)
-      if (session?.user) {
-        const { data } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', session.user.id)
-          .single()
-        setUserProfile(data)
-      } else {
-        setUserProfile(null)
-      }
-      setLoading(false)
-    })
+useEffect(() => {
+  const getSession = async () => {
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
 
-    return () => subscription.unsubscribe()
-  }, [])
+    setUser(session?.user ?? null);
+    setLoading(false); // ✅ done loading
+  };
+
+  getSession();
+
+  const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+    setUser(session?.user ?? null);
+    setLoading(false); // ✅ also done loading
+  });
+
+  return () => {
+    listener.subscription.unsubscribe();
+  };
+}, []);
+
+
 
   const signUp = async (email, password, additionalData) => {
     const { data, error } = await supabase.auth.signUp({ email, password })

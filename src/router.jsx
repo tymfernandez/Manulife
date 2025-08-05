@@ -6,6 +6,7 @@ import Dashboard from "./Dashboard";
 
 const ProtectedRoute = () => {
   const { user, loading } = useAuth();
+  console.log("ProtectedRoute:", { user, loading });
 
   if (loading)
     return (
