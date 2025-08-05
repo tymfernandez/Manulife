@@ -3,6 +3,7 @@ import { useAuth } from "./AuthContext";
 import SignIn from "./SignIn";
 import SignUp from "./SignUp";
 import Dashboard from "./Dashboard";
+import Profile from "./Profile";
 
 const ProtectedRoute = () => {
   const { user, loading } = useAuth();
@@ -63,6 +64,16 @@ export const router = createBrowserRouter([
       {
         index: true,
         element: <Dashboard />,
+      },
+    ],
+  },
+  {
+    path: "/profile",
+    element: <ProtectedRoute />,
+    children: [
+      {
+        index: true,
+        element: <Profile />,
       },
     ],
   },

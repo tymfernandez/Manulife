@@ -1,4 +1,5 @@
 import { useAuth } from './AuthContext'
+import { Link } from 'react-router-dom'
 
 export default function Dashboard() {
   const { user, signOut } = useAuth()
@@ -8,6 +9,9 @@ export default function Dashboard() {
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-2xl font-bold text-white">Dashboard</h1>
         <div className="flex items-center space-x-4">
+          <Link to="/profile" className="text-blue-400 hover:text-blue-300">
+            Profile
+          </Link>
           <span className="text-white">Welcome, {user?.email}</span>
           <button
             onClick={signOut}
