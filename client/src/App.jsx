@@ -1,32 +1,44 @@
+import { useState } from 'react';
+
 function App() {
+  const [isCollapsed, setIsCollapsed] = useState(false);
+
   return (
     <div className="flex h-screen bg-gray-50">
       {/* Sidebar */}
-      <div className="w-64 bg-slate-700 text-white h-screen shadow-lg">
+      <div className={`${isCollapsed ? 'w-16' : 'w-64'} bg-slate-700 text-white h-screen shadow-lg transition-all duration-300 relative`}>
+        {/* Toggle Button */}
+        <button
+          onClick={() => setIsCollapsed(!isCollapsed)}
+          className="absolute -right-3 top-20 bg-slate-700 border border-slate-600 rounded-full p-1 hover:bg-slate-600 transition-colors z-10"
+        >
+          <span className="text-white text-sm">{isCollapsed ? '→' : '←'}</span>
+        </button>
+        
         <div className="p-6 border-b border-slate-600">
           <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 bg-green-600 rounded flex items-center justify-center">
+            <div className="w-8 h-8 bg-green-600 rounded flex items-center justify-center flex-shrink-0">
               <span className="text-white font-bold text-sm">M</span>
             </div>
-            <span className="font-semibold text-lg">Manulife</span>
+            {!isCollapsed && <span className="font-semibold text-lg">Manulife</span>}
           </div>
         </div>
         <nav className="pt-4">
           <div className="flex items-center px-6 py-3 bg-green-600 border-r-4 border-green-400">
-            <span className="text-white text-lg">🏠</span>
-            <span className="ml-3 font-medium">Dashboard</span>
+            <span className="text-white text-lg flex-shrink-0">🏠</span>
+            {!isCollapsed && <span className="ml-3 font-medium">Dashboard</span>}
           </div>
           <div className="flex items-center px-6 py-3 hover:bg-slate-600 cursor-pointer">
-            <span className="text-white text-lg">👥</span>
-            <span className="ml-3 font-medium">Recruits</span>
+            <span className="text-white text-lg flex-shrink-0">👥</span>
+            {!isCollapsed && <span className="ml-3 font-medium">Recruits</span>}
           </div>
           <div className="flex items-center px-6 py-3 hover:bg-slate-600 cursor-pointer">
-            <span className="text-white text-lg">👤</span>
-            <span className="ml-3 font-medium">Users</span>
+            <span className="text-white text-lg flex-shrink-0">👤</span>
+            {!isCollapsed && <span className="ml-3 font-medium">Users</span>}
           </div>
           <div className="flex items-center px-6 py-3 hover:bg-slate-600 cursor-pointer">
-            <span className="text-white text-lg">📄</span>
-            <span className="ml-3 font-medium">Logs</span>
+            <span className="text-white text-lg flex-shrink-0">📄</span>
+            {!isCollapsed && <span className="ml-3 font-medium">Logs</span>}
           </div>
         </nav>
       </div>
