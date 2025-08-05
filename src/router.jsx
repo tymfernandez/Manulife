@@ -6,6 +6,7 @@ import Dashboard from './Dashboard'
 
 const ProtectedRoute = () => {
   const { user, loading } = useAuth()
+  console.log('ProtectedRoute:', { user, loading })
   
   if (loading) return <div className="min-h-screen bg-[#141414] flex items-center justify-center text-white">zzz Loading...</div>
   
