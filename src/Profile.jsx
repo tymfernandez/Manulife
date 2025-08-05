@@ -6,10 +6,10 @@ const Profile = () => {
   const { user, signOut } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
-    firstName: 'John',
-    lastName: 'Doe',
-    contactNumber: '+1 (555) 123-4567',
-    address: '123 Main St, Toronto, ON M5V 3A8'
+    firstName: 'Manny',
+    lastName: 'Lyfe',
+    contactNumber: '+63 912 345 6789',
+    address: 'Maitim na Kahoy, Mabalacat, Pampanga'
   });
 
   const handleInputChange = (e) => {
