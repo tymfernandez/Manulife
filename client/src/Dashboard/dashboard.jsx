@@ -77,17 +77,45 @@ const Dashboard = () => {
 
         setRecruitsCounts(newCounts)
 
-        // Generate chart data based on selected period
-        const generateChartData = () => {
-          const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
-          const data = months.map((month, index) => ({
-            month,
-            recruits: Math.floor(Math.random() * 50) + 10 // Sample data - replace with real data
-          }))
-          setChartData(data)
+        // Generate chart data from Applications table
+        const generateChartData = async () => {
+          const monthsBack = selectedPeriod === '3 Months' ? 3 : selectedPeriod === '6 Months' ? 6 : 12
+          const startDate = new Date()
+          startDate.setMonth(startDate.getMonth() - monthsBack)
+          
+          const { data: applications, error } = await supabase
+            .from('Applications')
+            .select('created_at')
+            .gte('created_at', startDate.toISOString())
+          
+          if (error) {
+            console.error('Error fetching chart data:', error)
+            return
+          }
+          
+          const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+          const chartData = []
+          
+          for (let i = monthsBack - 1; i >= 0; i--) {
+            const date = new Date()
+            date.setMonth(date.getMonth() - i)
+            const monthName = monthNames[date.getMonth()]
+            
+            const monthStart = new Date(date.getFullYear(), date.getMonth(), 1)
+            const monthEnd = new Date(date.getFullYear(), date.getMonth() + 1, 0)
+            
+            const recruits = applications.filter(app => {
+              const appDate = new Date(app.created_at)
+              return appDate >= monthStart && appDate <= monthEnd
+            }).length
+            
+            chartData.push({ month: monthName, recruits })
+          }
+          
+          setChartData(chartData)
         }
 
-        generateChartData()
+        await generateChartData()
       } catch (error) {
         console.error('Error fetching applications data:', error)
       }
