@@ -11,8 +11,8 @@ const Dashboard = () => {
     financialAdvisor: 0,
   })
 
-  const [totalApplications, setTotalApplications] = useState(425)
-  const [newRecruits, setNewRecruits] = useState(23)
+  const [totalApplications, setTotalApplications] = useState(0)
+  const [newRecruits, setNewRecruits] = useState(0)
   const [selectedPeriod, setSelectedPeriod] = useState('12 Months')
 
   // Function to convert role string to camelCase
@@ -21,33 +21,65 @@ const Dashboard = () => {
       .toLowerCase()
       .replace(/[^a-zA-Z0-9]+(.)/g, (_, chr) => chr.toUpperCase())
 
-  // UseEffect hook to fetch recruits counts based on role
+  // UseEffect hook to fetch data from Applications table
   useEffect(() => {
-    const fetchRecruitsData = async () => {
-      const roles = [
-        'Region Head',
-        'Branch Head',
-        'Unit Head',
-        'Unit Head Associate',
-        'Financial Advisor',
-      ]
-
-      const newCounts = {}
-
-      for (const role of roles) {
-        const { count, error } = await supabase
-          .from('Recruits')
+    const fetchApplicationsData = async () => {
+      try {
+        // Fetch total applications count
+        const { count: totalCount, error: totalError } = await supabase
+          .from('Applications')
           .select('*', { count: 'exact', head: true })
-          .eq('role', role)
 
-        if (error) console.error('Error fetching recruits:', error)
-        newCounts[camelCase(role)] = count || 0
+        if (totalError) {
+          console.error('Error fetching total applications:', totalError)
+        } else {
+          setTotalApplications(totalCount || 0)
+        }
+
+        // Fetch new applications (last 30 days)
+        const thirtyDaysAgo = new Date()
+        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
+        
+        const { count: newCount, error: newError } = await supabase
+          .from('Applications')
+          .select('*', { count: 'exact', head: true })
+          .gte('created_at', thirtyDaysAgo.toISOString())
+
+        if (newError) {
+          console.error('Error fetching new applications:', newError)
+        } else {
+          setNewRecruits(newCount || 0)
+        }
+
+        // Fetch role-based counts
+        const roles = [
+          'Region Head',
+          'Branch Head', 
+          'Unit Head',
+          'Unit Head Associate',
+          'Financial Advisor',
+        ]
+
+        const newCounts = {}
+        for (const role of roles) {
+          const { count, error } = await supabase
+            .from('Applications')
+            .select('*', { count: 'exact', head: true })
+            .eq('position_applied_for', role)
+
+          if (error) {
+            console.error(`Error fetching ${role} applications:`, error)
+          }
+          newCounts[camelCase(role)] = count || 0
+        }
+
+        setRecruitsCounts(newCounts)
+      } catch (error) {
+        console.error('Error fetching applications data:', error)
       }
-
-      setRecruitsCounts(newCounts)
     }
 
-    fetchRecruitsData()
+    fetchApplicationsData()
   }, [])
 
   return (
@@ -107,25 +139,25 @@ const Dashboard = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <RoleCard 
           title="Branch Head" 
-          value={recruitsCounts.branchHead || 6} 
+          value={recruitsCounts.branchHead} 
           percentage={1} 
           isPositive={true}
         />
         <RoleCard 
           title="Unit Head" 
-          value={recruitsCounts.unitHead || 15} 
+          value={recruitsCounts.unitHead} 
           percentage={1} 
           isPositive={true}
         />
         <RoleCard 
           title="Unit Head Associate" 
-          value={recruitsCounts.unitHeadAssociate || 15} 
+          value={recruitsCounts.unitHeadAssociate} 
           percentage={2} 
           isPositive={true}
         />
         <RoleCard 
           title="Financial Advisors" 
-          value={recruitsCounts.financialAdvisor || 32} 
+          value={recruitsCounts.financialAdvisor} 
           percentage={4} 
           isPositive={true}
         />
