@@ -2,7 +2,7 @@ import { Search, Bell, User } from 'lucide-react';
 
 const Header = () => {
   return (
-    <header className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
+    <header className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between fixed top-0 left-0 right-0 z-10">
       {/* Logo */}
       <div className="flex items-center space-x-3">
         <div className="w-8 h-8 bg-green-600 rounded flex items-center justify-center">

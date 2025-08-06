@@ -3,33 +3,30 @@ import {
   BarChart3, 
   Users, 
   UserCheck, 
-  TrendingUp, 
-  User, 
-  Settings, 
+  FileText,
   ChevronLeft,
   ChevronRight
 } from 'lucide-react';
 
 const Sidebar = () => {
+  const [activeItem, setActiveItem] = useState('Dashboard');
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   const menuItems = [
-    { icon: BarChart3, label: 'Dashboard', active: false },
-    { icon: Users, label: 'Recruits', active: true },
-    { icon: UserCheck, label: 'Accounts', active: false },
-    { icon: TrendingUp, label: 'Sales', active: false },
-    { icon: User, label: 'Profile', active: false },
-    { icon: Settings, label: 'Settings', active: false },
+    { icon: BarChart3, label: 'Dashboard' },
+    { icon: Users, label: 'Recruits' },
+    { icon: UserCheck, label: 'Users' },
+    { icon: FileText, label: 'Logs' },
   ];
 
   return (
-    <div className={`bg-slate-700 text-white h-screen transition-all duration-300 ${
-      isCollapsed ? 'w-16' : 'w-56'
-    } relative`}>
-      {/* Collapse Toggle */}
+    <div className={`bg-green-900 text-white h-screen transition-all duration-300 relative ${
+      isCollapsed ? 'w-16' : 'w-60'
+    }`}>
+      {/* Toggle Button */}
       <button
         onClick={() => setIsCollapsed(!isCollapsed)}
-        className="absolute -right-3 top-20 bg-slate-700 border border-slate-600 rounded-full p-1 hover:bg-slate-600 transition-colors"
+        className="absolute -right-3 top-24 bg-green-900 border border-green-700 rounded-full p-1 hover:bg-green-800 transition-colors z-20"
       >
         {isCollapsed ? (
           <ChevronRight className="w-4 h-4" />
@@ -39,21 +36,23 @@ const Sidebar = () => {
       </button>
 
       {/* Menu Items */}
-      <nav className="pt-8">
+      <nav className="pt-20">
         {menuItems.map((item, index) => {
           const Icon = item.icon;
+          const isActive = activeItem === item.label;
           return (
             <div
               key={index}
-              className={`flex items-center px-4 py-3 cursor-pointer transition-colors ${
-                item.active 
-                  ? 'bg-green-600 border-r-2 border-green-400' 
-                  : 'hover:bg-slate-600'
+              onClick={() => setActiveItem(item.label)}
+              className={`flex items-center px-6 py-4 cursor-pointer transition-all duration-200 ${
+                isActive 
+                  ? 'bg-orange-500 text-white' 
+                  : 'hover:bg-green-700 text-gray-200'
               }`}
             >
               <Icon className="w-5 h-5 flex-shrink-0" />
               {!isCollapsed && (
-                <span className="ml-3 font-medium">{item.label}</span>
+                <span className="ml-4 font-medium">{item.label}</span>
               )}
             </div>
           );
