@@ -38,16 +38,15 @@ export const AuthProvider = ({ children }) => {
         }),
       });
 
-      if (!response.ok) {
-        throw new Error(`Server error: ${response.status}`);
-      }
-
       const result = await response.json();
       return result.success
         ? { data: result.data, error: null }
         : { data: null, error: { message: result.message } };
     } catch (error) {
-      return { data: null, error: { message: error.message } };
+      return {
+        data: null,
+        error: { message: "Network error. Please check your connection." },
+      };
     }
   };
 
@@ -59,10 +58,6 @@ export const AuthProvider = ({ children }) => {
         body: JSON.stringify({ email, password }),
       });
 
-      if (!response.ok) {
-        throw new Error(`Server error: ${response.status}`);
-      }
-
       const result = await response.json();
       if (result.success && result.data.user) {
         setUser(result.data.user);
@@ -70,7 +65,10 @@ export const AuthProvider = ({ children }) => {
       }
       return { data: null, error: { message: result.message } };
     } catch (error) {
-      return { data: null, error: { message: error.message } };
+      return {
+        data: null,
+        error: { message: "Network error. Please check your connection." },
+      };
     }
   };
   const signOut = async () => {
