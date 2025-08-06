@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Server Connection</title>
+</head>
+<body>
+    <h1>Server Connection Test</h1>
+    <button onclick="testConnection()">Test Server</button>
+    <div id="result"></div>
+
+    <script>
+        async function testConnection() {
+            const result = document.getElementById('result');
+            try {
+                // Test accounts endpoint
+                const accountsResponse = await fetch('http://localhost:3001/api/accounts');
+                const accountsData = await accountsResponse.json();
+                
+                result.innerHTML = `
+                    <p style="color: green;">✅ Accounts API working!</p>
+                    <p>Found ${accountsData.data.length} accounts:</p>
+                    <ul>
+                        ${accountsData.data.map(acc => `<li>${acc.name} - ${acc.role}</li>`).join('')}
+                    </ul>
+                `;
+            } catch (error) {
+                result.innerHTML = `<p style="color: red;">❌ Error: ${error.message}</p>`;
+                console.error('Full error:', error);
+            }
+        }
+    </script>
+</body>
+</html>

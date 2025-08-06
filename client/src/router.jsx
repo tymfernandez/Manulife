@@ -5,6 +5,7 @@ import SignUp from "./UserAuth/Signup/signUp";
 import Dashboard from "./Dashboard/dashboard";
 import Profile from "./Profile/profile";
 import ApplicationForm from "./ApplicationForm/applicationForm";
+import TestAccountManagement from "./testAccountManagement";
 
 const ProtectedRoute = () => {
   const { user, loading } = useAuth();
@@ -13,7 +14,7 @@ const ProtectedRoute = () => {
   if (loading)
     return (
       <div className="min-h-screen bg-[#141414] flex items-center justify-center text-white">
-        zzz Loading...
+        Loading...
       </div>
     );
 
@@ -26,7 +27,7 @@ const PublicRoute = () => {
   if (loading)
     return (
       <div className="min-h-screen bg-[#141414] flex items-center justify-center text-white">
-        zzzzz Loading...
+        Loading...
       </div>
     );
 
@@ -87,5 +88,9 @@ export const router = createBrowserRouter([
         element: <ApplicationForm />,
       },
     ],
+  },
+  {
+    path: "/test-accounts",
+    element: <TestAccountManagement />,
   },
 ]);

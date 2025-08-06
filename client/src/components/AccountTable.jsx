@@ -1,7 +1,7 @@
 import React from 'react';
 import { Trash2 } from 'lucide-react';
 import Avatar from './avatar';
-import { getStatusColor } from '../utils/helpers';
+import { getStatusColor, formatDate, formatRelativeTime } from '../utils/helpers';
 
 const AccountTable = ({ accounts, onDelete }) => {
   return (
@@ -30,8 +30,8 @@ const AccountTable = ({ accounts, onDelete }) => {
                 </td>
                 <td className="py-4 px-6 text-gray-600">{account.role}</td>
                 <td className="py-4 px-6 text-gray-600">{account.email}</td>
-                <td className="py-4 px-6 text-gray-600">{account.lastOnline}</td>
-                <td className="py-4 px-6 text-gray-600">{account.joinedDate}</td>
+                <td className="py-4 px-6 text-gray-600">{formatRelativeTime(account.last_online)}</td>
+                <td className="py-4 px-6 text-gray-600">{formatDate(account.joined_date)}</td>
                 <td className="py-4 px-6">
                   <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(account.status)}`}>
                     {account.status}
