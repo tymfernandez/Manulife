@@ -1,17 +1,62 @@
-import React from 'react';
-import { BarChart3, Search, Bell } from 'lucide-react';
+import React, { useState, useRef, useEffect } from 'react';
+import { Search, Bell, Menu, X, User, Settings, LogOut } from 'lucide-react';
 import Avatar from './avatar';
+import EagleLogo from './eagleLogo';
 
-const Header = () => {
+const Header = ({ onMenuClick, activeItem, setActiveItem }) => {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isSearchFocused, setIsSearchFocused] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [isNotificationOpen, setIsNotificationOpen] = useState(false);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
+  
+  const notificationRef = useRef(null);
+  const profileRef = useRef(null);
+  
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (notificationRef.current && !notificationRef.current.contains(event.target)) {
+        setIsNotificationOpen(false);
+      }
+      if (profileRef.current && !profileRef.current.contains(event.target)) {
+        setIsProfileOpen(false);
+      }
+    };
+    
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+  
+  const notifications = [
+    { id: 1, title: 'New Account Created', message: 'John Doe has been added to the system', time: '2 min ago', unread: true },
+    { id: 2, title: 'Application Submitted', message: 'New application from Jane Smith', time: '1 hour ago', unread: true },
+    { id: 3, title: 'System Update', message: 'Maintenance scheduled for tonight', time: '3 hours ago', unread: false }
+  ];
+  
+  const menuItems = [
+    { id: 'dashboard', label: 'Dashboard' },
+    { id: 'accounts', label: 'Account Management' },
+    { id: 'applications', label: 'Applications' },
+    { id: 'reports', label: 'Reports' },
+    { id: 'settings', label: 'Settings' }
+  ];
   return (
     <header className="bg-white border-b border-gray-200 px-6 py-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
-          <div className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-emerald-600 rounded flex items-center justify-center">
-              <BarChart3 className="w-5 h-5 text-white" />
+          <button
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            className="p-2 rounded-lg hover:bg-gray-100 lg:hidden"
+          >
+            {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+          </button>
+          
+          <div className="flex items-center space-x-3">
+            <EagleLogo className="w-10 h-10" />
+            <div>
+              <div className="text-xl font-bold text-gray-900">Royal Eagles</div>
+              <div className="text-sm text-emerald-600 font-medium">Region</div>
             </div>
-            <span className="text-xl font-semibold text-gray-900">Manulife</span>
           </div>
         </div>
         
