@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { supabase } from '../supabaseClient'
 import { TrendingUp, TrendingDown } from 'lucide-react'
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
 
 const Dashboard = () => {
   const [recruitsCounts, setRecruitsCounts] = useState({
@@ -14,6 +15,7 @@ const Dashboard = () => {
   const [totalApplications, setTotalApplications] = useState(0)
   const [newRecruits, setNewRecruits] = useState(0)
   const [selectedPeriod, setSelectedPeriod] = useState('12 Months')
+  const [chartData, setChartData] = useState([])
 
   // Function to convert role string to camelCase
   const camelCase = (str) =>
@@ -74,13 +76,25 @@ const Dashboard = () => {
         }
 
         setRecruitsCounts(newCounts)
+
+        // Generate chart data based on selected period
+        const generateChartData = () => {
+          const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+          const data = months.map((month, index) => ({
+            month,
+            recruits: Math.floor(Math.random() * 50) + 10 // Sample data - replace with real data
+          }))
+          setChartData(data)
+        }
+
+        generateChartData()
       } catch (error) {
         console.error('Error fetching applications data:', error)
       }
     }
 
     fetchApplicationsData()
-  }, [])
+  }, [selectedPeriod])
 
   return (
     <div className="p-4 bg-gray-50 min-h-screen">
@@ -129,9 +143,42 @@ const Dashboard = () => {
           </div>
         </div>
         
-        {/* Chart placeholder */}
-        <div className="h-64 bg-gray-50 rounded flex items-center justify-center">
-          <span className="text-gray-500">Chart will be implemented here</span>
+        {/* Chart */}
+        <div className="h-64">
+          <ResponsiveContainer width="100%" height="100%">
+            <LineChart data={chartData}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+              <XAxis 
+                dataKey="month" 
+                stroke="#6b7280" 
+                fontSize={12}
+                axisLine={false}
+                tickLine={false}
+              />
+              <YAxis 
+                stroke="#6b7280" 
+                fontSize={12}
+                axisLine={false}
+                tickLine={false}
+              />
+              <Tooltip 
+                contentStyle={{ 
+                  backgroundColor: 'white', 
+                  border: '1px solid #e5e7eb',
+                  borderRadius: '8px',
+                  boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+                }}
+              />
+              <Line 
+                type="monotone" 
+                dataKey="recruits" 
+                stroke="#f59e0b" 
+                strokeWidth={3}
+                dot={{ fill: '#f59e0b', strokeWidth: 2, r: 4 }}
+                activeDot={{ r: 6, fill: '#f59e0b' }}
+              />
+            </LineChart>
+          </ResponsiveContainer>
         </div>
       </div>
 
