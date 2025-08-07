@@ -7,6 +7,7 @@ const { submitApplication } = require('./routes/Applications');
 const { signUp, signIn, signOut } = require('./routes/auth');
 const { getSession } = require('./routes/session');
 const { getAccounts, createAccount, updateAccount, deleteAccount } = require('./routes/accounts');
+const { getRecruits, updateRecruit, deleteRecruit } = require('./routes/recruitment');
 
 const app = new Hono();
 
@@ -42,6 +43,11 @@ app.get('/api/accounts', getAccounts);
 app.post('/api/accounts', createAccount);
 app.put('/api/accounts/:id', updateAccount);
 app.delete('/api/accounts/:id', deleteAccount);
+
+// Recruitment routes
+app.get('/api/recruitment', getRecruits);
+app.put('/api/recruitment/:id', updateRecruit);
+app.delete('/api/recruitment/:id', deleteRecruit);
 
 const port = process.env.PORT || 3000;
 serve({ fetch: app.fetch, port }, () => {

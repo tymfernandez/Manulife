@@ -1,9 +1,4 @@
 import { useState, useEffect } from "react";
-import { createClient } from '@supabase/supabase-js';
-
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-const supabase = createClient(supabaseUrl, supabaseKey);
 
 const RecruitmentManagement = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -37,14 +32,12 @@ const RecruitmentManagement = () => {
 
   const fetchRecruits = async () => {
     try {
-      const { data, error } = await supabase
-        .from('recruitment')
-        .select('*')
-        .order('createdat', { ascending: false });
+      const response = await fetch('http://localhost:3000/api/recruitment');
+      const result = await response.json();
       
-      if (error) throw error;
+      if (!result.success) throw new Error(result.message);
       
-      const processedData = data.map(recruit => ({
+      const processedData = result.data.map(recruit => ({
         id: recruit.id,
         fullName: recruit.fullname,
         email: recruit.email,
@@ -174,18 +167,14 @@ const RecruitmentManagement = () => {
 
   const handleSave = async (id) => {
     try {
-      const { error } = await supabase
-        .from('recruitment')
-        .update({
-          fullname: editData.fullName,
-          email: editData.email,
-          priority: editData.position,
-          status: editData.status,
-          updatedat: new Date().toISOString()
-        })
-        .eq('id', id);
+      const response = await fetch(`http://localhost:3000/api/recruitment/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(editData)
+      });
+      const result = await response.json();
 
-      if (error) throw error;
+      if (!result.success) throw new Error(result.message);
 
       setRecruits(recruits.map(recruit => 
         recruit.id === id 
@@ -206,12 +195,12 @@ const RecruitmentManagement = () => {
 
   const handleDelete = async () => {
     try {
-      const { error } = await supabase
-        .from('recruitment')
-        .delete()
-        .eq('id', deleteId);
+      const response = await fetch(`http://localhost:3000/api/recruitment/${deleteId}`, {
+        method: 'DELETE'
+      });
+      const result = await response.json();
 
-      if (error) throw error;
+      if (!result.success) throw new Error(result.message);
 
       setRecruits(recruits.filter(recruit => recruit.id !== deleteId));
       setShowDeleteModal(false);

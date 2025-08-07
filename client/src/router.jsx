@@ -6,6 +6,7 @@ import Dashboard from "./Dashboard/dashboard";
 import Profile from "./Profile/profile";
 import ApplicationForm from "./ApplicationForm/applicationForm";
 import TestAccountManagement from "./testAccountManagement";
+import RecruitmentManagement from "./RecruitmentManagement/recruitmentManagement";
 
 const ProtectedRoute = () => {
   const { user, loading } = useAuth();
