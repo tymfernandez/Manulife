@@ -6,6 +6,7 @@ import Dashboard from "./Dashboard/dashboard";
 import Profile from "./Profile/profile";
 import ApplicationForm from "./ApplicationForm/applicationForm";
 import TestAccountManagement from "./testAccountManagement";
+import RecruitmentManagement from "./RecruitmentManagement/recruitmentManagement";
 
 const ProtectedRoute = () => {
   const { user, loading } = useAuth();
@@ -93,4 +94,14 @@ export const router = createBrowserRouter([
     path: "/test-accounts",
     element: <TestAccountManagement />,
   },
+  {
+   path: "/recruitment",
+    element: <ProtectedRoute />,
+    children: [
+      {
+        index: true,
+        element: <RecruitmentManagement />,
+      },
+    ],
+  }
 ]);

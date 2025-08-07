@@ -1,25 +1,25 @@
-import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "../../lib/AuthContext";
+import { useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+import { useAuth } from '../../lib/AuthContext'
 
 export default function SignUp() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const [message, setMessage] = useState("");
-  const { signUp } = useAuth();
-  const navigate = useNavigate();
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [error, setError] = useState('')
+  const [message, setMessage] = useState('')
+  const { signUp } = useAuth()
+  const navigate = useNavigate()
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    const { error } = await signUp(email, password);
+    e.preventDefault()
+    const { error } = await signUp(email, password)
     if (error) {
-      setError(error.message);
+      setError(error.message)
     } else {
-      setMessage("Check your email for confirmation link");
-      setTimeout(() => navigate("/signin"), 2000);
+      setMessage('Check your email for confirmation link')
+      setTimeout(() => navigate('/signin'), 2000)
     }
-  };
+  }
 
   return (
     <div className="min-h-screen bg-[#141414] flex items-center justify-center p-4">
@@ -52,12 +52,10 @@ export default function SignUp() {
           </button>
         </form>
         <p className="text-center mt-4">
-          Already have an account?{" "}
-          <Link to="/signin" className="text-[#0ce872] hover:underline">
-            Sign In
-          </Link>
+          Already have an account?{' '}
+          <Link to="/signin" className="text-[#0ce872] hover:underline">Sign In</Link>
         </p>
       </div>
     </div>
-  );
+  )
 }

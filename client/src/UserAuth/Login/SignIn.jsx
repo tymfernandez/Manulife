@@ -1,20 +1,20 @@
-import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "../../lib/authContext";
+import { useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+import { useAuth } from '../../lib/AuthContext'
 
 export default function SignIn() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const { signIn } = useAuth();
-  const navigate = useNavigate();
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [error, setError] = useState('')
+  const { signIn } = useAuth()
+  const navigate = useNavigate()
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    const { error } = await signIn(email, password);
-    if (error) setError(error.message);
-    else navigate("/dashboard");
-  };
+    e.preventDefault()
+    const { error } = await signIn(email, password)
+    if (error) setError(error.message)
+    else navigate('/dashboard')
+  }
 
   return (
     <div className="min-h-screen bg-[#141414] flex items-center justify-center p-4">
@@ -46,12 +46,9 @@ export default function SignIn() {
           </button>
         </form>
         <p className="text-center mt-4">
-          Don't have an account?{" "}
-          <Link to="/signup" className="text-[#0ce872] hover:underline">
-            Sign Up
-          </Link>
+          Don't have an account? <Link to="/signup" className="text-[#0ce872] hover:underline">Sign Up</Link>
         </p>
       </div>
     </div>
-  );
+  )
 }
