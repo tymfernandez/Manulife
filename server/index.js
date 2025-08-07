@@ -43,7 +43,7 @@ app.post('/api/accounts', createAccount);
 app.put('/api/accounts/:id', updateAccount);
 app.delete('/api/accounts/:id', deleteAccount);
 
-const port = process.env.PORT || 3001;
+const port = process.env.PORT || 3000;
 serve({ fetch: app.fetch, port }, () => {
   console.log(`Server running on port ${port}`);
 });
