@@ -1,70 +1,54 @@
-import { supabase } from '../lib/supabase';
+const API_BASE = 'http://localhost:3001/api';
 
 export const accountService = {
   // Get all accounts
   async getAccounts() {
-    const { data, error } = await supabase
-      .from('accounts')
-      .select('*')
-      .order('created_at', { ascending: false });
+    const response = await fetch(`${API_BASE}/accounts`);
+    const result = await response.json();
     
-    if (error) throw error;
-    return data;
+    if (!result.success) throw new Error(result.message);
+    return result.data;
   },
 
   // Create new account
   async createAccount(accountData) {
-    const { data, error } = await supabase
-      .from('accounts')
-      .insert([accountData])
-      .select();
+    const response = await fetch(`${API_BASE}/accounts`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(accountData)
+    });
+    const result = await response.json();
     
-    if (error) throw error;
-    return data[0];
+    if (!result.success) throw new Error(result.message);
+    return result.data;
   },
 
   // Update account
   async updateAccount(id, accountData) {
-    const { data, error } = await supabase
-      .from('accounts')
-      .update({ ...accountData, updated_at: new Date() })
-      .eq('id', id)
-      .select();
+    const response = await fetch(`${API_BASE}/accounts/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(accountData)
+    });
+    const result = await response.json();
     
-    if (error) throw error;
-    return data[0];
+    if (!result.success) throw new Error(result.message);
+    return result.data;
   },
 
   // Delete account
   async deleteAccount(id) {
-    const { error } = await supabase
-      .from('accounts')
-      .delete()
-      .eq('id', id);
+    const response = await fetch(`${API_BASE}/accounts/${id}`, {
+      method: 'DELETE'
+    });
+    const result = await response.json();
     
-    if (error) throw error;
+    if (!result.success) throw new Error(result.message);
     return true;
   },
 
-  // Search accounts
+  // Search accounts (handled by frontend filtering for now)
   async searchAccounts(searchTerm, roleFilter, statusFilter) {
-    let query = supabase.from('accounts').select('*');
-    
-    if (searchTerm) {
-      query = query.ilike('name', `%${searchTerm}%`);
-    }
-    
-    if (roleFilter) {
-      query = query.eq('role', roleFilter);
-    }
-    
-    if (statusFilter) {
-      query = query.eq('status', statusFilter);
-    }
-    
-    const { data, error } = await query.order('created_at', { ascending: false });
-    
-    if (error) throw error;
-    return data;
+    return this.getAccounts();
   }
 };

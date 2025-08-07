@@ -7,7 +7,9 @@ const AccountFilters = ({
   roleFilter, 
   setRoleFilter, 
   statusFilter, 
-  setStatusFilter 
+  setStatusFilter,
+  dateFilter,
+  setDateFilter
 }) => {
   return (
     <div className="flex flex-wrap gap-4 mb-6">
@@ -51,11 +53,19 @@ const AccountFilters = ({
       </div>
       
       <div className="relative">
-        <button className="flex items-center space-x-2 bg-white border border-gray-200 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent">
-          <Calendar className="w-4 h-4 text-gray-400" />
-          <span className="text-gray-600">Joined Date</span>
-          <ChevronDown className="w-4 h-4 text-gray-400" />
-        </button>
+        <select
+          value={dateFilter}
+          onChange={(e) => setDateFilter(e.target.value)}
+          className="appearance-none bg-white border border-gray-200 rounded-lg px-4 py-2 pr-8 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+        >
+          <option value="">All Time</option>
+          <option value="today">Today</option>
+          <option value="week">This Week</option>
+          <option value="month">This Month</option>
+          <option value="quarter">Last 3 Months</option>
+          <option value="year">This Year</option>
+        </select>
+        <ChevronDown className="w-4 h-4 text-gray-400 absolute right-2 top-1/2 transform -translate-y-1/2 pointer-events-none" />
       </div>
     </div>
   );

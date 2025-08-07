@@ -8,22 +8,50 @@ const AccountManagement = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [roleFilter, setRoleFilter] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
+  const [dateFilter, setDateFilter] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
-  const { accounts, loading, error, searchAccounts, deleteAccount } = useAccounts();
+  const { accounts, loading, error, fetchAccounts, deleteAccount } = useAccounts();
 
-  useEffect(() => {
-    const delayedSearch = setTimeout(() => {
-      searchAccounts(searchTerm, roleFilter, statusFilter);
-    }, 300);
+  // Filter accounts locally
+  const filteredAccounts = accounts.filter(account => {
+    const matchesSearch = account.name.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesRole = roleFilter === '' || account.role === roleFilter;
+    const matchesStatus = statusFilter === '' || account.status === statusFilter;
+    
+    let matchesDate = true;
+    if (dateFilter && account.joined_date) {
+      const joinedDate = new Date(account.joined_date);
+      const now = new Date();
+      
+      switch (dateFilter) {
+        case 'today':
+          matchesDate = joinedDate.toDateString() === now.toDateString();
+          break;
+        case 'week':
+          const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+          matchesDate = joinedDate >= weekAgo;
+          break;
+        case 'month':
+          matchesDate = joinedDate.getMonth() === now.getMonth() && joinedDate.getFullYear() === now.getFullYear();
+          break;
+        case 'quarter':
+          const threeMonthsAgo = new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000);
+          matchesDate = joinedDate >= threeMonthsAgo;
+          break;
+        case 'year':
+          matchesDate = joinedDate.getFullYear() === now.getFullYear();
+          break;
+      }
+    }
+    
+    return matchesSearch && matchesRole && matchesStatus && matchesDate;
+  });
 
-    return () => clearTimeout(delayedSearch);
-  }, [searchTerm, roleFilter, statusFilter]);
-
-  const totalPages = Math.ceil(accounts.length / itemsPerPage);
+  const totalPages = Math.ceil(filteredAccounts.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
-  const paginatedAccounts = accounts.slice(startIndex, startIndex + itemsPerPage);
+  const paginatedAccounts = filteredAccounts.slice(startIndex, startIndex + itemsPerPage);
 
   if (loading) {
     return (
@@ -66,6 +94,8 @@ const AccountManagement = () => {
         setRoleFilter={setRoleFilter}
         statusFilter={statusFilter}
         setStatusFilter={setStatusFilter}
+        dateFilter={dateFilter}
+        setDateFilter={setDateFilter}
       />
 
       <AccountTable accounts={paginatedAccounts} onDelete={deleteAccount} />
@@ -74,7 +104,7 @@ const AccountManagement = () => {
         currentPage={currentPage}
         setCurrentPage={setCurrentPage}
         totalPages={totalPages}
-        filteredCount={accounts.length}
+        filteredCount={filteredAccounts.length}
       />
     </div>
   );
