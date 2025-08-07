@@ -41,7 +41,7 @@ const Header = ({ onMenuClick, activeItem, setActiveItem }) => {
     { id: 'settings', label: 'Settings' }
   ];
   return (
-    <header className="bg-white border-b border-gray-200 px-6 py-4">
+    <header className="bg-white border-b border-gray-200 px-6 py-4 flex-shrink-0">
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
           <button
