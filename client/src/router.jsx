@@ -1,5 +1,5 @@
 import { createBrowserRouter, Navigate, Outlet } from "react-router-dom";
-import { useAuth } from "./lib/AuthContext";
+import { useAuth } from "./lib/authContext";
 import SignIn from "./UserAuth/Login/signIn";
 import SignUp from "./UserAuth/Signup/signUp";
 import Dashboard from "./Dashboard/dashboard";
@@ -38,7 +38,7 @@ const PublicRoute = () => {
 export const router = createBrowserRouter([
   {
     path: "/",
-    element: <Navigate to="/dashboard" replace />,
+    element: <Navigate to="/signin" replace />,
   },
   {
     path: "/signin",
