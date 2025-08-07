@@ -1,4 +1,5 @@
 import ApplicationForm from './ApplicationForm/applicationForm';
+<<<<<<< HEAD
 import Layout from './components/Layout';
 import Dashboard from './Dashboard/dashboard';
 
@@ -10,6 +11,14 @@ function App() {
   )
     <Layout>
       <Dashboard />
+=======
+
+function App() {
+  return (
+    <Layout>
+      <Dashboard />
+      <ApplicationForm />
+>>>>>>> main
     </Layout>
   );
 }

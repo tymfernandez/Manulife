@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import React, { useEffect, useState } from 'react'
 import { supabase } from '../supabaseClient'
 import { TrendingUp, TrendingDown } from 'lucide-react'
@@ -236,10 +237,48 @@ const Dashboard = () => {
           percentage={4} 
           isPositive={true}
         />
+=======
+import { useAuth } from '../lib/AuthContext'
+import { Link } from 'react-router-dom'
+
+export default function Dashboard() {
+  const { user, signOut } = useAuth()
+
+  return (
+    <div className="min-h-screen bg-[#141414] p-4">
+      <div className="flex justify-between items-center mb-8">
+        <h1 className="text-2xl font-bold text-white">Dashboard</h1>
+        <div className="flex items-center space-x-4">
+          <Link to="/profile" className="text-blue-400 hover:text-blue-300">
+            Profile
+          </Link>
+          <span className="text-white">Welcome, {user?.email}</span>
+
+          {/* This is the link to the application form for debugging purposes only*/}
+          <Link
+            to="/application-form"
+            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors"
+          >
+            Application Form
+          </Link>
+
+          <button
+            onClick={signOut}
+            className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition-colors"
+          >
+            Sign Out
+          </button>
+        </div>
+      </div>
+
+      <div className="flex flex-col items-center justify-center">
+        <p className="text-white text-xl">Welcome to Manulife!</p>
+>>>>>>> main
       </div>
     </div>
   )
 }
+<<<<<<< HEAD
 
 const SmallMetricCard = ({ title, value, percentage, isPositive }) => (
   <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-200">
@@ -280,3 +319,5 @@ const RoleCard = ({ title, value, percentage, isPositive }) => (
 )
 
 export default Dashboard
+=======
+>>>>>>> main
