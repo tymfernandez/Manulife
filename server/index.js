@@ -6,15 +6,22 @@ const supabase = require('./supabase');
 const { submitApplication } = require('./routes/Applications');
 const { signUp, signIn, signOut } = require('./routes/auth');
 const { getSession } = require('./routes/session');
+const { getAccounts, createAccount, updateAccount, deleteAccount } = require('./routes/accounts');
 
 const app = new Hono();
 
 // Enable CORS for client requests
 app.use('/*', cors({
-  origin: 'http://localhost:5174',
-  allowMethods: ['GET', 'POST', 'PUT', 'DELETE'],
-  allowHeaders: ['Content-Type'],
+  origin: '*',
+  allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowHeaders: ['Content-Type', 'Authorization'],
+  credentials: false
 }));
+
+// Handle preflight requests
+app.options('/*', (c) => {
+  return c.text('', 200);
+});
 
 app.get('/api', (c) => {
   return c.json({ message: 'RES Server is running!', supabase: 'connected' });
@@ -29,6 +36,12 @@ app.post('/api/auth/signup', signUp);
 app.post('/api/auth/signin', signIn);
 app.post('/api/auth/signout', signOut);
 app.get('/api/auth/session', getSession);
+
+// Account management routes
+app.get('/api/accounts', getAccounts);
+app.post('/api/accounts', createAccount);
+app.put('/api/accounts/:id', updateAccount);
+app.delete('/api/accounts/:id', deleteAccount);
 
 const port = process.env.PORT || 3000;
 serve({ fetch: app.fetch, port }, () => {

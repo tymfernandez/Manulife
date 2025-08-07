@@ -1,26 +1,43 @@
 import { createBrowserRouter, Navigate, Outlet } from "react-router-dom";
 import { useAuth } from "./lib/AuthContext";
-import SignIn from "./UserAuth/Login/SignIn";
-import SignUp from "./UserAuth/Signup/SignUp";
+import SignIn from "./UserAuth/Login/signIn";
+import SignUp from "./UserAuth/Signup/signUp";
 import Dashboard from "./Dashboard/dashboard";
-import Profile from "./Profile/Profile";
+import Profile from "./Profile/profile";
 import ApplicationForm from "./ApplicationForm/applicationForm";
-import RecruitmentManagement from "./RecruitmentManagement/recruitmentManagement";
+import TestAccountManagement from "./testAccountManagement";
 
 const ProtectedRoute = () => {
-  const { user } = useAuth();
-  return true ? <Outlet /> : <Navigate to="/signin" replace />;
+  const { user, loading } = useAuth();
+  console.log("ProtectedRoute:", { user, loading });
+
+  if (loading)
+    return (
+      <div className="min-h-screen bg-[#141414] flex items-center justify-center text-white">
+        Loading...
+      </div>
+    );
+
+  return user ? <Outlet /> : <Navigate to="/signin" />;
 };
 
 const PublicRoute = () => {
-  const { user } = useAuth();
-  return user ? <Navigate to="/dashboard" replace /> : <Outlet />;
+  const { user, loading } = useAuth();
+
+  if (loading)
+    return (
+      <div className="min-h-screen bg-[#141414] flex items-center justify-center text-white">
+        Loading...
+      </div>
+    );
+
+  return user ? <Navigate to="/dashboard" /> : <Outlet />;
 };
 
 export const router = createBrowserRouter([
   {
     path: "/",
-    element: <Navigate to="/recruitment" replace />,
+    element: <Navigate to="/dashboard" replace />,
   },
   {
     path: "/signin",
@@ -73,7 +90,11 @@ export const router = createBrowserRouter([
     ],
   },
   {
-    path: "/recruitment",
+    path: "/test-accounts",
+    element: <TestAccountManagement />,
+  },
+  {
+   path: "/recruitment",
     element: <ProtectedRoute />,
     children: [
       {
@@ -81,5 +102,5 @@ export const router = createBrowserRouter([
         element: <RecruitmentManagement />,
       },
     ],
-  },
+  }
 ]);

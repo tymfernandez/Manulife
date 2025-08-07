@@ -1,8 +1,16 @@
+<<<<<<< HEAD
 import { useAuth } from '../lib/AuthContext'
 import { Link } from 'react-router-dom'
 
 export default function Dashboard() {
   const { user, signOut } = useAuth()
+=======
+import { useAuth } from "../lib/authContext";
+import { Link } from "react-router-dom";
+
+export default function Dashboard() {
+  const { user, signOut } = useAuth();
+>>>>>>> recruitmentManagement
 
   return (
     <div className="min-h-screen bg-[#141414] p-4">
@@ -22,7 +30,10 @@ export default function Dashboard() {
             Application Form
           </Link>
 
+<<<<<<< HEAD
           
+=======
+>>>>>>> recruitmentManagement
           <button
             onClick={signOut}
             className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition-colors"
@@ -36,5 +47,9 @@ export default function Dashboard() {
         <p className="text-white text-xl">Welcome to Manulife!</p>
       </div>
     </div>
+<<<<<<< HEAD
   )
+=======
+  );
+>>>>>>> recruitmentManagement
 }
