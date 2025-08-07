@@ -12,7 +12,7 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const getSession = async () => {
       try {
-        const response = await fetch("http://localhost:3000/api/auth/session");
+        const response = await fetch('http://localhost:3000/api/auth/session');
         const result = await response.json();
         setUser(result.success && result.session ? result.session.user : null);
       } catch (error) {
@@ -27,55 +27,54 @@ export const AuthProvider = ({ children }) => {
 
   const signUp = async (email, password, additionalData = {}) => {
     try {
-      const response = await fetch("http://localhost:3000/api/auth/signup", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      const response = await fetch('http://localhost:3000/api/auth/signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           email,
           password,
-          fullName: additionalData.fullName || "",
-          contactNumber: additionalData.contactNumber || "",
-        }),
+          fullName: additionalData.fullName || '',
+          contactNumber: additionalData.contactNumber || ''
+        })
       });
-
+      
+      if (!response.ok) {
+        throw new Error(`Server error: ${response.status}`);
+      }
+      
       const result = await response.json();
-      return result.success
-        ? { data: result.data, error: null }
-        : { data: null, error: { message: result.message } };
+      return result.success ? { data: result.data, error: null } : { data: null, error: { message: result.message } };
     } catch (error) {
-      return {
-        data: null,
-        error: { message: "Network error. Please check your connection." },
-      };
+      return { data: null, error: { message: error.message } };
     }
   };
 
   const signIn = async (email, password) => {
     try {
-      const response = await fetch("http://localhost:3000/api/auth/signin", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+      const response = await fetch('http://localhost:3000/api/auth/signin', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
       });
-
-      const result = await response.json();
       
+      if (!response.ok) {
+        throw new Error(`Server error: ${response.status}`);
+      }
+      
+      const result = await response.json();
       if (result.success && result.data.user) {
         setUser(result.data.user);
         return { data: result.data, error: null };
       }
       return { data: null, error: { message: result.message } };
     } catch (error) {
-      return {
-        data: null,
-        error: { message: "Network error. Please check your connection." },
-      };
+      return { data: null, error: { message: error.message } };
     }
   };
   const signOut = async () => {
     try {
-      const response = await fetch("http://localhost:3000/api/auth/signout", {
-        method: "POST",
+      const response = await fetch('http://localhost:3000/api/auth/signout', {
+        method: 'POST'
       });
       const result = await response.json();
       if (result.success) {

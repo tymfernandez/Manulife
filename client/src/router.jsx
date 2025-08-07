@@ -93,4 +93,14 @@ export const router = createBrowserRouter([
     path: "/test-accounts",
     element: <TestAccountManagement />,
   },
+  {
+   path: "/recruitment",
+    element: <ProtectedRoute />,
+    children: [
+      {
+        index: true,
+        element: <RecruitmentManagement />,
+      },
+    ],
+  }
 ]);

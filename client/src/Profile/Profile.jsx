@@ -1,5 +1,9 @@
 import { useState } from "react";
+<<<<<<< HEAD
+import { useAuth } from "../lib/AuthContext";
+=======
 import { useAuth } from "../lib/authContext";
+>>>>>>> recruitmentManagement
 import { Link } from "react-router-dom";
 
 const Profile = () => {
