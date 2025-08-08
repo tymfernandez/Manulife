@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { Search, Bell, Menu, X, User, Settings, LogOut } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../lib/authContext";
-import Avatar from "./avatar";
+import Avatar from "./Avatar";
 import EagleLogo from "./eagleLogo";
 
 const Header = ({ onMenuClick, activeItem, setActiveItem }) => {

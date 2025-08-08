@@ -5,7 +5,7 @@ import SignUp from "./UserAuth/Signup/signUp";
 import Dashboard from "./Dashboard/dashboard";
 import Profile from "./Profile/profile";
 import ApplicationForm from "./ApplicationForm/applicationForm";
-import TestAccountManagement from "./testAccountManagement";
+import AccountManagement from "./AccountManagement/accountManagement";
 import RecruitmentManagement from "./RecruitmentManagement/recruitmentManagement";
 
 const ProtectedRoute = () => {
@@ -91,8 +91,14 @@ export const router = createBrowserRouter([
     ],
   },
   {
-    path: "/test-accounts",
-    element: <TestAccountManagement />,
+    path: "/account-management",
+    element: <ProtectedRoute />,
+    children: [
+      {
+        index: true,
+        element: <AccountManagement />,
+      },
+    ],
   },
   {
    path: "/recruitment",
@@ -101,6 +107,16 @@ export const router = createBrowserRouter([
       {
         index: true,
         element: <RecruitmentManagement />,
+      },
+    ],
+  },
+  {
+    path: "/settings",
+    element: <ProtectedRoute />,
+    children: [
+      {
+        index: true,
+        element: <div className="bg-gray-100 min-h-screen p-6"><h1 className="text-2xl font-semibold text-gray-900">Settings</h1><p className="text-gray-600 mt-2">This section is under development.</p></div>,
       },
     ],
   }
