@@ -23,7 +23,7 @@ const Sidebar = ({ activeItem, setActiveItem }) => {
   ];
 
   return (
-    <aside className={`${isCollapsed ? 'w-16' : 'w-64'} bg-emerald-800 text-white min-h-screen transition-all duration-300`}>
+    <aside className={`${isCollapsed ? 'w-16' : 'w-64'} bg-emerald-800 text-white h-screen flex-shrink-0 transition-all duration-300`}>
       <div className="p-6">
         {/* Logo Section - only show when expanded */}
         {!isCollapsed && (
