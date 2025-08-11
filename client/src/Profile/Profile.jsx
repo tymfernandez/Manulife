@@ -1,16 +1,20 @@
-import { useState } from "react";
-import { useAuth } from "../lib/AuthContext";
+import { useState, useEffect } from "react";
+import { useAuth } from "../lib/authContext";
 import { Link } from "react-router-dom";
 
 const Profile = () => {
   const { user, signOut } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
-    firstName: "Manny",
-    lastName: "Lyfe",
-    contactNumber: "+63 912 345 6789",
-    address: "Maitim na Kahoy, Mabalacat, Pampanga",
+    firstName: "",
+    lastName: "",
+    contactNumber: "",
+    address: "",
+    day: "",
+    month: "",
+    year: "",
   });
+  const [loading, setLoading] = useState(false);
 
   const handleInputChange = (e) => {
     setFormData({
@@ -19,10 +23,57 @@ const Profile = () => {
     });
   };
 
-  const handleSave = () => {
-    setIsEditing(false);
-    // TODO: Save to database
+  const handleSave = async () => {
+    setLoading(true);
+    try {
+      const dateOfBirth =
+        formData.day && formData.month && formData.year
+          ? `${formData.year}-${formData.month.padStart(
+              2,
+              "0"
+            )}-${formData.day.padStart(2, "0")}`
+          : null;
+
+      const response = await fetch("http://localhost:3000/api/auth/update-profile", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          first_name: formData.firstName,
+          last_name: formData.lastName,
+          contact_number: formData.contactNumber,
+          address: formData.address,
+          date_of_birth: dateOfBirth
+        })
+      });
+
+      const result = await response.json();
+      if (!result.success) throw new Error(result.message);
+      setIsEditing(false);
+    } catch (error) {
+      console.error("Error updating profile:", error);
+    } finally {
+      setLoading(false);
+    }
   };
+
+  useEffect(() => {
+    if (user?.user_metadata) {
+      const metadata = user.user_metadata;
+      const dob = metadata.date_of_birth
+        ? new Date(metadata.date_of_birth)
+        : null;
+
+      setFormData({
+        firstName: metadata.first_name || "",
+        lastName: metadata.last_name || "",
+        contactNumber: metadata.contact_number || "",
+        address: metadata.address || "",
+        day: dob ? dob.getDate().toString() : "",
+        month: dob ? (dob.getMonth() + 1).toString() : "",
+        year: dob ? dob.getFullYear().toString() : "",
+      });
+    }
+  }, [user]);
 
   return (
     <div className="min-h-screen bg-gray-50 p-4">
@@ -32,6 +83,31 @@ const Profile = () => {
           <Link to="/dashboard" className="text-blue-600 hover:text-blue-800">
             Dashboard
           </Link>
+
+          {!isEditing ? (
+            <button
+              onClick={() => setIsEditing(true)}
+              className="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600"
+            >
+              Edit
+            </button>
+          ) : (
+            <div className="flex space-x-2">
+              <button
+                onClick={handleSave}
+                disabled={loading}
+                className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 disabled:opacity-50"
+              >
+                {loading ? "Saving..." : "Save"}
+              </button>
+              <button
+                onClick={() => setIsEditing(false)}
+                className="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600"
+              >
+                Cancel
+              </button>
+            </div>
+          )}
 
           <button
             onClick={signOut}
@@ -142,30 +218,45 @@ const Profile = () => {
                   </label>
                   <div className="flex gap-2">
                     <select
+                      name="day"
+                      value={formData.day}
+                      onChange={handleInputChange}
                       className="w-1/3 border border-green-300 rounded-md px-2 py-2 bg-white"
                       disabled={!isEditing}
                     >
-                      <option>DD</option>
+                      <option value="">DD</option>
                       {[...Array(31)].map((_, i) => (
-                        <option key={i}>{i + 1}</option>
+                        <option key={i} value={i + 1}>
+                          {i + 1}
+                        </option>
                       ))}
                     </select>
                     <select
+                      name="month"
+                      value={formData.month}
+                      onChange={handleInputChange}
                       className="w-1/3 border border-green-300 rounded-md px-2 py-2 bg-white"
                       disabled={!isEditing}
                     >
-                      <option>MM</option>
+                      <option value="">MM</option>
                       {[...Array(12)].map((_, i) => (
-                        <option key={i}>{i + 1}</option>
+                        <option key={i} value={i + 1}>
+                          {i + 1}
+                        </option>
                       ))}
                     </select>
                     <select
+                      name="year"
+                      value={formData.year}
+                      onChange={handleInputChange}
                       className="w-1/3 border border-green-300 rounded-md px-2 py-2 bg-white"
                       disabled={!isEditing}
                     >
-                      <option>YYYY</option>
+                      <option value="">YYYY</option>
                       {[...Array(100)].map((_, i) => (
-                        <option key={i}>{2025 - i}</option>
+                        <option key={i} value={2025 - i}>
+                          {2025 - i}
+                        </option>
                       ))}
                     </select>
                   </div>

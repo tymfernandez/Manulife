@@ -1,8 +1,8 @@
 import { createBrowserRouter, Navigate, Outlet } from "react-router-dom";
 import { useAuth } from "./lib/authContext";
-import SignIn from "./UserAuth/Login/signIn";
+import SignIn from "./UserAuth/Login/SignIn";
 import SignUp from "./UserAuth/Signup/signUp";
-import Dashboard from "./Dashboard/dashboard";
+import Dashboard from "./Dashboard/Dashboard";
 import Profile from "./Profile/profile";
 import ApplicationForm from "./ApplicationForm/applicationForm";
 import TestAccountManagement from "./testAccountManagement";
@@ -95,7 +95,7 @@ export const router = createBrowserRouter([
     element: <TestAccountManagement />,
   },
   {
-   path: "/recruitment",
+    path: "/recruitment",
     element: <ProtectedRoute />,
     children: [
       {
@@ -103,5 +103,5 @@ export const router = createBrowserRouter([
         element: <RecruitmentManagement />,
       },
     ],
-  }
+  },
 ]);

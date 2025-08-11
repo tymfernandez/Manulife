@@ -104,4 +104,26 @@ const signOut = async (c) => {
   }
 };
 
-module.exports = { signUp, signIn, signOut };
+const updateProfile = async (c) => {
+  try {
+    const { first_name, last_name, contact_number, address, date_of_birth } = await c.req.json();
+    
+    const { data, error } = await supabase.auth.updateUser({
+      data: {
+        first_name,
+        last_name,
+        contact_number,
+        address,
+        date_of_birth
+      }
+    });
+    
+    if (error) throw error;
+    
+    return c.json({ success: true, data });
+  } catch (error) {
+    return c.json({ success: false, message: error.message }, 400);
+  }
+};
+
+module.exports = { signUp, signIn, signOut, updateProfile };

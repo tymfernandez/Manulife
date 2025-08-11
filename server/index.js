@@ -4,7 +4,7 @@ const { serve } = require('@hono/node-server');
 const { cors } = require('hono/cors');
 const supabase = require('./supabase');
 const { submitApplication } = require('./routes/Applications');
-const { signUp, signIn, signOut } = require('./routes/auth');
+const { signUp, signIn, signOut, updateProfile } = require('./routes/auth');
 const { getSession } = require('./routes/session');
 const { getAccounts, createAccount, updateAccount, deleteAccount } = require('./routes/accounts');
 const { getRecruits, updateRecruit, deleteRecruit } = require('./routes/recruitment');
@@ -36,6 +36,7 @@ app.post('/api/Applications', submitApplication);
 app.post('/api/auth/signup', signUp);
 app.post('/api/auth/signin', signIn);
 app.post('/api/auth/signout', signOut);
+app.post('/api/auth/update-profile', updateProfile);
 app.get('/api/auth/session', getSession);
 
 // Account management routes
