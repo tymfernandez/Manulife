@@ -14,6 +14,7 @@ import Header from "../components/Header";
 import SideBar from "../components/Sidebar";
 
 const Dashboard = () => {
+  const [activeItem, setActiveItem] = useState('dashboard');
   const [recruitsCounts, setRecruitsCounts] = useState({
     regionHead: 0,
     branchHead: 0,
@@ -158,9 +159,9 @@ const Dashboard = () => {
 
   return (
     <div className="flex h-screen bg-gray-50 overflow-hidden">
-      <SideBar />
+      <SideBar activeItem={activeItem} setActiveItem={setActiveItem} />
       <div className="flex-1 flex flex-col">
-        <Header />
+        <Header activeItem={activeItem} setActiveItem={setActiveItem} />
         <main className="flex-1 overflow-y-auto p-6">
           {/* Dashboard Header */}
           <div className="flex justify-between items-center mb-8">
