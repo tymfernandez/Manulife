@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 
 const ApplicationForm = () => {
+  const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
   const [formData, setFormData] = useState({
     fullName: "",
     emailAddress: "",
@@ -130,28 +131,29 @@ const ApplicationForm = () => {
         submitData.append("resume", resumeFile);
       }
 
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      const res = await fetch(`${API_BASE}/api/Applications`, {
+        method: 'POST',
+        body: submitData,
+      });
 
-      // Mock response - replace with actual API call
-      const mockSuccess = true;
+      const result = await res.json().catch(() => ({ success: false, message: 'Invalid server response' }));
 
-      if (mockSuccess) {
-        setIsSubmitted(true);
-        // Clear form data
-        setFormData({
-          fullName: "",
-          emailAddress: "",
-          contactNumber: "",
-          positionAppliedFor: "",
-          referralName: "",
-        });
-        setResumeFile(null);
-        setCompletedFields({});
-        setCurrentStep(1);
-      } else {
-        setMessage("Error: Please try again later");
+      if (!res.ok || !result.success) {
+        throw new Error(result.message || `Request failed with status ${res.status}`);
       }
+
+      setIsSubmitted(true);
+      // Clear form data
+      setFormData({
+        fullName: "",
+        emailAddress: "",
+        contactNumber: "",
+        positionAppliedFor: "",
+        referralName: "",
+      });
+      setResumeFile(null);
+      setCompletedFields({});
+      setCurrentStep(1);
     } catch (error) {
       setMessage(`Error: ${error.message}`);
     } finally {

@@ -1,4 +1,8 @@
-require('dotenv').config({ path: '../.env' });
+// Load environment variables from both project root and server folder (fallback)
+const path = require('path');
+const dotenv = require('dotenv');
+dotenv.config({ path: path.resolve(__dirname, '..', '.env') });
+dotenv.config({ path: path.resolve(__dirname, '.env') });
 const { Hono } = require('hono');
 const { serve } = require('@hono/node-server');
 const { cors } = require('hono/cors');
@@ -65,18 +69,27 @@ app.post('/api/test-migrate', (c) => {
 app.get('/api/debug', async (c) => {
   try {
     const { supabaseAdmin } = require('./supabase');
-    
+
+    const serviceKeyExists = !!process.env.SUPABASE_SERVICE_ROLE_KEY;
     console.log('Testing service role key...');
-    console.log('Service key exists:', !!process.env.SUPABASE_SERVICE_ROLE_KEY);
-    
-    // Check authenticated users
+    console.log('Service key exists:', serviceKeyExists);
+
+    if (!serviceKeyExists || !supabaseAdmin) {
+      return c.json({
+        success: false,
+        serviceKeyExists,
+        message: 'Service role key not configured. Admin-only operations are disabled.'
+      }, 400);
+    }
+
+    // Check authenticated users (requires service role key)
     const { data: authData, error: usersError } = await supabaseAdmin.auth.admin.listUsers();
-    
+
     console.log('Auth response:', { authData, usersError });
-    
-    return c.json({ 
-      success: true, 
-      serviceKeyExists: !!process.env.SUPABASE_SERVICE_ROLE_KEY,
+
+    return c.json({
+      success: true,
+      serviceKeyExists,
       users: authData?.users?.length || 0,
       usersError: usersError?.message || null,
       firstUser: authData?.users?.[0]?.email || null
