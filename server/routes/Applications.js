@@ -1,4 +1,4 @@
-const supabase = require('../supabase');
+const { supabase } = require('../supabase');
 
 const submitApplication = async (c) => {
   try {
