@@ -3,9 +3,9 @@ const { supabase } = require('../supabase');
 const getRecruits = async (c) => {
   try {
     const { data, error } = await supabase
-      .from('recruitment')
+      .from('Applications')
       .select('*')
-      .order('createdat', { ascending: false });
+      .order('created_at', { ascending: false });
     
     if (error) throw error;
     
@@ -21,20 +21,20 @@ const updateRecruit = async (c) => {
     const recruitData = await c.req.json();
     
     const { data, error } = await supabase
-      .from('recruitment')
+      .from('Applications')
       .update({
-        fullname: recruitData.fullName,
-        email: recruitData.email,
-        priority: recruitData.position,
+        full_name: recruitData.fullName,
+        email_address: recruitData.email,
+        position_applied_for: recruitData.position,
         status: recruitData.status,
-        updatedat: new Date().toISOString()
+        updated_at: new Date().toISOString()
       })
       .eq('id', id)
       .select();
     
     if (error) throw error;
     
-    return c.json({ success: true, data: data[0] });
+    return c.json({ success: true, data: data?.[0] || {} });
   } catch (error) {
     return c.json({ success: false, message: error.message }, 500);
   }
@@ -45,7 +45,7 @@ const deleteRecruit = async (c) => {
     const id = c.req.param('id');
     
     const { error } = await supabase
-      .from('recruitment')
+      .from('Applications')
       .delete()
       .eq('id', id);
     
@@ -57,4 +57,40 @@ const deleteRecruit = async (c) => {
   }
 };
 
-module.exports = { getRecruits, updateRecruit, deleteRecruit };
+const getRecruitsWithDetails = async (c) => {
+  try {
+    const { data, error } = await supabase
+      .from('Applications')
+      .select('*')
+      .order('created_at', { ascending: false });
+    
+    if (error) throw error;
+    
+    return c.json({ success: true, data });
+  } catch (error) {
+    return c.json({ success: false, message: error.message }, 500);
+  }
+};
+
+const getApplicationsWithRecruitment = async (c) => {
+  try {
+    const { data, error } = await supabase
+      .from('Applications')
+      .select('*')
+      .order('created_at', { ascending: false });
+    
+    if (error) throw error;
+    
+    return c.json({ success: true, data });
+  } catch (error) {
+    return c.json({ success: false, message: error.message }, 500);
+  }
+};
+
+module.exports = { 
+  getRecruits, 
+  updateRecruit, 
+  deleteRecruit, 
+  getRecruitsWithDetails, 
+  getApplicationsWithRecruitment 
+};

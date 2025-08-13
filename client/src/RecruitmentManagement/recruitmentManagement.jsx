@@ -1,4 +1,6 @@
 import { useState, useEffect } from "react";
+import Sidebar from '../components/Sidebar';
+import Header from '../components/Header';
 
 const RecruitmentManagement = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -19,8 +21,8 @@ const RecruitmentManagement = () => {
   const [sortField, setSortField] = useState(null);
   const [sortDirection, setSortDirection] = useState('asc');
 
-  const positions = ["Region Head", "Branch Leader", "Unit Head", "Financial Advisor"];
-  const statuses = ["Interview", "Life Champion Event", "Pending", "Approved", "Rejected"];
+  const positions = ["Branch Head", "Unit Head", "Unit Head Associate", "Financial Advisor"];
+  const statuses = ["Interview", "Life Champion Event", "Exam passed (Trad)", "Exam passed (VL)", "Jump Start Program (JSP)", "eRecruitment", "Tagged/Appointed"];
   const dateOptions = ["Last 7 days", "Last 30 days", "Last 90 days"];
   const rowOptions = [5, 10, 15, 20];
 
@@ -39,12 +41,13 @@ const RecruitmentManagement = () => {
       
       const processedData = result.data.map(recruit => ({
         id: recruit.id,
-        fullName: recruit.fullname,
-        email: recruit.email,
-        position: recruit.priority,
-        status: recruit.status,
-        date: recruit.createdat,
-        daysOld: Math.floor((new Date() - new Date(recruit.createdat)) / (1000 * 60 * 60 * 24))
+        fullName: recruit.full_name,
+        email: recruit.email_address,
+        position: recruit.position_applied_for,
+        status: recruit.status || recruit.application_status || 'Interview',
+        date: recruit.created_at,
+        daysOld: Math.floor((new Date() - new Date(recruit.created_at)) / (1000 * 60 * 60 * 24)),
+        resumeUrl: recruit.resume_url
       }));
       
       setRecruits(processedData);
@@ -170,7 +173,12 @@ const RecruitmentManagement = () => {
       const response = await fetch(`http://localhost:3000/api/recruitment/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(editData)
+        body: JSON.stringify({
+          fullName: editData.fullName,
+          email: editData.email,
+          position: editData.position,
+          status: editData.status
+        })
       });
       const result = await response.json();
 
@@ -247,6 +255,11 @@ const RecruitmentManagement = () => {
       bVal = new Date(bVal);
     }
     
+    if (typeof aVal === 'string') {
+      aVal = aVal.toLowerCase();
+      bVal = bVal.toLowerCase();
+    }
+    
     if (aVal < bVal) return sortDirection === 'asc' ? -1 : 1;
     if (aVal > bVal) return sortDirection === 'asc' ? 1 : -1;
     return 0;
@@ -269,30 +282,33 @@ const RecruitmentManagement = () => {
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
         </svg>
       </button>
-      {show && (
-        <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg">
-
-          {options.map((option) => (
-            <div
-              key={option}
-              className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer last:rounded-b-lg"
-              onClick={() => {
-                onChange(option);
-                setShow(false);
-              }}
-            >
-              {option}
-            </div>
-          ))}
-        </div>
-      )}
+      <div className={`absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg transition-all duration-200 origin-top ${show ? 'opacity-100 scale-y-100' : 'opacity-0 scale-y-0 pointer-events-none'}`}>
+        {options.map((option) => (
+          <div
+            key={option}
+            className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer last:rounded-b-lg"
+            onClick={() => {
+              onChange(option);
+              setShow(false);
+            }}
+          >
+            {option}
+          </div>
+        ))}
+      </div>
     </div>
   );
 
+  const [activeItem, setActiveItem] = useState('recruits');
+
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
-      <div className="max-w-7xl mx-auto">
-        <h1 className="text-2xl font-bold text-gray-800 mb-6">Recruitment Management</h1>
+    <div className="flex min-h-screen bg-white">
+      <Sidebar activeItem={activeItem} setActiveItem={setActiveItem} />
+      <div className="flex-1 flex flex-col">
+        <Header activeItem={activeItem} setActiveItem={setActiveItem} />
+        <div className="flex-1 p-6 bg-white">
+        <div className="max-w-7xl mx-auto">
+          <h1 className="text-2xl font-bold text-gray-800 mb-6">Recruitment Management</h1>
         
         <div className="mb-6 flex flex-wrap gap-4 items-center">
           <div className="relative flex-1 min-w-64">
@@ -326,37 +342,35 @@ const RecruitmentManagement = () => {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                 </svg>
               </button>
-              {showPositionDropdown && (
-                <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg">
+              <div className={`absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg transition-all duration-200 origin-top ${showPositionDropdown ? 'opacity-100 scale-y-100' : 'opacity-0 scale-y-0 pointer-events-none'}`}>
+                <div
+                  className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer rounded-t-lg"
+                  onClick={() => {
+                    setPositionFilter("Position");
+                    setShowPositionDropdown(false);
+                  }}
+                >
+                  Position
+                </div>
+                {positions.map((option) => (
                   <div
-                    className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer rounded-t-lg"
+                    key={option}
+                    className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer last:rounded-b-lg"
                     onClick={() => {
-                      setPositionFilter("Position");
+                      setPositionFilter(option);
                       setShowPositionDropdown(false);
                     }}
                   >
-                    Position
+                    {option}
                   </div>
-                  {positions.map((option) => (
-                    <div
-                      key={option}
-                      className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer last:rounded-b-lg"
-                      onClick={() => {
-                        setPositionFilter(option);
-                        setShowPositionDropdown(false);
-                      }}
-                    >
-                      {option}
-                    </div>
-                  ))}
-                </div>
-              )}
+                ))}
+              </div>
             </div>
             
             <div className="relative">
               <button
                 onClick={() => setShowStatusDropdown(!showStatusDropdown)}
-                className="flex items-center justify-between w-full px-4 py-2 text-sm bg-white border border-gray-300 rounded-full hover:bg-gray-50 focus:ring-2 focus:ring-blue-500"
+                className="flex items-center justify-between w-48 px-4 py-2 text-sm bg-white border border-gray-300 rounded-full hover:bg-gray-50 focus:ring-2 focus:ring-blue-500"
               >
                 <div className="flex items-center gap-2">
                   <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -370,31 +384,29 @@ const RecruitmentManagement = () => {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                 </svg>
               </button>
-              {showStatusDropdown && (
-                <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg">
+              <div className={`absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg transition-all duration-200 origin-top ${showStatusDropdown ? 'opacity-100 scale-y-100' : 'opacity-0 scale-y-0 pointer-events-none'}`}>
+                <div
+                  className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer rounded-t-lg"
+                  onClick={() => {
+                    setStatusFilter("Status");
+                    setShowStatusDropdown(false);
+                  }}
+                >
+                  Status
+                </div>
+                {statuses.map((option) => (
                   <div
-                    className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer rounded-t-lg"
+                    key={option}
+                    className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer last:rounded-b-lg"
                     onClick={() => {
-                      setStatusFilter("Status");
+                      setStatusFilter(option);
                       setShowStatusDropdown(false);
                     }}
                   >
-                    Status
+                    {option}
                   </div>
-                  {statuses.map((option) => (
-                    <div
-                      key={option}
-                      className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer last:rounded-b-lg"
-                      onClick={() => {
-                        setStatusFilter(option);
-                        setShowStatusDropdown(false);
-                      }}
-                    >
-                      {option}
-                    </div>
-                  ))}
-                </div>
-              )}
+                ))}
+              </div>
             </div>
             
             <div className="relative">
@@ -414,38 +426,36 @@ const RecruitmentManagement = () => {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                 </svg>
               </button>
-              {showDateDropdown && (
-                <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg">
+              <div className={`absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg transition-all duration-200 origin-top ${showDateDropdown ? 'opacity-100 scale-y-100' : 'opacity-0 scale-y-0 pointer-events-none'}`}>
+                <div
+                  className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer rounded-t-lg"
+                  onClick={() => {
+                    setDateFilter("Date");
+                    setShowDateDropdown(false);
+                  }}
+                >
+                  Date
+                </div>
+                {dateOptions.map((option) => (
                   <div
-                    className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer rounded-t-lg"
+                    key={option}
+                    className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer last:rounded-b-lg"
                     onClick={() => {
-                      setDateFilter("Date");
+                      setDateFilter(option);
                       setShowDateDropdown(false);
                     }}
                   >
-                    Date
+                    {option}
                   </div>
-                  {dateOptions.map((option) => (
-                    <div
-                      key={option}
-                      className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer last:rounded-b-lg"
-                      onClick={() => {
-                        setDateFilter(option);
-                        setShowDateDropdown(false);
-                      }}
-                    >
-                      {option}
-                    </div>
-                  ))}
-                </div>
-              )}
+                ))}
+              </div>
             </div>
           </div>
         </div>
 
-        <div className="bg-white shadow overflow-hidden">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead style={{backgroundColor: '#222653'}}>
+        <div className="bg-white shadow overflow-x-auto">
+          <table className="min-w-full divide-y divide-gray-200 table-fixed">
+            <thead className="bg-emerald-800">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase cursor-pointer hover:bg-opacity-80" onClick={() => handleSort('fullName')}>
                   <div className="flex items-center gap-1">
@@ -486,7 +496,7 @@ const RecruitmentManagement = () => {
                     </div>
                   </div>
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase cursor-pointer hover:bg-opacity-80" onClick={() => handleSort('status')}>
+                <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase cursor-pointer hover:bg-opacity-80" style={{width: '200px'}} onClick={() => handleSort('status')}>
                   <div className="flex items-center gap-1">
                     Status
                     <div className="flex flex-col">
@@ -525,6 +535,7 @@ const RecruitmentManagement = () => {
                     </div>
                   </div>
                 </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase">File</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase">Actions</th>
               </tr>
             </thead>
@@ -570,23 +581,34 @@ const RecruitmentManagement = () => {
                       recruit.position
                     )}
                   </td>
-                  <td className="px-6 py-4 text-sm text-gray-900">
+                  <td className="px-6 py-4 text-sm text-gray-900" style={{width: '200px'}}>
                     {editingId === recruit.id ? (
                       <select
                         value={editData.status}
                         onChange={(e) => setEditData({...editData, status: e.target.value})}
-                        className="w-full px-2 py-1 border border-gray-300 rounded"
+                        className="w-full px-2 py-1 border border-gray-300 rounded text-xs overflow-hidden"
                       >
                         {statuses.map(status => (
                           <option key={status} value={status}>{status}</option>
                         ))}
                       </select>
                     ) : (
-                      recruit.status
+                      <span className="text-xs truncate block">{recruit.status}</span>
                     )}
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-500">{formatDate(recruit.date)}</td>
                   <td className="px-6 py-4 text-sm text-gray-500">{recruit.daysOld} days</td>
+                  <td className="px-6 py-4 text-sm text-gray-500">
+                    {recruit.resumeUrl ? (
+                      <a href={recruit.resumeUrl} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800">
+                        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clipRule="evenodd" />
+                        </svg>
+                      </a>
+                    ) : (
+                      <span className="text-gray-400">-</span>
+                    )}
+                  </td>
                   <td className="px-6 py-4 text-sm font-medium">
                     {editingId === recruit.id ? (
                       <div className="flex space-x-2">
@@ -672,7 +694,7 @@ const RecruitmentManagement = () => {
                       ? 'text-white'
                       : 'border border-gray-300 hover:bg-gray-50'
                   }`}
-                  style={currentPage === page ? {backgroundColor: '#222653'} : {}}
+                  style={currentPage === page ? {backgroundColor: '#065f46'} : {}}
                 >
                   {page}
                 </button>
@@ -687,6 +709,8 @@ const RecruitmentManagement = () => {
               </button>
             </div>
           </div>
+          </div>
+        </div>
         </div>
       </div>
 

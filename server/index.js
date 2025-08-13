@@ -14,6 +14,7 @@ const { getAccounts, createAccount, updateAccount, deleteAccount } = require('./
 const { getRecruits, updateRecruit, deleteRecruit, getRecruitsWithDetails, getApplicationsWithRecruitment } = require('./routes/recruitment');
 // const { migrateUsersToAccounts } = require('./routes/migration');
 
+
 const app = new Hono();
 
 // Enable CORS for client requests
@@ -51,6 +52,8 @@ app.delete('/api/accounts/:id', deleteAccount);
 
 // Recruitment routes
 app.get('/api/recruitment', getRecruits);
+app.get('/api/recruitment/details', getRecruitsWithDetails);
+app.get('/api/applications/recruitment', getApplicationsWithRecruitment);
 app.put('/api/recruitment/:id', updateRecruit);
 app.delete('/api/recruitment/:id', deleteRecruit);
 
