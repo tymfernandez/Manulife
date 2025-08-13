@@ -1,11 +1,19 @@
-import { FiHome, FiUsers, FiUser, FiFileText } from 'react-icons/fi';
+import {
+  FiHome,
+  FiUsers,
+  FiUser,
+  FiFileText,
+  FiSettings,
+} from "react-icons/fi";
 
 const Sidebar = ({ activeTab, setActiveTab }) => {
   const menuItems = [
-    { id: 'dashboard', icon: FiHome, label: 'Dashboard' },
-    { id: 'recruits', icon: FiUsers, label: 'Recruits' },
-    { id: 'users', icon: FiUser, label: 'Users' },
-    { id: 'logs', icon: FiFileText, label: 'Logs' },
+    { id: "dashboard", icon: FiHome, label: "Dashboard" },
+    { id: "recruits", icon: FiUsers, label: "Recruits" },
+    { id: "users", icon: FiUser, label: "Users" },
+    { id: "logs", icon: FiFileText, label: "Logs" },
+    { id: "profile", icon: FiUser, label: "Profile" },
+    { id: "settings", icon: FiSettings, label: "Settings" },
   ];
 
   return (
@@ -18,9 +26,9 @@ const Sidebar = ({ activeTab, setActiveTab }) => {
               key={item.id}
               onClick={() => setActiveTab(item.id)}
               className={`flex items-center px-6 py-3 cursor-pointer transition-colors ${
-                activeTab === item.id 
-                  ? 'bg-green-600 border-r-2 border-green-400' 
-                  : 'hover:bg-slate-600'
+                activeTab === item.id
+                  ? "bg-green-600 border-r-2 border-green-400"
+                  : "hover:bg-slate-600"
               }`}
             >
               <Icon className="w-5 h-5" />

@@ -11,11 +11,12 @@ const Header = ({ onMenuClick, activeItem, setActiveItem }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [userProfile, setUserProfile] = useState({ firstName: "", lastName: "", email: "" });
 
   const notificationRef = useRef(null);
   const profileRef = useRef(null);
   const navigate = useNavigate();
-  const { signOut } = useAuth();
+  const { signOut, user } = useAuth();
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -33,6 +34,42 @@ const Header = ({ onMenuClick, activeItem, setActiveItem }) => {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      try {
+        const response = await fetch("http://localhost:3000/api/auth/profile", {
+          credentials: "include",
+        });
+        const result = await response.json();
+
+        if (result.success && result.data) {
+          setUserProfile({
+            firstName: result.data.first_name || "",
+            lastName: result.data.last_name || "",
+            email: user?.email || "",
+          });
+        } else {
+          setUserProfile({
+            firstName: "",
+            lastName: "",
+            email: user?.email || "",
+          });
+        }
+      } catch (error) {
+        console.error("Error fetching user profile:", error);
+        setUserProfile({
+          firstName: "",
+          lastName: "",
+          email: user?.email || "",
+        });
+      }
+    };
+
+    if (user) {
+      fetchUserProfile();
+    }
+  }, [user]);
 
   const notifications = [
     {
@@ -195,7 +232,7 @@ const Header = ({ onMenuClick, activeItem, setActiveItem }) => {
               onClick={() => setIsProfileOpen(!isProfileOpen)}
               className="flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-100 transition-colors"
             >
-              <Avatar name="User Name" className="w-8 h-8" />
+              <Avatar name={userProfile.firstName && userProfile.lastName ? `${userProfile.firstName} ${userProfile.lastName}` : userProfile.email?.split('@')[0] || "User"} className="w-8 h-8" />
               <span className="w-2 h-2 bg-emerald-500 rounded-full"></span>
             </button>
 
@@ -204,13 +241,15 @@ const Header = ({ onMenuClick, activeItem, setActiveItem }) => {
               <div className="absolute top-full right-0 mt-2 w-64 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
                 <div className="p-4 border-b border-gray-200">
                   <div className="flex items-center space-x-3">
-                    <Avatar name="User Name" className="w-12 h-12" />
+                    <Avatar name={userProfile.firstName && userProfile.lastName ? `${userProfile.firstName} ${userProfile.lastName}` : userProfile.email?.split('@')[0] || "User"} className="w-12 h-12" />
                     <div>
                       <div className="font-semibold text-gray-900">
-                        John Doe
+                        {userProfile.firstName && userProfile.lastName 
+                          ? `${userProfile.firstName} ${userProfile.lastName}` 
+                          : userProfile.email?.split('@')[0] || "User"}
                       </div>
                       <div className="text-sm text-gray-600">
-                        john.doe@royaleagles.com
+                        {userProfile.email}
                       </div>
                       <div className="text-xs text-emerald-600 mt-1">
                         ● Online
@@ -219,7 +258,13 @@ const Header = ({ onMenuClick, activeItem, setActiveItem }) => {
                   </div>
                 </div>
                 <div className="py-2">
-                  <button className="w-full flex items-center space-x-3 px-4 py-2 text-left hover:bg-gray-50 transition-colors">
+                  <button 
+                    onClick={() => {
+                      navigate('/profile');
+                      setIsProfileOpen(false);
+                    }}
+                    className="w-full flex items-center space-x-3 px-4 py-2 text-left hover:bg-gray-50 transition-colors"
+                  >
                     <User className="w-4 h-4 text-gray-500" />
                     <span className="text-gray-700">View Profile</span>
                   </button>
