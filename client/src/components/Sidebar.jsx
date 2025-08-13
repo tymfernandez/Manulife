@@ -7,7 +7,8 @@ import {
   FileText,
   Settings,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Activity
 } from 'lucide-react';
 
 const Sidebar = ({ activeItem, setActiveItem }) => {
@@ -18,6 +19,7 @@ const Sidebar = ({ activeItem, setActiveItem }) => {
     { id: 'dashboard', icon: BarChart3, label: 'Dashboard', path: '/dashboard' },
     { id: 'recruits', icon: UserCheck, label: 'Recruits', path: '/recruitment' },
     { id: 'accounts', icon: Users, label: 'Accounts', path: '/account-management' },
+    { id: 'activity-logs', icon: Activity, label: 'Activity Logs', path: '/activity-logs' },
     { id: 'profile', icon: UserCheck, label: 'Profile', path: '/profile' },
     { id: 'settings', icon: Settings, label: 'Settings', path: '/settings' },
   ];

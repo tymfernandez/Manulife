@@ -1,3 +1,5 @@
+import { logCreate, logEdit, logDelete, logView } from '../utils/activityLogger';
+
 const API_BASE = 'http://localhost:3000/api';
 
 export const accountService = {
@@ -11,6 +13,8 @@ export const accountService = {
       const result = await response.json();
       
       if (!result.success) throw new Error(result.message);
+      // Log view activity
+      logView('accounts');
       return result.data || [];
     } catch (error) {
       if (error.name === 'TypeError' && error.message.includes('fetch')) {
@@ -30,6 +34,8 @@ export const accountService = {
     const result = await response.json();
     
     if (!result.success) throw new Error(result.message);
+    // Log create activity
+    logCreate('account');
     return result.data;
   },
 
@@ -43,6 +49,8 @@ export const accountService = {
     const result = await response.json();
     
     if (!result.success) throw new Error(result.message);
+    // Log edit activity
+    logEdit('account', id);
     return result.data;
   },
 
@@ -54,6 +62,8 @@ export const accountService = {
     const result = await response.json();
     
     if (!result.success) throw new Error(result.message);
+    // Log delete activity
+    logDelete('account', id);
     return true;
   },
 

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { supabase } from "../supabaseClient";
 import { TrendingUp, TrendingDown } from "lucide-react";
+import { logView, logExport } from "../utils/activityLogger";
 import {
   LineChart,
   Line,
@@ -36,6 +37,9 @@ const Dashboard = () => {
 
   // UseEffect hook to fetch data from Applications table
   useEffect(() => {
+    // Log dashboard view
+    logView('dashboard');
+    
     const fetchApplicationsData = async () => {
       try {
         // Fetch total applications count
@@ -166,7 +170,10 @@ const Dashboard = () => {
           {/* Dashboard Header */}
           <div className="flex justify-between items-center mb-8">
             <h1 className="text-3xl font-bold text-green-800">DASHBOARD</h1>
-            <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+            <button 
+              onClick={() => logExport('dashboard-data')}
+              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+            >
               Export
             </button>
           </div>

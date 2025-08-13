@@ -12,6 +12,7 @@ const { signUp, signIn, signOut } = require('./routes/auth');
 const { getSession } = require('./routes/session');
 const { getAccounts, createAccount, updateAccount, deleteAccount } = require('./routes/accounts');
 const { getRecruits, updateRecruit, deleteRecruit, getRecruitsWithDetails, getApplicationsWithRecruitment } = require('./routes/recruitment');
+const { getActivityLogs, createActivityLog, deleteActivityLog, exportActivityLogs } = require('./routes/activityLogs');
 // const { migrateUsersToAccounts } = require('./routes/migration');
 
 
@@ -56,6 +57,12 @@ app.get('/api/recruitment/details', getRecruitsWithDetails);
 app.get('/api/applications/recruitment', getApplicationsWithRecruitment);
 app.put('/api/recruitment/:id', updateRecruit);
 app.delete('/api/recruitment/:id', deleteRecruit);
+
+// Activity logs routes
+app.get('/api/activity-logs', getActivityLogs);
+app.post('/api/activity-logs', createActivityLog);
+app.delete('/api/activity-logs/:id', deleteActivityLog);
+app.get('/api/activity-logs/export', exportActivityLogs);
 
 // Migration route
 // app.post('/api/migrate-users', migrateUsersToAccounts);

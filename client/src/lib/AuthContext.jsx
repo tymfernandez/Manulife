@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useState } from "react";
+import { logLogin, logLogout } from "../utils/activityLogger";
 
 const AuthContext = createContext();
 
@@ -66,6 +67,8 @@ export const AuthProvider = ({ children }) => {
       const result = await response.json();
       if (result.success && result.data.user) {
         setUser(result.data.user);
+        // Log login activity
+        logLogin(result.data.user);
         return { data: result.data, error: null };
       }
       return { data: null, error: { message: result.message } };
@@ -80,6 +83,8 @@ export const AuthProvider = ({ children }) => {
       });
       const result = await response.json();
       if (result.success) {
+        // Log logout activity before clearing user
+        if (user) logLogout(user);
         setUser(null);
         return { error: null };
       }

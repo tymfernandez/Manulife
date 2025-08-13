@@ -7,6 +7,7 @@ import Profile from "./Profile/profile";
 import ApplicationForm from "./ApplicationForm/applicationForm";
 import AccountManagement from "./AccountManagement/accountManagement";
 import RecruitmentManagement from "./RecruitmentManagement/recruitmentManagement";
+import ActivityLogs from "./ActivityLogs/activityLogs";
 
 const ProtectedRoute = () => {
   const { user, loading } = useAuth();
@@ -107,6 +108,16 @@ export const router = createBrowserRouter([
       {
         index: true,
         element: <RecruitmentManagement />,
+      },
+    ],
+  },
+  {
+    path: "/activity-logs",
+    element: <ProtectedRoute />,
+    children: [
+      {
+        index: true,
+        element: <ActivityLogs />,
       },
     ],
   },
