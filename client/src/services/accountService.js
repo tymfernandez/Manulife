@@ -3,11 +3,21 @@ const API_BASE = 'http://localhost:3000/api';
 export const accountService = {
   // Get all accounts
   async getAccounts() {
-    const response = await fetch(`${API_BASE}/accounts`);
-    const result = await response.json();
-    
-    if (!result.success) throw new Error(result.message);
-    return result.data;
+    try {
+      const response = await fetch(`${API_BASE}/accounts`);
+      if (!response.ok) {
+        throw new Error(`Server error: ${response.status}`);
+      }
+      const result = await response.json();
+      
+      if (!result.success) throw new Error(result.message);
+      return result.data || [];
+    } catch (error) {
+      if (error.name === 'TypeError' && error.message.includes('fetch')) {
+        throw new Error('Cannot connect to server. Please ensure the server is running.');
+      }
+      throw error;
+    }
   },
 
   // Create new account
@@ -23,12 +33,12 @@ export const accountService = {
     return result.data;
   },
 
-  // Update account
-  async updateAccount(id, accountData) {
+  // Update account role
+  async updateAccount(id, role) {
     const response = await fetch(`${API_BASE}/accounts/${id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(accountData)
+      body: JSON.stringify({ role })
     });
     const result = await response.json();
     
@@ -45,6 +55,11 @@ export const accountService = {
     
     if (!result.success) throw new Error(result.message);
     return true;
+  },
+
+  // Update account role
+  async updateRole(id, role) {
+    return this.updateAccount(id, role);
   },
 
   // Search accounts (handled by frontend filtering for now)

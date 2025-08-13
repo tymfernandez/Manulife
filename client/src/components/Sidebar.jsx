@@ -17,13 +17,13 @@ const Sidebar = ({ activeItem, setActiveItem }) => {
   const menuItems = [
     { id: 'dashboard', icon: BarChart3, label: 'Dashboard', path: '/dashboard' },
     { id: 'recruits', icon: UserCheck, label: 'Recruits', path: '/recruitment' },
-    { id: 'accounts', icon: Users, label: 'Accounts', path: '/test-accounts' },
+    { id: 'accounts', icon: Users, label: 'Accounts', path: '/account-management' },
     { id: 'profile', icon: UserCheck, label: 'Profile', path: '/profile' },
     { id: 'settings', icon: Settings, label: 'Settings', path: '/settings' },
   ];
 
   return (
-    <aside className={`${isCollapsed ? 'w-16' : 'w-64'} bg-emerald-800 text-white min-h-screen transition-all duration-300`}>
+    <aside className={`${isCollapsed ? 'w-16' : 'w-64'} bg-emerald-800 text-white h-screen flex-shrink-0 transition-all duration-300`}>
       <div className="p-6">
         {/* Logo Section - only show when expanded */}
         {!isCollapsed && (

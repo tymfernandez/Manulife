@@ -16,22 +16,19 @@ export default function SignIn() {
   // Carousel content
   const slides = [
     {
-      image:
-        "https://images.unsplash.com/photo-1560472354-b33ff0c44a43?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1926&q=80",
+      image: "/Carousel01.JPG",
       title: "Decisions made easier. Lives made better",
       description:
         "For your security — Sign in via your email password, your passcode, PIN, or Touch ID where available.",
     },
     {
-      image:
-        "https://images.unsplash.com/photo-1559526324-4b87b5e36e44?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1742&q=80",
+      image: "/Carousel03.JPG",
       title: "Secure your future today",
       description:
         "Advanced security measures to protect your financial information and personal data.",
     },
     {
-      image:
-        "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1888&q=80",
+      image: "/Carousel02.JPG",
       title: "Your financial partner",
       description:
         "Comprehensive solutions tailored to your unique needs and goals.",
@@ -54,9 +51,9 @@ export default function SignIn() {
   };
 
   return (
-    <div className="min-h-screen flex">
+    <div className="min-h-screen flex p-20">
       {/* Left side - Form */}
-      <div className="flex-1 bg-gray-50 flex items-center justify-center p-8">
+      <div className="flex-1 bg-gray-50 flex items-center justify-center p-8 rounded-l-2xl shadow-2xl">
         <div className="w-full max-w-md">
           {/* Header */}
           <div className="text-center mb-8">
@@ -169,7 +166,7 @@ export default function SignIn() {
       </div>
 
       {/* Right side - Carousel */}
-      <div className="flex-1 relative overflow-hidden">
+      <div className="flex-1 relative overflow-hidden rounded-r-2xl shadow-2xl">
         {/* Manulife logo */}
         <div className="absolute top-6 right-6 z-10">
           <div className="bg-green-600 text-white px-3 py-1 rounded text-sm font-medium flex items-center">
@@ -191,6 +188,11 @@ export default function SignIn() {
                 src={slide.image}
                 alt={slide.title}
                 className="w-full h-full object-cover"
+                onError={(e) => {
+                  console.error("Image failed to load:", slide.image);
+                  e.target.style.display = "none";
+                }}
+                onLoad={() => console.log("Image loaded:", slide.image)}
               />
               <div className="absolute inset-0 bg-black bg-opacity-40"></div>
             </div>

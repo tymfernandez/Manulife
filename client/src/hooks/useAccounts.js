@@ -10,10 +10,12 @@ export const useAccounts = () => {
     try {
       setLoading(true);
       const data = await accountService.getAccounts();
-      setAccounts(data);
+      setAccounts(data || []);
       setError(null);
     } catch (err) {
-      setError(err.message);
+      console.error('Failed to fetch accounts:', err);
+      setError(err.message || 'Failed to connect to server');
+      setAccounts([]);
     } finally {
       setLoading(false);
     }
