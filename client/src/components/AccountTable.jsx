@@ -1,9 +1,28 @@
-import React from 'react';
-import { Trash2 } from 'lucide-react';
-import Avatar from './avatar';
+import React, { useState } from 'react';
+import { Trash2, Edit3, Check, X } from 'lucide-react';
+import Avatar from './Avatar';
 import { getStatusColor, formatDate, formatRelativeTime } from '../utils/helpers';
 
-const AccountTable = ({ accounts, onDelete }) => {
+const AccountTable = ({ accounts, onDelete, onUpdateRole }) => {
+  const [editingRole, setEditingRole] = useState(null);
+  const [selectedRole, setSelectedRole] = useState('');
+  
+  const roles = ['Financial Adviser', 'Unit Head', 'Branch Leader', 'Region Head', 'Admin'];
+  
+  const handleRoleEdit = (accountId, currentRole) => {
+    setEditingRole(accountId);
+    setSelectedRole(currentRole);
+  };
+  
+  const handleRoleSave = async (accountId) => {
+    await onUpdateRole(accountId, selectedRole);
+    setEditingRole(null);
+  };
+  
+  const handleRoleCancel = () => {
+    setEditingRole(null);
+    setSelectedRole('');
+  };
   return (
     <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
       <div className="overflow-x-auto">
@@ -28,7 +47,34 @@ const AccountTable = ({ accounts, onDelete }) => {
                     <span className="font-medium text-gray-900">{account.name}</span>
                   </div>
                 </td>
-                <td className="py-4 px-6 text-gray-600">{account.role}</td>
+                <td className="py-4 px-6">
+                  {editingRole === account.id ? (
+                    <div className="flex items-center space-x-2">
+                      <select 
+                        value={selectedRole} 
+                        onChange={(e) => setSelectedRole(e.target.value)}
+                        className="text-sm border border-gray-300 rounded px-2 py-1"
+                      >
+                        {roles.map(role => (
+                          <option key={role} value={role}>{role}</option>
+                        ))}
+                      </select>
+                      <button onClick={() => handleRoleSave(account.id)} className="text-green-600 hover:text-green-800">
+                        <Check className="w-4 h-4" />
+                      </button>
+                      <button onClick={handleRoleCancel} className="text-red-600 hover:text-red-800">
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="flex items-center space-x-2">
+                      <span className="text-gray-600">{account.role}</span>
+                      <button onClick={() => handleRoleEdit(account.id, account.role)} className="text-gray-400 hover:text-blue-600">
+                        <Edit3 className="w-3 h-3" />
+                      </button>
+                    </div>
+                  )}
+                </td>
                 <td className="py-4 px-6 text-gray-600">{account.email}</td>
                 <td className="py-4 px-6 text-gray-600">{formatRelativeTime(account.last_online)}</td>
                 <td className="py-4 px-6 text-gray-600">{formatDate(account.joined_date)}</td>

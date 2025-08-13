@@ -1,7 +1,10 @@
-const supabase = require('../supabase');
+const { supabase } = require('../supabase');
 
 const submitApplication = async (c) => {
   try {
+    if (!supabase) {
+      return c.json({ success: false, message: 'Server misconfiguration: Supabase is not initialized. Check SUPABASE_URL and SUPABASE_ANON_KEY.' }, 500);
+    }
     const formData = await c.req.formData();
     
     const applicationData = {

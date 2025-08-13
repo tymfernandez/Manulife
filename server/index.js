@@ -1,13 +1,20 @@
-require('dotenv').config();
+// Load environment variables from both project root and server folder (fallback)
+const path = require('path');
+const dotenv = require('dotenv');
+dotenv.config({ path: path.resolve(__dirname, '..', '.env') });
+dotenv.config({ path: path.resolve(__dirname, '.env') });
 const { Hono } = require('hono');
 const { serve } = require('@hono/node-server');
 const { cors } = require('hono/cors');
-const supabase = require('./supabase');
+const { supabase } = require('./supabase');
 const { submitApplication } = require('./routes/Applications');
 const { signUp, signIn, signOut, updateProfile } = require('./routes/auth');
 const { getSession } = require('./routes/session');
 const { getAccounts, createAccount, updateAccount, deleteAccount } = require('./routes/accounts');
-const { getRecruits, updateRecruit, deleteRecruit } = require('./routes/recruitment');
+const { getRecruits, updateRecruit, deleteRecruit, getRecruitsWithDetails, getApplicationsWithRecruitment } = require('./routes/recruitment');
+const { getActivityLogs, createActivityLog, deleteActivityLog, exportActivityLogs } = require('./routes/activityLogs');
+// const { migrateUsersToAccounts } = require('./routes/migration');
+
 
 const app = new Hono();
 
@@ -47,8 +54,62 @@ app.delete('/api/accounts/:id', deleteAccount);
 
 // Recruitment routes
 app.get('/api/recruitment', getRecruits);
+app.get('/api/recruitment/details', getRecruitsWithDetails);
+app.get('/api/applications/recruitment', getApplicationsWithRecruitment);
 app.put('/api/recruitment/:id', updateRecruit);
 app.delete('/api/recruitment/:id', deleteRecruit);
+
+// Activity logs routes
+app.get('/api/activity-logs', getActivityLogs);
+app.post('/api/activity-logs', createActivityLog);
+app.delete('/api/activity-logs/:id', deleteActivityLog);
+app.get('/api/activity-logs/export', exportActivityLogs);
+
+// Migration route
+// app.post('/api/migrate-users', migrateUsersToAccounts);
+
+// Test routes
+app.get('/api/test-migrate', (c) => {
+  return c.json({ success: true, message: 'GET Test route working' });
+});
+app.post('/api/test-migrate', (c) => {
+  return c.json({ success: true, message: 'POST Test route working' });
+});
+
+// Debug route to check authenticated users
+app.get('/api/debug', async (c) => {
+  try {
+    const { supabaseAdmin } = require('./supabase');
+
+    const serviceKeyExists = !!process.env.SUPABASE_SERVICE_ROLE_KEY;
+    console.log('Testing service role key...');
+    console.log('Service key exists:', serviceKeyExists);
+
+    if (!serviceKeyExists || !supabaseAdmin) {
+      return c.json({
+        success: false,
+        serviceKeyExists,
+        message: 'Service role key not configured. Admin-only operations are disabled.'
+      }, 400);
+    }
+
+    // Check authenticated users (requires service role key)
+    const { data: authData, error: usersError } = await supabaseAdmin.auth.admin.listUsers();
+
+    console.log('Auth response:', { authData, usersError });
+
+    return c.json({
+      success: true,
+      serviceKeyExists,
+      users: authData?.users?.length || 0,
+      usersError: usersError?.message || null,
+      firstUser: authData?.users?.[0]?.email || null
+    });
+  } catch (error) {
+    console.error('Debug error:', error);
+    return c.json({ success: false, error: error.message });
+  }
+});
 
 const port = process.env.PORT || 3000;
 serve({ fetch: app.fetch, port }, () => {

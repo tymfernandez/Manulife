@@ -1,4 +1,4 @@
-const supabase = require("../supabase");
+const { supabase } = require("../supabase");
 
 const signUp = async (c) => {
   try {
@@ -27,13 +27,18 @@ const signUp = async (c) => {
       return c.json({ success: false, message }, status);
     }
 
-    if (data.user && (fullName || contactNumber)) {
-      await supabase.from("profiles").insert({
-        id: data.user.id,
-        full_name: fullName || null,
-        contact_number: contactNumber || null,
-        email: email,
-      });
+    if (data.user) {
+      // Create profile record
+      if (fullName || contactNumber) {
+        await supabase.from("profiles").insert({
+          id: data.user.id,
+          full_name: fullName || null,
+          contact_number: contactNumber || null,
+          email: email,
+        });
+      }
+      
+
     }
 
     return c.json({ success: true, data });

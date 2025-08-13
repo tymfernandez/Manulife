@@ -5,8 +5,9 @@ import SignUp from "./UserAuth/Signup/signUp";
 import Dashboard from "./Dashboard/Dashboard";
 import Profile from "./Profile/profile";
 import ApplicationForm from "./ApplicationForm/applicationForm";
-import TestAccountManagement from "./testAccountManagement";
+import AccountManagement from "./AccountManagement/accountManagement";
 import RecruitmentManagement from "./RecruitmentManagement/recruitmentManagement";
+import ActivityLogs from "./ActivityLogs/activityLogs";
 
 const ProtectedRoute = () => {
   const { user, loading } = useAuth();
@@ -91,17 +92,50 @@ export const router = createBrowserRouter([
     ],
   },
   {
-    path: "/test-accounts",
-    element: <TestAccountManagement />,
-  },
-  {
-    path: "/recruitment",
+    path: "/account-management",
     element: <ProtectedRoute />,
     children: [
       {
         index: true,
-        element: <RecruitmentManagement />,
+        element: <AccountManagement />,
       },
     ],
   },
+  {
+  path: "/recruitment",
+  element: <ProtectedRoute />,
+  children: [
+    {
+      index: true,
+      element: <RecruitmentManagement />,
+    },
+  ],
+},
+{
+  path: "/activity-logs",
+  element: <ProtectedRoute />,
+  children: [
+    {
+      index: true,
+      element: <ActivityLogs />,
+    },
+  ],
+},
+{
+  path: "/settings",
+  element: <ProtectedRoute />,
+  children: [
+    {
+      index: true,
+      element: (
+        <div className="bg-gray-100 min-h-screen p-6">
+          <h1 className="text-2xl font-semibold text-gray-900">Settings</h1>
+          <p className="text-gray-600 mt-2">
+            This section is under development.
+          </p>
+        </div>
+      ),
+    },
+  ],
+}
 ]);

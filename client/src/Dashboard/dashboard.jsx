@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { supabase } from "../supabaseClient";
 import { TrendingUp, TrendingDown } from "lucide-react";
+import { logView, logExport } from "../utils/activityLogger";
 import {
   LineChart,
   Line,
@@ -14,6 +15,7 @@ import Header from "../components/Header";
 import SideBar from "../components/Sidebar";
 
 const Dashboard = () => {
+  const [activeItem, setActiveItem] = useState('dashboard');
   const [recruitsCounts, setRecruitsCounts] = useState({
     regionHead: 0,
     branchHead: 0,
@@ -35,6 +37,9 @@ const Dashboard = () => {
 
   // UseEffect hook to fetch data from Applications table
   useEffect(() => {
+    // Log dashboard view
+    logView('dashboard');
+    
     const fetchApplicationsData = async () => {
       try {
         // Fetch total applications count
@@ -158,14 +163,17 @@ const Dashboard = () => {
 
   return (
     <div className="flex h-screen bg-gray-50 overflow-hidden">
-      <SideBar />
+      <SideBar activeItem={activeItem} setActiveItem={setActiveItem} />
       <div className="flex-1 flex flex-col">
-        <Header />
+        <Header activeItem={activeItem} setActiveItem={setActiveItem} />
         <main className="flex-1 overflow-y-auto p-6">
           {/* Dashboard Header */}
           <div className="flex justify-between items-center mb-8">
             <h1 className="text-3xl font-bold text-green-800">DASHBOARD</h1>
-            <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+            <button 
+              onClick={() => logExport('dashboard-data')}
+              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+            >
               Export
             </button>
           </div>
