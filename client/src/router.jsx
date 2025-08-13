@@ -1,8 +1,8 @@
 import { createBrowserRouter, Navigate, Outlet } from "react-router-dom";
 import { useAuth } from "./lib/authContext";
-import SignIn from "./UserAuth/Login/signIn";
+import SignIn from "./UserAuth/Login/SignIn";
 import SignUp from "./UserAuth/Signup/signUp";
-import Dashboard from "./Dashboard/dashboard";
+import Dashboard from "./Dashboard/Dashboard";
 import Profile from "./Profile/profile";
 import ApplicationForm from "./ApplicationForm/applicationForm";
 import AccountManagement from "./AccountManagement/accountManagement";
@@ -102,33 +102,40 @@ export const router = createBrowserRouter([
     ],
   },
   {
-   path: "/recruitment",
-    element: <ProtectedRoute />,
-    children: [
-      {
-        index: true,
-        element: <RecruitmentManagement />,
-      },
-    ],
-  },
-  {
-    path: "/activity-logs",
-    element: <ProtectedRoute />,
-    children: [
-      {
-        index: true,
-        element: <ActivityLogs />,
-      },
-    ],
-  },
-  {
-    path: "/settings",
-    element: <ProtectedRoute />,
-    children: [
-      {
-        index: true,
-        element: <div className="bg-gray-100 min-h-screen p-6"><h1 className="text-2xl font-semibold text-gray-900">Settings</h1><p className="text-gray-600 mt-2">This section is under development.</p></div>,
-      },
-    ],
-  }
+  path: "/recruitment",
+  element: <ProtectedRoute />,
+  children: [
+    {
+      index: true,
+      element: <RecruitmentManagement />,
+    },
+  ],
+},
+{
+  path: "/activity-logs",
+  element: <ProtectedRoute />,
+  children: [
+    {
+      index: true,
+      element: <ActivityLogs />,
+    },
+  ],
+},
+{
+  path: "/settings",
+  element: <ProtectedRoute />,
+  children: [
+    {
+      index: true,
+      element: (
+        <div className="bg-gray-100 min-h-screen p-6">
+          <h1 className="text-2xl font-semibold text-gray-900">Settings</h1>
+          <p className="text-gray-600 mt-2">
+            This section is under development.
+          </p>
+        </div>
+      ),
+    },
+  ],
+}
 ]);
