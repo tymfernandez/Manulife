@@ -11,7 +11,7 @@ const { submitApplication } = require('./routes/Applications');
 const { signUp, signIn, signOut } = require('./routes/auth');
 const { getSession } = require('./routes/session');
 const { getAccounts, createAccount, updateAccount, deleteAccount } = require('./routes/accounts');
-const { getRecruits, updateRecruit, deleteRecruit } = require('./routes/recruitment');
+const { getRecruits, updateRecruit, deleteRecruit, getRecruitsWithDetails, getApplicationsWithRecruitment } = require('./routes/recruitment');
 // const { migrateUsersToAccounts } = require('./routes/migration');
 
 const app = new Hono();
