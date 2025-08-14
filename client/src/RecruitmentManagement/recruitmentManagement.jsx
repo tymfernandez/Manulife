@@ -46,6 +46,7 @@ const RecruitmentManagement = () => {
         position: recruit.position_applied_for,
         status: recruit.status || recruit.application_status || 'Interview',
         date: recruit.created_at,
+        lastEdited: recruit.updated_at || recruit.created_at,
         daysOld: Math.floor((new Date() - new Date(recruit.created_at)) / (1000 * 60 * 60 * 24)),
         resumeUrl: recruit.resume_url
       }));
@@ -66,6 +67,7 @@ const RecruitmentManagement = () => {
       position: "Region Head",
       status: "Interview",
       date: "2025-07-30",
+      lastEdited: "2025-08-01",
       daysOld: 7
     },
     {
@@ -75,6 +77,7 @@ const RecruitmentManagement = () => {
       position: "Region Head",
       status: "Life Champion Event",
       date: "2025-07-31",
+      lastEdited: "2025-08-02",
       daysOld: 6
     },
     {
@@ -84,6 +87,7 @@ const RecruitmentManagement = () => {
       position: "Branch Leader",
       status: "Pending",
       date: "2025-08-01",
+      lastEdited: "2025-08-01",
       daysOld: 5
     },
     {
@@ -93,6 +97,7 @@ const RecruitmentManagement = () => {
       position: "Unit Head",
       status: "Approved",
       date: "2025-08-02",
+      lastEdited: "2025-08-03",
       daysOld: 4
     },
     {
@@ -102,6 +107,7 @@ const RecruitmentManagement = () => {
       position: "Financial Advisor",
       status: "Rejected",
       date: "2025-08-03",
+      lastEdited: "2025-08-03",
       daysOld: 3
     },
     {
@@ -111,6 +117,7 @@ const RecruitmentManagement = () => {
       position: "Branch Leader",
       status: "Interview",
       date: "2025-08-04",
+      lastEdited: "2025-08-05",
       daysOld: 2
     },
     {
@@ -120,6 +127,7 @@ const RecruitmentManagement = () => {
       position: "Unit Head",
       status: "Life Champion Event",
       date: "2025-08-05",
+      lastEdited: "2025-08-05",
       daysOld: 1
     },
     {
@@ -129,6 +137,7 @@ const RecruitmentManagement = () => {
       position: "Financial Advisor",
       status: "Pending",
       date: "2025-07-29",
+      lastEdited: "2025-07-30",
       daysOld: 8
     },
     {
@@ -138,6 +147,7 @@ const RecruitmentManagement = () => {
       position: "Region Head",
       status: "Approved",
       date: "2025-07-28",
+      lastEdited: "2025-07-29",
       daysOld: 9
     },
     {
@@ -147,6 +157,7 @@ const RecruitmentManagement = () => {
       position: "Financial Advisor",
       status: "Rejected",
       date: "2025-07-27",
+      lastEdited: "2025-07-28",
       daysOld: 10
     }
     ]);
@@ -156,6 +167,16 @@ const RecruitmentManagement = () => {
     const date = new Date(dateString);
     const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
     return `${months[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`;
+  };
+
+  const getPositionColor = (position) => {
+    switch (position) {
+      case 'Branch Head': return 'bg-purple-100 text-purple-800';
+      case 'Unit Head': return 'bg-blue-100 text-blue-800';
+      case 'Unit Head Associate': return 'bg-cyan-100 text-cyan-800';
+      case 'Financial Advisor': return 'bg-green-100 text-green-800';
+      default: return 'bg-gray-100 text-gray-800';
+    }
   };
 
   const handleEdit = (recruit) => {
@@ -453,14 +474,14 @@ const RecruitmentManagement = () => {
           </div>
         </div>
 
-        <div className="bg-white shadow overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200 table-fixed">
+        <div className="bg-white shadow overflow-x-auto rounded-lg">
+          <table className="w-full divide-y divide-gray-200">
             <thead className="bg-emerald-800">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase cursor-pointer hover:bg-opacity-80" onClick={() => handleSort('fullName')}>
+                <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase cursor-pointer hover:bg-opacity-80 w-48" onClick={() => handleSort('fullName')}>
                   <div className="flex items-center gap-1">
                     Full Name
-                    <div className="flex flex-col">
+                    <div className="flex flex-col -space-y-1">
                       <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clipRule="evenodd" />
                       </svg>
@@ -470,10 +491,10 @@ const RecruitmentManagement = () => {
                     </div>
                   </div>
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase cursor-pointer hover:bg-opacity-80" onClick={() => handleSort('email')}>
+                <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase cursor-pointer hover:bg-opacity-80 w-64" onClick={() => handleSort('email')}>
                   <div className="flex items-center gap-1">
                     Email
-                    <div className="flex flex-col">
+                    <div className="flex flex-col -space-y-1">
                       <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clipRule="evenodd" />
                       </svg>
@@ -483,10 +504,10 @@ const RecruitmentManagement = () => {
                     </div>
                   </div>
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase cursor-pointer hover:bg-opacity-80" onClick={() => handleSort('position')}>
+                <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase cursor-pointer hover:bg-opacity-80 w-44" onClick={() => handleSort('position')}>
                   <div className="flex items-center gap-1">
                     Position
-                    <div className="flex flex-col">
+                    <div className="flex flex-col -space-y-1">
                       <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clipRule="evenodd" />
                       </svg>
@@ -496,10 +517,10 @@ const RecruitmentManagement = () => {
                     </div>
                   </div>
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase cursor-pointer hover:bg-opacity-80" style={{width: '200px'}} onClick={() => handleSort('status')}>
+                <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase cursor-pointer hover:bg-opacity-80 w-52" onClick={() => handleSort('status')}>
                   <div className="flex items-center gap-1">
                     Status
-                    <div className="flex flex-col">
+                    <div className="flex flex-col -space-y-1">
                       <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clipRule="evenodd" />
                       </svg>
@@ -509,10 +530,10 @@ const RecruitmentManagement = () => {
                     </div>
                   </div>
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase cursor-pointer hover:bg-opacity-80" onClick={() => handleSort('date')}>
+                <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase cursor-pointer hover:bg-opacity-80 w-36" onClick={() => handleSort('date')}>
                   <div className="flex items-center gap-1">
-                    Date
-                    <div className="flex flex-col">
+                    First Created
+                    <div className="flex flex-col -space-y-1">
                       <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clipRule="evenodd" />
                       </svg>
@@ -522,10 +543,23 @@ const RecruitmentManagement = () => {
                     </div>
                   </div>
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase cursor-pointer hover:bg-opacity-80" onClick={() => handleSort('daysOld')}>
+                <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase cursor-pointer hover:bg-opacity-80 w-36" onClick={() => handleSort('lastEdited')}>
+                  <div className="flex items-center gap-1">
+                    Last Edited
+                    <div className="flex flex-col -space-y-1">
+                      <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clipRule="evenodd" />
+                      </svg>
+                      <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+                      </svg>
+                    </div>
+                  </div>
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase cursor-pointer hover:bg-opacity-80 w-24" onClick={() => handleSort('daysOld')}>
                   <div className="flex items-center gap-1">
                     Days Old
-                    <div className="flex flex-col">
+                    <div className="flex flex-col -space-y-1">
                       <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clipRule="evenodd" />
                       </svg>
@@ -535,8 +569,8 @@ const RecruitmentManagement = () => {
                     </div>
                   </div>
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase">File</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase">Actions</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase w-16">File</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase w-20">Actions</th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
@@ -567,19 +601,23 @@ const RecruitmentManagement = () => {
                     )}
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-900">
-                    {editingId === recruit.id ? (
-                      <select
-                        value={editData.position}
-                        onChange={(e) => setEditData({...editData, position: e.target.value})}
-                        className="w-full px-2 py-1 border border-gray-300 rounded"
-                      >
-                        {positions.map(pos => (
-                          <option key={pos} value={pos}>{pos}</option>
-                        ))}
-                      </select>
-                    ) : (
-                      recruit.position
-                    )}
+                    <div className="flex items-center">
+                      {editingId === recruit.id ? (
+                        <select
+                          value={editData.position}
+                          onChange={(e) => setEditData({...editData, position: e.target.value})}
+                          className="w-full px-2 py-1 border border-gray-300 rounded"
+                        >
+                          {positions.map(pos => (
+                            <option key={pos} value={pos}>{pos}</option>
+                          ))}
+                        </select>
+                      ) : (
+                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${getPositionColor(recruit.position)}`}>
+                          {recruit.position}
+                        </span>
+                      )}
+                    </div>
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-900" style={{width: '200px'}}>
                     {editingId === recruit.id ? (
@@ -597,6 +635,7 @@ const RecruitmentManagement = () => {
                     )}
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-500">{formatDate(recruit.date)}</td>
+                  <td className="px-6 py-4 text-sm text-gray-500">{formatDate(recruit.lastEdited)}</td>
                   <td className="px-6 py-4 text-sm text-gray-500">{recruit.daysOld} days</td>
                   <td className="px-6 py-4 text-sm text-gray-500">
                     {recruit.resumeUrl ? (
