@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   BarChart3, 
@@ -12,7 +12,14 @@ import {
 } from 'lucide-react';
 
 const Sidebar = ({ activeItem, setActiveItem }) => {
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(() => {
+    const saved = localStorage.getItem('sidebarCollapsed');
+    return saved !== null ? JSON.parse(saved) : true;
+  });
+
+  useEffect(() => {
+    localStorage.setItem('sidebarCollapsed', JSON.stringify(isCollapsed));
+  }, [isCollapsed]);
   const navigate = useNavigate();
   
   const menuItems = [
@@ -62,21 +69,27 @@ const Sidebar = ({ activeItem, setActiveItem }) => {
             const isActive = activeItem === item.id;
             
             return (
-              <button
-                key={item.id}
-                onClick={() => {
-                  setActiveItem(item.id);
-                  navigate(item.path);
-                }}
-                className={`w-full flex items-center ${isCollapsed ? 'justify-center px-2' : 'space-x-3 px-4'} py-2.5 rounded-lg text-left transition-colors ${
-                  isActive 
-                    ? 'bg-orange-500 text-white' 
-                    : 'text-emerald-100 hover:bg-emerald-700'
-                }`}
-              >
-                <Icon className="w-5 h-5 flex-shrink-0" />
-                {!isCollapsed && <span className="font-medium">{item.label}</span>}
-              </button>
+              <div key={item.id} className="relative group">
+                <button
+                  onClick={() => {
+                    setActiveItem(item.id);
+                    navigate(item.path);
+                  }}
+                  className={`w-full flex items-center ${isCollapsed ? 'justify-center px-4' : 'space-x-3 px-4'} py-2.5 rounded-lg text-left transition-colors ${
+                    isActive 
+                      ? 'bg-orange-500 text-white' 
+                      : 'text-emerald-100 hover:bg-emerald-700'
+                  }`}
+                >
+                  <Icon className="w-5 h-5 flex-shrink-0" />
+                  {!isCollapsed && <span className="font-medium">{item.label}</span>}
+                </button>
+                {isCollapsed && (
+                  <div className="absolute left-full ml-2 px-2 py-1 bg-gray-800 text-white text-sm rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-10">
+                    {item.label}
+                  </div>
+                )}
+              </div>
             );
           })}
         </nav>
