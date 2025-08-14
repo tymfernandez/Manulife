@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Download, Plus } from 'lucide-react';
 import { useActivityLogs } from '../hooks/useActivityLogs';
+import { useActivityLogger } from '../hooks/useActivityLogger';
 import ActivityLogFilters from '../components/ActivityLogFilters';
 import ActivityLogTable from '../components/ActivityLogTable';
 import AddActivityLogModal from '../components/AddActivityLogModal';
@@ -20,6 +21,7 @@ const ActivityLogs = () => {
   const itemsPerPage = 10;
 
   const { logs, loading, error, pagination, fetchLogs, createLog, deleteLog, exportLogs } = useActivityLogs();
+  const { logExport, logDelete } = useActivityLogger();
 
   // Fetch logs when filters change
   useEffect(() => {
@@ -53,6 +55,8 @@ const ActivityLogs = () => {
         dateTo: dateToFilter
       };
       await exportLogs(params);
+      // Log export activity
+      logExport('Activity Logs');
     } catch (error) {
       console.error('Export failed:', error);
     }
@@ -80,7 +84,10 @@ const ActivityLogs = () => {
   const handleDeleteLog = async (id) => {
     if (window.confirm('Are you sure you want to delete this activity log?')) {
       try {
+        const logToDelete = logs.find(log => log.id === id);
         await deleteLog(id);
+        // Log deletion activity
+        logDelete('Activity Log', `${logToDelete?.activity_type || 'Unknown'} by ${logToDelete?.user_name || 'Unknown'}`);
         // Refresh the current page
         const params = {
           page: currentPage,

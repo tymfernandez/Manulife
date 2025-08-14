@@ -12,6 +12,7 @@ import {
   Home,
   ArrowLeft,
 } from "lucide-react";
+import { logActivity, ACTIVITY_TYPES } from "../utils/activityLogger";
 
 const ApplicationForm = () => {
   const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
@@ -140,6 +141,18 @@ const ApplicationForm = () => {
 
       if (!res.ok || !result.success) {
         throw new Error(result.message || `Request failed with status ${res.status}`);
+      }
+
+      // Log application submission (anonymous user)
+      try {
+        await logActivity(
+          ACTIVITY_TYPES.CREATE,
+          `New application submitted: ${formData.fullName} for ${formData.positionAppliedFor}${formData.referralName ? ` (Referred by: ${formData.referralName})` : ''}`,
+          { id: 'anonymous', email: formData.emailAddress },
+          { firstName: formData.fullName.split(' ')[0], lastName: formData.fullName.split(' ').slice(1).join(' '), role: 'Applicant' }
+        );
+      } catch (logError) {
+        console.error('Failed to log application activity:', logError);
       }
 
       setIsSubmitted(true);

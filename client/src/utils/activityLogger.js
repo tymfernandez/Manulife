@@ -1,26 +1,23 @@
 import { activityLogService } from '../services/activityLogService';
 
-export const logActivity = async (activityType, description, user = null) => {
+export const logActivity = async (activityType, description, user = null, userProfile = null) => {
   try {
-    // If no user provided, try to get from localStorage or context
-    if (!user) {
-      const storedUser = localStorage.getItem('user');
-      if (storedUser) {
-        user = JSON.parse(storedUser);
-      }
-    }
-
     if (!user) {
       console.warn('Cannot log activity: No user information available');
       return;
     }
 
+    // Build user name from profile or fallback to email
+    const userName = userProfile 
+      ? `${userProfile.firstName} ${userProfile.lastName}`.trim() || user.email
+      : user.email || 'Unknown User';
+
     const logData = {
-      user_name: user.name || user.email || 'Unknown User',
-      user_role: user.role || 'Unknown Role',
+      user_id: user.id,
+      user_name: userName,
+      user_role: userProfile?.role || user.role || 'User',
       activity_type: activityType,
-      description: description,
-      user_id: user.id || null
+      description: description
     };
 
     await activityLogService.createActivityLog(logData);
@@ -30,24 +27,24 @@ export const logActivity = async (activityType, description, user = null) => {
   }
 };
 
-// Common activity types
+// Activity types for significant actions only
 export const ACTIVITY_TYPES = {
   LOGIN: 'Login',
   LOGOUT: 'Logout',
   CREATE: 'Create',
   EDIT: 'Edit',
   DELETE: 'Delete',
-  VIEW: 'View',
   EXPORT: 'Export',
   APPROVAL: 'Approval',
   REFERRAL: 'Referral'
 };
 
-// Helper functions for common activities
-export const logLogin = (user) => logActivity(ACTIVITY_TYPES.LOGIN, 'User logged into the system', user);
-export const logLogout = (user) => logActivity(ACTIVITY_TYPES.LOGOUT, 'User logged out of the system', user);
-export const logCreate = (entityType, user) => logActivity(ACTIVITY_TYPES.CREATE, `Created new ${entityType}`, user);
-export const logEdit = (entityType, entityId, user) => logActivity(ACTIVITY_TYPES.EDIT, `Edited ${entityType} (ID: ${entityId})`, user);
-export const logDelete = (entityType, entityId, user) => logActivity(ACTIVITY_TYPES.DELETE, `Deleted ${entityType} (ID: ${entityId})`, user);
-export const logView = (entityType, user) => logActivity(ACTIVITY_TYPES.VIEW, `Viewed ${entityType} list`, user);
-export const logExport = (entityType, user) => logActivity(ACTIVITY_TYPES.EXPORT, `Exported ${entityType} data`, user);
+// Helper functions for significant activities only
+export const logLogin = (user, userProfile) => logActivity(ACTIVITY_TYPES.LOGIN, 'User logged into the system', user, userProfile);
+export const logLogout = (user, userProfile) => logActivity(ACTIVITY_TYPES.LOGOUT, 'User logged out of the system', user, userProfile);
+export const logCreate = (entityType, entityName, user, userProfile) => logActivity(ACTIVITY_TYPES.CREATE, `Created ${entityType}: ${entityName}`, user, userProfile);
+export const logEdit = (entityType, entityName, user, userProfile) => logActivity(ACTIVITY_TYPES.EDIT, `Updated ${entityType}: ${entityName}`, user, userProfile);
+export const logDelete = (entityType, entityName, user, userProfile) => logActivity(ACTIVITY_TYPES.DELETE, `Deleted ${entityType}: ${entityName}`, user, userProfile);
+export const logExport = (entityType, user, userProfile) => logActivity(ACTIVITY_TYPES.EXPORT, `Exported ${entityType} data`, user, userProfile);
+export const logApproval = (entityType, entityName, status, user, userProfile) => logActivity(ACTIVITY_TYPES.APPROVAL, `${status} ${entityType}: ${entityName}`, user, userProfile);
+export const logReferral = (referralCode, user, userProfile) => logActivity(ACTIVITY_TYPES.REFERRAL, `Used referral code: ${referralCode}`, user, userProfile);

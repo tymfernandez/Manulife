@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { supabase } from "../supabaseClient";
 import { TrendingUp, TrendingDown } from "lucide-react";
-import { logView, logExport } from "../utils/activityLogger";
+import { logExport } from "../utils/activityLogger";
 import {
   LineChart,
   Line,
@@ -69,8 +69,7 @@ const Dashboard = () => {
 
   // UseEffect hook to fetch data from Applications table
   useEffect(() => {
-    // Log dashboard view
-    logView('dashboard');
+
     
     const fetchApplicationsData = async () => {
       try {

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAccounts } from '../hooks/useAccounts';
+import { useActivityLogger } from '../hooks/useActivityLogger';
 import AccountFilters from '../components/AccountFilters';
 import AccountTable from '../components/AccountTable';
 import Pagination from '../components/Pagination';
@@ -16,6 +17,7 @@ const AccountManagement = () => {
   const itemsPerPage = 10;
 
   const { accounts, loading, error, fetchAccounts, deleteAccount } = useAccounts();
+  const { logEdit } = useActivityLogger();
 
   // Filter accounts locally
   const filteredAccounts = (accounts || []).filter(account => {
@@ -127,11 +129,14 @@ const AccountManagement = () => {
             onDelete={deleteAccount}
             onUpdateRole={async (id, role) => {
               try {
+                const account = accounts.find(acc => acc.id === id);
                 await fetch(`http://localhost:3000/api/accounts/${id}`, {
                   method: 'PUT',
                   headers: { 'Content-Type': 'application/json' },
                   body: JSON.stringify({ role })
                 });
+                // Log role update
+                logEdit('Account Role', `${account?.name || account?.email || `ID: ${id}`} → ${role}`);
                 fetchAccounts(); // Refresh the accounts list
               } catch (error) {
                 console.error('Error updating role:', error);

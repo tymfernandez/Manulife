@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
 import { accountService } from '../services/accountService';
+import { useActivityLogger } from './useActivityLogger';
 
 export const useAccounts = () => {
   const [accounts, setAccounts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { logCreate, logEdit, logDelete } = useActivityLogger();
 
   const fetchAccounts = async () => {
     try {
@@ -25,6 +27,8 @@ export const useAccounts = () => {
     try {
       const newAccount = await accountService.createAccount(accountData);
       setAccounts(prev => [newAccount, ...prev]);
+      // Log account creation
+      logCreate('Account', accountData.name || accountData.email || 'New Account');
       return newAccount;
     } catch (err) {
       setError(err.message);
@@ -34,8 +38,11 @@ export const useAccounts = () => {
 
   const updateAccount = async (id, accountData) => {
     try {
+      const existingAccount = accounts.find(acc => acc.id === id);
       const updatedAccount = await accountService.updateAccount(id, accountData);
       setAccounts(prev => prev.map(acc => acc.id === id ? updatedAccount : acc));
+      // Log account update
+      logEdit('Account', existingAccount?.name || existingAccount?.email || `ID: ${id}`);
       return updatedAccount;
     } catch (err) {
       setError(err.message);
@@ -45,8 +52,11 @@ export const useAccounts = () => {
 
   const deleteAccount = async (id) => {
     try {
+      const accountToDelete = accounts.find(acc => acc.id === id);
       await accountService.deleteAccount(id);
       setAccounts(prev => prev.filter(acc => acc.id !== id));
+      // Log account deletion
+      logDelete('Account', accountToDelete?.name || accountToDelete?.email || `ID: ${id}`);
     } catch (err) {
       setError(err.message);
       throw err;

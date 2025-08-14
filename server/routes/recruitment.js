@@ -43,16 +43,21 @@ const updateRecruit = async (c) => {
 const deleteRecruit = async (c) => {
   try {
     const id = c.req.param('id');
+    console.log('Deleting recruit with ID:', id);
     
-    const { error } = await supabase
+    const { data, error } = await supabase
       .from('Applications')
       .delete()
-      .eq('id', id);
+      .eq('id', id)
+      .select();
+    
+    console.log('Delete result:', { data, error });
     
     if (error) throw error;
     
-    return c.json({ success: true });
+    return c.json({ success: true, deleted: data });
   } catch (error) {
+    console.error('Delete error:', error);
     return c.json({ success: false, message: error.message }, 500);
   }
 };

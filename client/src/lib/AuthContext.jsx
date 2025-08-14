@@ -67,8 +67,24 @@ export const AuthProvider = ({ children }) => {
       const result = await response.json();
       if (result.success && result.data.user) {
         setUser(result.data.user);
-        // Log login activity
-        logLogin(result.data.user);
+        // Fetch user profile for activity logging
+        try {
+          const profileResponse = await fetch("http://localhost:3000/api/auth/profile", {
+            credentials: "include",
+          });
+          const profileResult = await profileResponse.json();
+          const profile = profileResult.success && profileResult.data ? {
+            firstName: profileResult.data.first_name || "",
+            lastName: profileResult.data.last_name || "",
+            role: profileResult.data.role || "User"
+          } : null;
+          setUserProfile(profile);
+          // Log login activity with profile
+          logLogin(result.data.user, profile);
+        } catch (profileError) {
+          console.error('Error fetching profile for login log:', profileError);
+          logLogin(result.data.user, null);
+        }
         return { data: result.data, error: null };
       }
       return { data: null, error: { message: result.message } };
@@ -84,8 +100,9 @@ export const AuthProvider = ({ children }) => {
       const result = await response.json();
       if (result.success) {
         // Log logout activity before clearing user
-        if (user) logLogout(user);
+        if (user) logLogout(user, userProfile);
         setUser(null);
+        setUserProfile(null);
         return { error: null };
       }
       return { error: { message: result.message } };

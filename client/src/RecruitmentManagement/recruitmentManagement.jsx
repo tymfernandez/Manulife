@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import Sidebar from '../components/Sidebar';
 import Header from '../components/Header';
+import { useActivityLogger } from '../hooks/useActivityLogger';
 
 const RecruitmentManagement = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -20,6 +21,7 @@ const RecruitmentManagement = () => {
   const [deleteId, setDeleteId] = useState(null);
   const [sortField, setSortField] = useState(null);
   const [sortDirection, setSortDirection] = useState('asc');
+  const { logEdit, logDelete } = useActivityLogger();
 
   const positions = ["Branch Head", "Unit Head", "Unit Head Associate", "Financial Advisor"];
   const statuses = ["Interview", "Life Champion Event", "Exam passed (Trad)", "Exam passed (VL)", "Jump Start Program (JSP)", "eRecruitment", "Tagged/Appointed"];
@@ -34,8 +36,11 @@ const RecruitmentManagement = () => {
 
   const fetchRecruits = async () => {
     try {
+      console.log('Fetching recruits from API...');
       const response = await fetch('http://localhost:3000/api/recruitment');
       const result = await response.json();
+      
+      console.log('API response:', result);
       
       if (!result.success) throw new Error(result.message);
       
@@ -50,9 +55,10 @@ const RecruitmentManagement = () => {
         resumeUrl: recruit.resume_url
       }));
       
+      console.log('Processed data:', processedData);
       setRecruits(processedData);
     } catch (error) {
-      console.error('Error fetching recruits:', error);
+      console.error('Error fetching recruits, using sample data:', error);
       setSampleData();
     }
   };
@@ -184,11 +190,14 @@ const RecruitmentManagement = () => {
 
       if (!result.success) throw new Error(result.message);
 
+      const updatedRecruit = { ...recruits.find(r => r.id === id), ...editData };
       setRecruits(recruits.map(recruit => 
         recruit.id === id 
-          ? { ...recruit, ...editData }
+          ? updatedRecruit
           : recruit
       ));
+      // Log recruitment update
+      logEdit('Recruitment Record', `${updatedRecruit.fullName} (${updatedRecruit.position})`);
       setEditingId(null);
       setEditData({});
     } catch (error) {
@@ -202,20 +211,25 @@ const RecruitmentManagement = () => {
   };
 
   const handleDelete = async () => {
+    const deletedRecruit = recruits.find(r => r.id === deleteId);
+    
     try {
       const response = await fetch(`http://localhost:3000/api/recruitment/${deleteId}`, {
         method: 'DELETE'
       });
+      
       const result = await response.json();
-
-      if (!result.success) throw new Error(result.message);
-
-      setRecruits(recruits.filter(recruit => recruit.id !== deleteId));
-      setShowDeleteModal(false);
-      setDeleteId(null);
+      
+      if (result.success) {
+        setRecruits(recruits.filter(recruit => recruit.id !== deleteId));
+        logDelete('Recruitment Record', `${deletedRecruit?.fullName || 'Unknown'}`);
+      }
     } catch (error) {
-      console.error('Error deleting recruit:', error);
+      console.error('Delete error:', error);
     }
+    
+    setShowDeleteModal(false);
+    setDeleteId(null);
   };
 
   const handleSort = (field) => {

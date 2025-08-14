@@ -69,6 +69,15 @@ const createActivityLog = async (c) => {
       }, 400);
     }
 
+    // Clean up old logs (older than 30 days)
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    
+    await supabase
+      .from('activity_logs')
+      .delete()
+      .lt('created_at', thirtyDaysAgo.toISOString());
+
     const { data, error } = await supabase
       .from('activity_logs')
       .insert([{
