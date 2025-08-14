@@ -21,7 +21,7 @@ const app = new Hono();
 
 // Enable CORS for client requests
 app.use('/*', cors({
-  origin: 'http://localhost:5174',
+  origin: ['http://localhost:5173', 'http://localhost:5174'],
   allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowHeaders: ['Content-Type', 'Authorization', 'user-id'],
   credentials: true
@@ -71,7 +71,15 @@ app.get('/api/activity-logs/export', exportActivityLogs);
 app.get('/api/settings', getUserSettings);
 app.put('/api/settings', updateUserSettings);
 app.put('/api/settings/password', changePassword);
-app.post('/api/settings/export', exportUserData);
+app.post('/api/settings/export', async (c) => {
+  try {
+    console.log('Export request received');
+    return await exportUserData(c);
+  } catch (error) {
+    console.error('Export error:', error);
+    return c.json({ success: false, message: error.message }, 500);
+  }
+});
 app.post('/api/settings/support', submitSupportTicket);
 app.get('/api/settings/tickets', getUserTickets);
 

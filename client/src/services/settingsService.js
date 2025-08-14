@@ -1,117 +1,46 @@
-const API_BASE = 'http://localhost:3000/api';
-const TEST_USER_ID = '00000000-0000-0000-0000-000000000000';
+const API_BASE_URL = 'http://localhost:3000/api';
 
 export const settingsService = {
-  // Get user settings
-  async getUserSettings() {
-    try {
-      const response = await fetch(`${API_BASE}/settings`, {
-        headers: {
-          'user-id': TEST_USER_ID
-        }
-      });
-      const result = await response.json();
-      
-      if (!result.success) throw new Error(result.message);
-      return result.data;
-    } catch (error) {
-      throw error;
-    }
-  },
-
-  // Update user settings
-  async updateSettings(settings) {
-    try {
-      const response = await fetch(`${API_BASE}/settings`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'user-id': TEST_USER_ID
-        },
-        body: JSON.stringify(settings)
-      });
-      const result = await response.json();
-      
-      if (!result.success) throw new Error(result.message);
-      return result.data;
-    } catch (error) {
-      throw error;
-    }
-  },
-
-  // Change password
-  async changePassword(currentPassword, newPassword) {
-    try {
-      const response = await fetch(`${API_BASE}/settings/password`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'user-id': TEST_USER_ID
-        },
-        body: JSON.stringify({ currentPassword, newPassword })
-      });
-      const result = await response.json();
-      
-      if (!result.success) throw new Error(result.message);
-      return result;
-    } catch (error) {
-      throw error;
-    }
-  },
-
-  // Export user data
-  async exportData(format = 'json') {
-    try {
-      const response = await fetch(`${API_BASE}/settings/export`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'user-id': TEST_USER_ID
-        },
-        body: JSON.stringify({ format })
-      });
-      const result = await response.json();
-      
-      if (!result.success) throw new Error(result.message);
-      return result;
-    } catch (error) {
-      throw error;
-    }
-  },
-
-  // Submit support ticket
   async submitTicket(ticketData) {
     try {
-      const response = await fetch(`${API_BASE}/settings/support`, {
+      const response = await fetch(`${API_BASE_URL}/settings/support`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'user-id': TEST_USER_ID
         },
-        body: JSON.stringify(ticketData)
+        body: JSON.stringify(ticketData),
       });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
       const result = await response.json();
-      
-      if (!result.success) throw new Error(result.message);
       return result;
     } catch (error) {
+      console.error('Error submitting support ticket:', error);
       throw error;
     }
   },
 
-  // Get user tickets
-  async getUserTickets() {
+  async exportData(format) {
     try {
-      const response = await fetch(`${API_BASE}/settings/tickets`, {
+      const response = await fetch(`${API_BASE_URL}/settings/export`, {
+        method: 'POST',
         headers: {
-          'user-id': TEST_USER_ID
-        }
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ format }),
       });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
       const result = await response.json();
-      
-      if (!result.success) throw new Error(result.message);
-      return result.data;
+      return result;
     } catch (error) {
+      console.error('Error exporting data:', error);
       throw error;
     }
   }

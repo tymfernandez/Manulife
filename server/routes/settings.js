@@ -76,67 +76,114 @@ const changePassword = async (c) => {
 // Export user data
 const exportUserData = async (c) => {
   try {
-    const userId = c.req.header('user-id');
+    console.log('Starting export process');
     const { format } = await c.req.json();
+    console.log('Export format requested:', format);
     
-    // Get user data from auth
-    const { data: userData, error: userError } = await supabaseAdmin.auth.admin.getUserById(userId);
-    if (userError) throw userError;
+    // Get real data from database tables
+    const { data: applications, error: appError } = await supabase
+      .from('Applications')
+      .select('*');
     
-    // Get user settings
-    const { data: settings } = await supabase
+    const { data: activityLogs, error: logError } = await supabase
+      .from('activity_logs')
+      .select('*');
+    
+    const { data: supportTickets, error: ticketError } = await supabase
+      .from('support_tickets')
+      .select('*');
+    
+    const { data: userSettings, error: settingsError } = await supabase
       .from('user_settings')
-      .select('*')
-      .eq('user_id', userId)
-      .single();
-    
-    // Get user profile if exists
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', userId)
-      .single();
+      .select('*');
     
     const exportData = {
-      user: {
-        id: userData.user.id,
-        email: userData.user.email,
-        created_at: userData.user.created_at,
-        last_sign_in_at: userData.user.last_sign_in_at
-      },
-      profile: profile || {},
-      settings: settings || {}
+      applications: applications || [],
+      activity_logs: activityLogs || [],
+      support_tickets: supportTickets || [],
+      user_settings: userSettings || [],
+      export_date: new Date().toISOString()
     };
     
     // Format data based on requested format
     let responseData;
     let contentType;
+    let filename;
     
     switch (format.toLowerCase()) {
       case 'json':
         responseData = JSON.stringify(exportData, null, 2);
         contentType = 'application/json';
+        filename = 'user_data.json';
         break;
       case 'csv':
-        // Simple CSV conversion
-        const csvData = Object.entries(exportData.user)
-          .map(([key, value]) => `${key},${value}`)
-          .join('\n');
-        responseData = csvData;
+        let csvContent = 'Table,Field,Value\n';
+        Object.entries(exportData).forEach(([tableName, records]) => {
+          if (Array.isArray(records)) {
+            records.forEach((record, index) => {
+              Object.entries(record).forEach(([field, value]) => {
+                csvContent += `${tableName},${field},"${value}"\n`;
+              });
+            });
+          } else {
+            csvContent += `${tableName},export_date,"${records}"\n`;
+          }
+        });
+        responseData = csvContent;
         contentType = 'text/csv';
+        filename = 'user_data.csv';
+        break;
+      case 'excel':
+        let excelContent = 'Table\tField\tValue\n';
+        Object.entries(exportData).forEach(([tableName, records]) => {
+          if (Array.isArray(records)) {
+            records.forEach((record, index) => {
+              Object.entries(record).forEach(([field, value]) => {
+                excelContent += `${tableName}\t${field}\t${value}\n`;
+              });
+            });
+          } else {
+            excelContent += `${tableName}\texport_date\t${records}\n`;
+          }
+        });
+        responseData = excelContent;
+        contentType = 'application/vnd.ms-excel';
+        filename = 'user_data.xls';
+        break;
+      case 'pdf':
+        let pdfContent = 'USER DATA EXPORT\n';
+        pdfContent += `Export Date: ${exportData.export_date}\n\n`;
+        Object.entries(exportData).forEach(([tableName, records]) => {
+          if (Array.isArray(records) && records.length > 0) {
+            pdfContent += `${tableName.toUpperCase()}:\n`;
+            records.forEach((record, index) => {
+              pdfContent += `Record ${index + 1}:\n`;
+              Object.entries(record).forEach(([field, value]) => {
+                pdfContent += `  ${field}: ${value}\n`;
+              });
+              pdfContent += '\n';
+            });
+          }
+        });
+        responseData = pdfContent;
+        contentType = 'application/pdf';
+        filename = 'user_data.pdf';
         break;
       default:
         responseData = JSON.stringify(exportData, null, 2);
         contentType = 'application/json';
+        filename = 'user_data.json';
     }
     
+    console.log('Export successful, returning data');
     return c.json({ 
       success: true, 
       data: responseData,
       contentType,
-      filename: `user_data_${userId}.${format.toLowerCase()}`
+      filename
     });
   } catch (error) {
+    console.error('Export function error:', error);
     return c.json({ success: false, message: error.message }, 500);
   }
 };
