@@ -1,11 +1,12 @@
+import Dashboard from './Dashboard/Dashboard';
 import ApplicationForm from './ApplicationForm/applicationForm';
 
 function App() {
   return (
-    <Layout>
+    <div>
       <Dashboard />
       <ApplicationForm />
-    </Layout>
+    </div>
   );
 }
 
