@@ -268,7 +268,13 @@ const Header = ({ onMenuClick, activeItem, setActiveItem }) => {
                     <User className="w-4 h-4 text-gray-500" />
                     <span className="text-gray-700">View Profile</span>
                   </button>
-                  <button className="w-full flex items-center space-x-3 px-4 py-2 text-left hover:bg-gray-50 transition-colors">
+                  <button 
+                    onClick={() => {
+                      navigate('/settings');
+                      setIsProfileOpen(false);
+                    }}
+                    className="w-full flex items-center space-x-3 px-4 py-2 text-left hover:bg-gray-50 transition-colors"
+                  >
                     <Settings className="w-4 h-4 text-gray-500" />
                     <span className="text-gray-700">Settings</span>
                   </button>
