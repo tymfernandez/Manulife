@@ -8,6 +8,7 @@ import ApplicationForm from "./ApplicationForm/applicationForm";
 import AccountManagement from "./AccountManagement/accountManagement";
 import RecruitmentManagement from "./RecruitmentManagement/recruitmentManagement";
 import ActivityLogs from "./ActivityLogs/activityLogs";
+import Settings from "./Settings/settings";
 
 const ProtectedRoute = () => {
   const { user, loading } = useAuth();
@@ -127,14 +128,7 @@ export const router = createBrowserRouter([
   children: [
     {
       index: true,
-      element: (
-        <div className="bg-gray-100 min-h-screen p-6">
-          <h1 className="text-2xl font-semibold text-gray-900">Settings</h1>
-          <p className="text-gray-600 mt-2">
-            This section is under development.
-          </p>
-        </div>
-      ),
+      element: <Settings />,
     },
   ],
 }
