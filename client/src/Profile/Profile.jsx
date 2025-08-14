@@ -25,6 +25,32 @@ const Profile = () => {
     });
   };
 
+  const fetchProfile = async () => {
+    try {
+      const response = await fetch("http://localhost:3000/api/auth/profile", {
+        credentials: "include",
+      });
+      const result = await response.json();
+
+      if (result.success && result.data) {
+        const data = result.data;
+        const dob = data.date_of_birth ? new Date(data.date_of_birth) : null;
+
+        setFormData({
+          firstName: data.first_name || "",
+          lastName: data.last_name || "",
+          contactNumber: data.contact_number || "",
+          address: data.address || "",
+          day: dob ? dob.getDate().toString() : "",
+          month: dob ? (dob.getMonth() + 1).toString() : "",
+          year: dob ? dob.getFullYear().toString() : "",
+        });
+      }
+    } catch (error) {
+      console.error("Error fetching profile:", error);
+    }
+  };
+
   const handleSave = async () => {
     setLoading(true);
     try {
@@ -48,11 +74,14 @@ const Profile = () => {
             address: formData.address,
             date_of_birth: dateOfBirth,
           }),
+          credentials: "include",
         }
       );
 
       const result = await response.json();
       if (!result.success) throw new Error(result.message);
+
+      await fetchProfile();
       setIsEditing(false);
     } catch (error) {
       console.error("Error updating profile:", error);
@@ -62,57 +91,51 @@ const Profile = () => {
   };
 
   useEffect(() => {
-    const fetchProfile = async () => {
-      try {
-        const response = await fetch("http://localhost:3000/api/auth/profile", {
-          credentials: "include",
-        });
-        const result = await response.json();
-
-        if (result.success && result.data) {
-          const data = result.data;
-          const dob = data.date_of_birth ? new Date(data.date_of_birth) : null;
-
-          setFormData({
-            firstName: data.first_name || "",
-            lastName: data.last_name || "",
-            contactNumber: data.contact_number || "",
-            address: data.address || "",
-            day: dob ? dob.getDate().toString() : "",
-            month: dob ? (dob.getMonth() + 1).toString() : "",
-            year: dob ? dob.getFullYear().toString() : "",
-          });
-        }
-      } catch (error) {
-        console.error("Error fetching profile:", error);
-      }
-    };
-
     fetchProfile();
   }, []);
+
+  useEffect(() => {
+    if (activeItem === "profile") {
+      fetchProfile();
+    }
+  }, [activeItem]);
+
+  const sidebarItems = [
+    { id: 1, label: "Personal Information", icon: "👤", active: true },
+    { id: 2, label: "Financial Information", icon: "💰", active: false },
+    { id: 3, label: "Health Plan", icon: "🏥", active: false },
+    { id: 4, label: "Retirement Plan", icon: "📊", active: false },
+    { id: 5, label: "Family Plan", icon: "👨‍👩‍👧‍👦", active: false },
+    { id: 6, label: "Education Plan", icon: "🎓", active: false },
+  ];
 
   const renderContent = () => {
     switch (activeItem) {
       case "profile":
         return (
-          <div className="min-h-screen bg-gray-100">
+          <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
             <div className="flex">
-              <div className="w-64 bg-white min-h-screen border-r border-gray-200">
-                <div className="p-6">
-                  <div className="text-center mb-8">
-                    <div className="relative inline-block">
-                      <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center">
+              {/* Enhanced Sidebar */}
+              <div className="w-80 bg-white min-h-screen shadow-xl border-r border-gray-200">
+                <div className="p-8">
+                  {/* Profile Avatar Section */}
+                  <div className="text-center mb-10">
+                    <div className="relative inline-block group">
+                      <div
+                        className="w-24 h-24 bg-gradient-to-br from-orange-300 to-orange-500
+                      -600 rounded-full flex items-center justify-center shadow-lg transform transition-transform group-hover:scale-105"
+                      >
                         <svg
-                          className="w-8 h-8 text-white"
+                          className="w-12 h-12 text-white"
                           fill="currentColor"
                           viewBox="0 0 24 24"
                         >
                           <path d="M24 20.993V24H0v-2.996A14.977 14.977 0 0112.004 15c4.904 0 9.26 2.354 11.996 5.993zM16.002 8.999a4 4 0 11-8 0 4 4 0 018 0z" />
                         </svg>
                       </div>
-                      <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-green-600 rounded-full flex items-center justify-center">
+                      <div className="absolute -bottom-1 -right-1 w-8 h-8 bg-green-500 rounded-full flex items-center justify-center shadow-md border-2 border-white">
                         <svg
-                          className="w-3 h-3 text-white"
+                          className="w-4 h-4 text-white"
                           fill="currentColor"
                           viewBox="0 0 24 24"
                         >
@@ -120,363 +143,310 @@ const Profile = () => {
                         </svg>
                       </div>
                     </div>
-                    <h2 className="mt-3 font-medium text-gray-900">
-                      {formData.firstName && formData.lastName
-                        ? `${formData.firstName} ${formData.lastName}`
-                        : user?.email?.split("@")[0] || "Anonymous"}
-                    </h2>
-                    <p className="text-sm text-gray-500">
-                      {formData.contactNumber || "No contact"}
-                    </p>
-                    <p className="text-xs text-gray-400 mt-1">
-                      Last update 15-11-2020
-                    </p>
+                    <div className="mt-4">
+                      <h2 className="text-xl font-semibold text-gray-900">
+                        {formData.firstName && formData.lastName
+                          ? `${formData.firstName} ${formData.lastName}`
+                          : user?.email?.split("@")[0] || "Anonymous"}
+                      </h2>
+                      <p className="text-sm text-gray-600 mt-1">
+                        {formData.contactNumber || "No contact"}
+                      </p>
+                      <div className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 mt-2">
+                        <span className="w-1.5 h-1.5 bg-green-400 rounded-full mr-1.5"></span>
+                        Active
+                      </div>
+                    </div>
                   </div>
-                  <nav className="space-y-1">
-                    <button className="w-full flex items-center px-3 py-2 rounded-md bg-green-50 border border-green-200">
-                      <div className="w-6 h-6 bg-green-500 rounded-sm flex items-center justify-center mr-3">
-                        <svg
-                          className="w-4 h-4 text-white"
-                          fill="currentColor"
-                          viewBox="0 0 24 24"
+
+                  {/* Navigation Menu */}
+                  <nav className="space-y-2">
+                    {sidebarItems.map((item) => (
+                      <button
+                        key={item.id}
+                        className={`w-full flex items-center px-4 py-3 rounded-xl text-left transition-all duration-200 ${
+                          item.active
+                            ? "bg-gradient-to-r from-emerald-50 to-orange-100 border border-orange-200 shadow-sm"
+                            : "hover:bg-gray-50 hover:shadow-sm"
+                        }`}
+                      >
+                        <div
+                          className={`w-8 h-8 rounded-lg flex items-center justify-center mr-3 ${
+                            item.active
+                              ? "bg-emerald-500 text-white"
+                              : "bg-gray-100 text-gray-600"
+                          }`}
                         >
-                          <path d="M24 20.993V24H0v-2.996A14.977 14.977 0 0112.004 15c4.904 0 9.26 2.354 11.996 5.993zM16.002 8.999a4 4 0 11-8 0 4 4 0 018 0z" />
-                        </svg>
-                      </div>
-                      <span className="text-sm text-gray-700">
-                        Personal Information
-                      </span>
-                    </button>
-                    <button className="w-full flex items-center px-3 py-2 rounded-md hover:bg-gray-50">
-                      <div className="w-6 h-6 bg-gray-400 rounded-sm flex items-center justify-center mr-3">
-                        <svg
-                          className="w-4 h-4 text-white"
-                          fill="currentColor"
-                          viewBox="0 0 24 24"
+                          <span className="text-sm">{item.icon}</span>
+                        </div>
+                        <span
+                          className={`text-sm font-medium ${
+                            item.active ? "text-green-800" : "text-gray-700"
+                          }`}
                         >
-                          <path d="M3 3v18h18v-18h-18zm16 16h-14v-14h14v14zm-10-8h-2v2h2v-2zm0 4h-2v2h2v-2zm4-4h-2v2h2v-2zm0 4h-2v2h2v-2zm4-4h-2v2h2v-2zm0 4h-2v2h2v-2z" />
-                        </svg>
-                      </div>
-                      <span className="text-sm text-gray-700">
-                        Financial Information
-                      </span>
-                    </button>
-                    <button className="w-full flex items-center px-3 py-2 rounded-md hover:bg-gray-50">
-                      <div className="w-6 h-6 bg-gray-400 rounded-sm flex items-center justify-center mr-3">
-                        <svg
-                          className="w-4 h-4 text-white"
-                          fill="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-                        </svg>
-                      </div>
-                      <span className="text-sm text-gray-700">Health Plan</span>
-                    </button>
-                    <button className="w-full flex items-center px-3 py-2 rounded-md hover:bg-gray-50">
-                      <div className="w-6 h-6 bg-gray-400 rounded-sm flex items-center justify-center mr-3">
-                        <svg
-                          className="w-4 h-4 text-white"
-                          fill="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path d="M17 3H7c-1.1 0-2 .9-2 2v16l7-3 7 3V5c0-1.1-.9-2-2-2z" />
-                        </svg>
-                      </div>
-                      <span className="text-sm text-gray-700">
-                        Retirement Plan
-                      </span>
-                    </button>
-                    <button className="w-full flex items-center px-3 py-2 rounded-md hover:bg-gray-50">
-                      <div className="w-6 h-6 bg-gray-400 rounded-sm flex items-center justify-center mr-3">
-                        <svg
-                          className="w-4 h-4 text-white"
-                          fill="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
-                        </svg>
-                      </div>
-                      <span className="text-sm text-gray-700">Family Plan</span>
-                    </button>
-                    <button className="w-full flex items-center px-3 py-2 rounded-md hover:bg-gray-50">
-                      <div className="w-6 h-6 bg-gray-400 rounded-sm flex items-center justify-center mr-3">
-                        <svg
-                          className="w-4 h-4 text-white"
-                          fill="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path d="M12 3L1 9l4 2.18v6L12 21l7-3.82v-6L23 9l-11-6zm2.82 7.58L12 11.94l-2.82-1.36L12 9.06l2.82 1.52z" />
-                        </svg>
-                      </div>
-                      <span className="text-sm text-gray-700">
-                        Education Plan
-                      </span>
-                    </button>
+                          {item.label}
+                        </span>
+                      </button>
+                    ))}
                   </nav>
                 </div>
               </div>
+
+              {/* Main Content Area */}
               <div className="flex-1 bg-white">
-                <div className="bg-white border-b border-gray-200">
-                  <div className="flex items-center justify-between px-4 py-4">
-                    <h1 className="text-lg font-medium text-gray-900">
-                      Profile
-                    </h1>
-                    <div className="flex items-center space-x-4">
+                {/* Header */}
+                <div className="bg-white border-b border-gray-200 shadow-sm">
+                  <div className="flex items-center justify-between px-8 py-6">
+                    <div>
+                      <h1 className="text-2xl font-bold text-gray-900">
+                        Profile Settings
+                      </h1>
+                      <p className="text-sm text-gray-600 mt-1">
+                        Manage your personal information and preferences
+                      </p>
+                    </div>
+                    <div className="flex items-center space-x-3">
                       {!isEditing ? (
                         <button
                           onClick={() => setIsEditing(true)}
-                          className="bg-blue-500 text-white px-4 py-2 rounded-md text-sm hover:bg-blue-600"
+                          className="bg-orange-500 hover:bg-blue-600 text-white px-6 py-2.5 rounded-lg text-sm font-medium transition-colors shadow-sm flex items-center"
                         >
-                          Edit
+                          <svg
+                            className="w-4 h-4 mr-2"
+                            fill="currentColor"
+                            viewBox="0 0 20 20"
+                          >
+                            <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+                          </svg>
+                          Edit Profile
                         </button>
                       ) : (
-                        <button
-                          onClick={handleSave}
-                          disabled={loading}
-                          className="bg-green-500 text-white px-4 py-2 rounded-md text-sm hover:bg-green-600 disabled:opacity-50"
-                        >
-                          {loading ? "Saving..." : "Save"}
-                        </button>
+                        <div className="flex space-x-2">
+                          <button
+                            onClick={handleSave}
+                            disabled={loading}
+                            className="bg-green-500 hover:bg-green-600 text-white px-6 py-2.5 rounded-lg text-sm font-medium transition-colors shadow-sm disabled:opacity-50 flex items-center"
+                          >
+                            {loading ? (
+                              <svg
+                                className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                              >
+                                <circle
+                                  className="opacity-25"
+                                  cx="12"
+                                  cy="12"
+                                  r="10"
+                                  stroke="currentColor"
+                                  strokeWidth="4"
+                                ></circle>
+                                <path
+                                  className="opacity-75"
+                                  fill="currentColor"
+                                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                                ></path>
+                              </svg>
+                            ) : (
+                              <svg
+                                className="w-4 h-4 mr-2"
+                                fill="currentColor"
+                                viewBox="0 0 20 20"
+                              >
+                                <path
+                                  fillRule="evenodd"
+                                  d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                  clipRule="evenodd"
+                                />
+                              </svg>
+                            )}
+                            {loading ? "Saving..." : "Save Changes"}
+                          </button>
+                          <button
+                            onClick={() => setIsEditing(false)}
+                            className="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2.5 rounded-lg text-sm font-medium transition-colors shadow-sm"
+                          >
+                            Cancel
+                          </button>
+                        </div>
                       )}
                     </div>
                   </div>
                 </div>
-                <div className="max-w-2xl p-6">
-                  <div className="mb-8">
-                    <div className="flex items-center mb-4">
-                      <div className="w-1 h-6 bg-blue-500 rounded-full mr-3"></div>
-                      <h2 className="text-lg font-medium text-gray-900">
-                        PERSONAL INFORMATION
-                      </h2>
-                    </div>
-                    <div className="space-y-4">
-                      <div className="grid grid-cols-2 gap-4">
-                        <div>
-                          <label className="block text-sm text-gray-700 mb-1">
-                            First Name
-                          </label>
-                          <input
-                            type="text"
-                            name="firstName"
-                            value={formData.firstName}
-                            onChange={handleInputChange}
-                            disabled={!isEditing}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-50"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-sm text-gray-700 mb-1">
-                            Last Name
-                          </label>
-                          <input
-                            type="text"
-                            name="lastName"
-                            value={formData.lastName}
-                            onChange={handleInputChange}
-                            disabled={!isEditing}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-50"
-                          />
+
+                {/* Form Content */}
+                <div className="p-8">
+                  <div className="max-w-4xl mx-auto space-y-8">
+                    {/* Personal Information Card */}
+                    <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                      <div className="bg-gradient-to-r from-orange-100 to-emerald-50 px-6 py-4 border-b border-gray-200">
+                        <div className="flex items-center">
+                          <div className="w-2 h-8 bg-orange-500 rounded-full mr-4"></div>
+                          <h2 className="text-lg font-semibold text-gray-900">
+                            Personal Information
+                          </h2>
                         </div>
                       </div>
-                      <div className="grid grid-cols-2 gap-4">
-                        <div>
-                          <label className="block text-sm text-gray-700 mb-1">
-                            Status
-                          </label>
-                          <select
-                            name="status"
-                            value={formData.status}
-                            onChange={handleInputChange}
-                            disabled={!isEditing}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-50"
-                          >
-                            <option value="">Please select</option>
-                            <option value="single">Single</option>
-                            <option value="married">Married</option>
-                          </select>
-                        </div>
-                        <div>
-                          <label className="block text-sm text-gray-700 mb-1">
-                            Date of Birth
-                          </label>
-                          <div className="flex gap-1">
-                            <select
-                              name="day"
-                              value={formData.day}
+                      <div className="p-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                          <div className="space-y-2">
+                            <label className="block text-sm font-medium text-gray-700">
+                              First Name
+                            </label>
+                            <input
+                              type="text"
+                              name="firstName"
+                              value={formData.firstName}
                               onChange={handleInputChange}
-                              className="w-1/3 px-2 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                               disabled={!isEditing}
-                            >
-                              <option value="">DD</option>
-                              {[...Array(31)].map((_, i) => (
-                                <option key={i} value={i + 1}>
-                                  {(i + 1).toString().padStart(2, "0")}
-                                </option>
-                              ))}
-                            </select>
-                            <select
-                              name="month"
-                              value={formData.month}
+                              className="w-full px-4 py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-50 disabled:text-gray-500 transition-colors"
+                              placeholder="Enter your first name"
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <label className="block text-sm font-medium text-gray-700">
+                              Last Name
+                            </label>
+                            <input
+                              type="text"
+                              name="lastName"
+                              value={formData.lastName}
                               onChange={handleInputChange}
-                              className="w-1/3 px-2 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                               disabled={!isEditing}
-                            >
-                              <option value="">MM</option>
-                              {[...Array(12)].map((_, i) => (
-                                <option key={i} value={i + 1}>
-                                  {(i + 1).toString().padStart(2, "0")}
-                                </option>
-                              ))}
-                            </select>
-                            <select
-                              name="year"
-                              value={formData.year}
+                              className="w-full px-4 py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-50 disabled:text-gray-500 transition-colors"
+                              placeholder="Enter your last name"
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <label className="block text-sm font-medium text-gray-700">
+                              Email Address
+                            </label>
+                            <input
+                              type="email"
+                              value={user?.email || ""}
+                              disabled
+                              className="w-full px-4 py-3 border border-gray-300 rounded-lg text-sm bg-gray-50 text-gray-500"
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <label className="block text-sm font-medium text-gray-700">
+                              Phone Number
+                            </label>
+                            <div className="flex gap-2">
+                              <select
+                                className="px-3 py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-50"
+                                disabled={!isEditing}
+                              >
+                                <option>+63</option>
+                                <option>+1</option>
+                                <option>+66</option>
+                              </select>
+                              <input
+                                type="tel"
+                                name="contactNumber"
+                                value={formData.contactNumber}
+                                onChange={handleInputChange}
+                                disabled={!isEditing}
+                                className="flex-1 px-4 py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-50 disabled:text-gray-500 transition-colors"
+                                placeholder="Enter your phone number"
+                              />
+                            </div>
+                          </div>
+                          <div className="space-y-2">
+                            <label className="block text-sm font-medium text-gray-700">
+                              Date of Birth
+                            </label>
+                            <div className="flex gap-2">
+                              <select
+                                name="day"
+                                value={formData.day}
+                                onChange={handleInputChange}
+                                className="flex-1 px-3 py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-50"
+                                disabled={!isEditing}
+                              >
+                                <option value="">Day</option>
+                                {[...Array(31)].map((_, i) => (
+                                  <option key={i} value={i + 1}>
+                                    {(i + 1).toString().padStart(2, "0")}
+                                  </option>
+                                ))}
+                              </select>
+                              <select
+                                name="month"
+                                value={formData.month}
+                                onChange={handleInputChange}
+                                className="flex-1 px-3 py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-50"
+                                disabled={!isEditing}
+                              >
+                                <option value="">Month</option>
+                                {[...Array(12)].map((_, i) => (
+                                  <option key={i} value={i + 1}>
+                                    {(i + 1).toString().padStart(2, "0")}
+                                  </option>
+                                ))}
+                              </select>
+                              <select
+                                name="year"
+                                value={formData.year}
+                                onChange={handleInputChange}
+                                className="flex-1 px-3 py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-50"
+                                disabled={!isEditing}
+                              >
+                                <option value="">Year</option>
+                                {[...Array(100)].map((_, i) => (
+                                  <option key={i} value={2025 - i}>
+                                    {2025 - i}
+                                  </option>
+                                ))}
+                              </select>
+                            </div>
+                          </div>
+                          <div className="space-y-2 md:col-span-2">
+                            <label className="block text-sm font-medium text-gray-700">
+                              Address
+                            </label>
+                            <input
+                              type="text"
+                              name="address"
+                              value={formData.address}
                               onChange={handleInputChange}
-                              className="w-1/3 px-2 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                               disabled={!isEditing}
-                            >
-                              <option value="">YYYY</option>
-                              {[...Array(100)].map((_, i) => (
-                                <option key={i} value={2025 - i}>
-                                  {2025 - i}
-                                </option>
-                              ))}
-                            </select>
+                              className="w-full px-4 py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-50 disabled:text-gray-500 transition-colors"
+                              placeholder="Enter your full address"
+                            />
                           </div>
                         </div>
                       </div>
-                      <div className="grid grid-cols-2 gap-4">
-                        <div>
-                          <label className="block text-sm text-gray-700 mb-1">
-                            Email Address
-                          </label>
-                          <input
-                            type="email"
-                            value={user?.email || ""}
-                            disabled
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm bg-gray-50"
-                          />
+                    </div>
+
+                    {/* Additional Information Card */}
+                    <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                      <div className="bg-gradient-to-r from-orange-100 to-emerald-50 px-6 py-4 border-b border-gray-200">
+                        <div className="flex items-center">
+                          <div className="w-2 h-8 bg-orange-500 rounded-full mr-4"></div>
+                          <h2 className="text-lg font-semibold text-gray-900">
+                            Additional Information
+                          </h2>
                         </div>
-                        <div>
-                          <label className="block text-sm text-gray-700 mb-1">
-                            Phone Number
-                          </label>
-                          <div className="flex gap-1">
-                            <select
-                              className="w-1/3 px-2 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      </div>
+                      <div className="p-6">
+                        <div className="space-y-4">
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                              Notes
+                            </label>
+                            <textarea
+                              placeholder="Add any additional notes or comments..."
+                              rows={4}
+                              className="w-full px-4 py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-50 disabled:text-gray-500 transition-colors resize-none"
                               disabled={!isEditing}
-                            >
-                              <option>+66</option>
-                              <option>+63</option>
-                              <option>+1</option>
-                            </select>
-                            <input
-                              type="tel"
-                              name="contactNumber"
-                              value={formData.contactNumber}
-                              onChange={handleInputChange}
-                              disabled={!isEditing}
-                              className="w-2/3 px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-50"
                             />
                           </div>
                         </div>
                       </div>
                     </div>
                   </div>
-                  <div className="mb-8">
-                    <div className="flex items-center mb-4">
-                      <div className="w-1 h-6 bg-blue-500 rounded-full mr-3"></div>
-                      <h2 className="text-lg font-medium text-gray-900">
-                        PERSONAL ADDRESS
-                      </h2>
-                    </div>
-                    <div className="space-y-4">
-                      <div className="grid grid-cols-2 gap-4">
-                        <div>
-                          <label className="block text-sm text-gray-700 mb-1">
-                            Address 1
-                          </label>
-                          <input
-                            type="text"
-                            name="address"
-                            value={formData.address}
-                            onChange={handleInputChange}
-                            disabled={!isEditing}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-50"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-sm text-gray-700 mb-1">
-                            City
-                          </label>
-                          <select
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-50"
-                            disabled={!isEditing}
-                          >
-                            <option>Please select</option>
-                            <option>Manila</option>
-                            <option>Tagaytay</option>
-                            <option>Cavite City</option>
-                          </select>
-                        </div>
-                      </div>
-                      <div className="grid grid-cols-2 gap-4">
-                        <div>
-                          <label className="block text-sm text-gray-700 mb-1">
-                            Country
-                          </label>
-                          <select
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-50"
-                            disabled={!isEditing}
-                          >
-                            <option>Please select</option>
-                            <option>Philippines</option>
-                            <option>Thailand</option>
-                            <option>USA</option>
-                          </select>
-                        </div>
-                        <div>
-                          <label className="block text-sm text-gray-700 mb-1">
-                            ZIP Code
-                          </label>
-                          <input
-                            type="text"
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-50"
-                            disabled={!isEditing}
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div>
-                    <div className="flex items-center mb-4">
-                      <div className="w-1 h-6 bg-blue-500 rounded-full mr-3"></div>
-                      <h2 className="text-lg font-medium text-gray-900">
-                        NOTES
-                      </h2>
-                    </div>
-                    <div>
-                      <label className="block text-sm text-gray-700 mb-1">
-                        Notes
-                      </label>
-                      <textarea
-                        placeholder="Add notes about customer"
-                        rows={4}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-50"
-                        disabled={!isEditing}
-                      />
-                    </div>
-                  </div>
                 </div>
-                {isEditing && (
-                  <button
-                    onClick={() => setIsEditing(false)}
-                    className="fixed bottom-6 right-6 bg-gray-500 text-white px-6 py-3 rounded-md hover:bg-gray-600 shadow-lg"
-                  >
-                    Cancel
-                  </button>
-                )}
               </div>
             </div>
           </div>
