@@ -32,8 +32,7 @@ const CustomTooltip = ({ children, content }) => {
     </div>
   );
 };
-import Header from "../components/Header";
-import SideBar from "../components/Sidebar";
+import Layout from "../components/Layout";
 
 const Dashboard = () => {
   const [activeItem, setActiveItem] = useState('dashboard');
@@ -238,11 +237,7 @@ const Dashboard = () => {
   const totalRecruitsPercentage = calculatePercentageChange(totalApplications, previousPeriodData.totalApplications);
 
   return (
-    <div className="flex h-screen bg-gray-50 overflow-hidden">
-      <SideBar activeItem={activeItem} setActiveItem={setActiveItem} />
-      <div className="flex-1 flex flex-col">
-        <Header activeItem={activeItem} setActiveItem={setActiveItem} />
-        <main className="flex-1 overflow-y-auto p-6">
+    <Layout activeItem={activeItem} setActiveItem={setActiveItem}>
           {/* Dashboard Header */}
           <div className="flex justify-between items-center mb-8">
             <h1 className="text-3xl font-bold text-green-800">DASHBOARD</h1>
@@ -359,9 +354,7 @@ const Dashboard = () => {
               isPositive={calculatePercentageChange(recruitsCounts.financialAdvisor, previousPeriodData.rolesCounts.financialAdvisor) >= 0}
             />
           </div>
-        </main>
-      </div>
-    </div>
+    </Layout>
   );
 };
 

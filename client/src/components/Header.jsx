@@ -5,7 +5,7 @@ import { useAuth } from "../lib/authContext";
 import Avatar from "./Avatar";
 import EagleLogo from "./eagleLogo";
 
-const Header = ({ onMenuClick, activeItem, setActiveItem }) => {
+const Header = ({ onMenuClick, activeItem, setActiveItem, isMobileMenuOpen = false, setIsMobileMenuOpen = () => {} }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -107,10 +107,13 @@ const Header = ({ onMenuClick, activeItem, setActiveItem }) => {
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
           <button
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="p-2 rounded-lg hover:bg-gray-100 lg:hidden"
+            onClick={() => {
+              console.log('Hamburger clicked', isMobileMenuOpen);
+              setIsMobileMenuOpen && setIsMobileMenuOpen(!isMobileMenuOpen);
+            }}
+            className="p-2 rounded-lg hover:bg-gray-100 lg:hidden relative z-50"
           >
-            {isMenuOpen ? (
+            {isMobileMenuOpen ? (
               <X className="w-6 h-6" />
             ) : (
               <Menu className="w-6 h-6" />
@@ -118,18 +121,18 @@ const Header = ({ onMenuClick, activeItem, setActiveItem }) => {
           </button>
 
           <div className="flex items-center space-x-3">
-            <EagleLogo className="w-10 h-10" />
-            <div>
-              <div className="text-xl font-bold text-gray-900">
+            <EagleLogo className="w-8 h-8 sm:w-10 sm:h-10" />
+            <div className="hidden sm:block">
+              <div className="text-lg sm:text-xl font-bold text-gray-900">
                 Royal Eagles
               </div>
-              <div className="text-sm text-emerald-600 font-medium">Region</div>
+              <div className="text-xs sm:text-sm text-emerald-600 font-medium">Region</div>
             </div>
           </div>
         </div>
 
-        <div className="flex items-center space-x-4">
-          <div className="relative">
+        <div className="flex items-center space-x-2 sm:space-x-4">
+          <div className="relative hidden md:block">
             <Search className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2" />
             <input
               type="text"
@@ -140,14 +143,14 @@ const Header = ({ onMenuClick, activeItem, setActiveItem }) => {
               onBlur={() => setTimeout(() => setIsSearchFocused(false), 200)}
               className={`pl-10 pr-4 py-2 border rounded-lg transition-all duration-200 ${
                 isSearchFocused
-                  ? "w-80 border-emerald-500 ring-2 ring-emerald-500 ring-opacity-20"
-                  : "w-64 border-gray-200"
+                  ? "w-64 lg:w-80 border-emerald-500 ring-2 ring-emerald-500 ring-opacity-20"
+                  : "w-48 lg:w-64 border-gray-200"
               } focus:outline-none`}
             />
 
             {/* Search Suggestions */}
             {isSearchFocused && searchQuery && (
-              <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+              <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50 w-64 lg:w-80">
                 <div className="p-2">
                   <div className="px-3 py-2 text-sm text-gray-500 border-b">
                     Quick Results
@@ -227,13 +230,20 @@ const Header = ({ onMenuClick, activeItem, setActiveItem }) => {
             )}
           </div>
 
+          <button
+            onClick={() => setIsProfileOpen(!isProfileOpen)}
+            className="md:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors"
+          >
+            <Search className="w-5 h-5 text-gray-600" />
+          </button>
+
           <div className="relative" ref={profileRef}>
             <button
               onClick={() => setIsProfileOpen(!isProfileOpen)}
               className="flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-100 transition-colors"
             >
-              <Avatar name={userProfile.firstName && userProfile.lastName ? `${userProfile.firstName} ${userProfile.lastName}` : userProfile.email?.split('@')[0] || "User"} className="w-8 h-8" />
-              <span className="w-2 h-2 bg-emerald-500 rounded-full"></span>
+              <Avatar name={userProfile.firstName && userProfile.lastName ? `${userProfile.firstName} ${userProfile.lastName}` : userProfile.email?.split('@')[0] || "User"} className="w-6 h-6 sm:w-8 sm:h-8" />
+              <span className="w-2 h-2 bg-emerald-500 rounded-full hidden sm:block"></span>
             </button>
 
             {/* Profile Dropdown */}
@@ -297,29 +307,7 @@ const Header = ({ onMenuClick, activeItem, setActiveItem }) => {
         </div>
       </div>
 
-      {/* Mobile Menu */}
-      {isMenuOpen && (
-        <div className="lg:hidden border-t border-gray-200 bg-white">
-          <div className="px-4 py-2 space-y-1">
-            {menuItems.map((item) => (
-              <button
-                key={item.id}
-                onClick={() => {
-                  setActiveItem && setActiveItem(item.id);
-                  setIsMenuOpen(false);
-                }}
-                className={`w-full text-left px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  activeItem === item.id
-                    ? "bg-emerald-100 text-emerald-700"
-                    : "text-gray-600 hover:bg-gray-100"
-                }`}
-              >
-                {item.label}
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
+
     </header>
   );
 };
