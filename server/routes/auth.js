@@ -131,4 +131,25 @@ const updateProfile = async (c) => {
   }
 };
 
-module.exports = { signUp, signIn, signOut, updateProfile };
+const getProfile = async (c) => {
+  try {
+    const { data: { session }, error } = await supabase.auth.getSession();
+    
+    if (error || !session?.user) {
+      return c.json({ success: false, message: 'Not authenticated' }, 401);
+    }
+
+    return c.json({ 
+      success: true, 
+      data: {
+        first_name: session.user.user_metadata?.first_name || '',
+        last_name: session.user.user_metadata?.last_name || '',
+        email: session.user.email
+      }
+    });
+  } catch (error) {
+    return c.json({ success: false, message: error.message }, 500);
+  }
+};
+
+module.exports = { signUp, signIn, signOut, updateProfile, getProfile };
