@@ -1,9 +1,44 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { ChevronDown } from "lucide-react";
+import { settingsService } from '../../services/settingsService';
 
 const UserAccount = () => {
   const [selectedLanguage, setSelectedLanguage] = useState("English");
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [settings, setSettings] = useState({
+    email_notifications: false,
+    sms_notifications: false,
+    two_factor_enabled: false,
+    language: 'English'
+  });
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    loadSettings();
+  }, []);
+
+  const loadSettings = async () => {
+    try {
+      const userSettings = await settingsService.getUserSettings();
+      setSettings(userSettings);
+      setSelectedLanguage(userSettings.language || 'English');
+    } catch (error) {
+      console.error('Error loading settings:', error);
+    }
+  };
+
+  const updateSetting = async (key, value) => {
+    try {
+      setLoading(true);
+      const updatedSettings = { ...settings, [key]: value };
+      await settingsService.updateSettings(updatedSettings);
+      setSettings(updatedSettings);
+    } catch (error) {
+      console.error('Error updating setting:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <>
@@ -24,7 +59,10 @@ const UserAccount = () => {
                 Update Your Password Regularly To Keep Your Account Secure.
               </p>
             </div>
-            <button className="px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-md hover:bg-green-700">
+            <button 
+              onClick={() => alert('Password change functionality')}
+              className="px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-md hover:bg-green-700"
+            >
               Change Password
             </button>
           </div>
@@ -38,7 +76,10 @@ const UserAccount = () => {
                 Set Up Password Recovery Options For Your Account.
               </p>
             </div>
-            <button className="px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-md hover:bg-green-700">
+            <button 
+              onClick={() => alert('Recovery setup functionality')}
+              className="px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-md hover:bg-green-700"
+            >
               Configure Recovery
             </button>
           </div>
