@@ -13,6 +13,7 @@ const { getSession } = require('./routes/session');
 const { getAccounts, createAccount, updateAccount, deleteAccount } = require('./routes/accounts');
 const { getRecruits, updateRecruit, deleteRecruit, getRecruitsWithDetails, getApplicationsWithRecruitment } = require('./routes/recruitment');
 const { getActivityLogs, createActivityLog, deleteActivityLog, exportActivityLogs } = require('./routes/activityLogs');
+const { getUserSettings, updateUserSettings, changePassword, exportUserData, submitSupportTicket, getUserTickets } = require('./routes/settings');
 // const { migrateUsersToAccounts } = require('./routes/migration');
 
 
@@ -22,7 +23,7 @@ const app = new Hono();
 app.use('/*', cors({
   origin: 'http://localhost:5174',
   allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowHeaders: ['Content-Type', 'Authorization'],
+  allowHeaders: ['Content-Type', 'Authorization', 'user-id'],
   credentials: true
 }));
 
@@ -65,6 +66,14 @@ app.get('/api/activity-logs', getActivityLogs);
 app.post('/api/activity-logs', createActivityLog);
 app.delete('/api/activity-logs/:id', deleteActivityLog);
 app.get('/api/activity-logs/export', exportActivityLogs);
+
+// Settings routes
+app.get('/api/settings', getUserSettings);
+app.put('/api/settings', updateUserSettings);
+app.put('/api/settings/password', changePassword);
+app.post('/api/settings/export', exportUserData);
+app.post('/api/settings/support', submitSupportTicket);
+app.get('/api/settings/tickets', getUserTickets);
 
 // Migration route
 // app.post('/api/migrate-users', migrateUsersToAccounts);

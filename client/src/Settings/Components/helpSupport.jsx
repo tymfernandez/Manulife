@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { ChevronDown, Phone, Mail, MessageCircle } from "lucide-react";
+import { settingsService } from '../../services/settingsService';
 
 const HelpSupport = () => {
   const [issueType, setIssueType] = useState("Select Issue Type");
@@ -134,7 +135,30 @@ const HelpSupport = () => {
               </div>
 
               {/* Submit Button */}
-              <button className="w-full py-2 bg-green-600 text-white text-sm font-medium rounded-md hover:bg-green-700 transition-colors">
+              <button 
+                onClick={async () => {
+                  try {
+                    if (!issueType || issueType === 'Select Issue Type' || !description.trim()) {
+                      alert('Please fill in all required fields');
+                      return;
+                    }
+                    
+                    await settingsService.submitTicket({
+                      issueType,
+                      priority: priorityType,
+                      description
+                    });
+                    
+                    alert('Support ticket submitted successfully!');
+                    setIssueType('Select Issue Type');
+                    setPriorityType('Low');
+                    setDescription('');
+                  } catch (error) {
+                    alert('Error submitting ticket: ' + error.message);
+                  }
+                }}
+                className="w-full py-2 bg-green-600 text-white text-sm font-medium rounded-md hover:bg-green-700 transition-colors"
+              >
                 Submit Ticket
               </button>
             </div>

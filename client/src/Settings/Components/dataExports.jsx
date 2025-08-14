@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { ChevronDown } from "lucide-react";
+import { settingsService } from '../../services/settingsService';
 
 const DataExport = () => {
   const [selectedFormat, setSelectedFormat] = useState("PDF");
@@ -54,7 +55,29 @@ const DataExport = () => {
             </div>
 
             {/* Export Button */}
-            <button className="px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-md hover:bg-green-700">
+            <button 
+              onClick={async () => {
+                try {
+                  const result = await settingsService.exportData(selectedFormat.toLowerCase());
+                  
+                  // Create and download file
+                  const blob = new Blob([result.data], { type: result.contentType });
+                  const url = window.URL.createObjectURL(blob);
+                  const a = document.createElement('a');
+                  a.href = url;
+                  a.download = result.filename;
+                  document.body.appendChild(a);
+                  a.click();
+                  window.URL.revokeObjectURL(url);
+                  document.body.removeChild(a);
+                  
+                  alert('Data exported successfully!');
+                } catch (error) {
+                  alert('Error exporting data: ' + error.message);
+                }
+              }}
+              className="px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-md hover:bg-green-700"
+            >
               Export
             </button>
           </div>
