@@ -28,6 +28,7 @@ const ApplicationForm = () => {
   const [message, setMessage] = useState("");
   const [currentStep, setCurrentStep] = useState(1);
   const [completedFields, setCompletedFields] = useState({});
+  const [fieldErrors, setFieldErrors] = useState({});
   const [isSubmitted, setIsSubmitted] = useState(false);
 
   const positionOptions = [
@@ -64,15 +65,75 @@ const ApplicationForm = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
+    
+    // Clear existing errors for this field
+    setFieldErrors({
+      ...fieldErrors,
+      [name]: "",
+    });
+    
+    // Validation for fullName - only letters and spaces, minimum 3 letters
+    if (name === 'fullName') {
+      const lettersOnly = /^[a-zA-Z\s]*$/;
+      if (!lettersOnly.test(value)) {
+        return; // Don't update if invalid characters
+      }
+      
+      // Check minimum length (excluding spaces)
+      const lettersCount = value.replace(/\s/g, '').length;
+      if (value.length > 0 && lettersCount < 3) {
+        setFieldErrors({
+          ...fieldErrors,
+          [name]: "Name must contain at least 3 letters",
+        });
+      }
+    }
+    
+    // Validation for emailAddress - must be a valid email format
+    if (name === 'emailAddress') {
+      // Basic email validation pattern
+      const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+      
+      if (value.length > 0 && !emailPattern.test(value)) {
+        setFieldErrors({
+          ...fieldErrors,
+          [name]: "Please enter a valid email address",
+        });
+      }
+    }
+    
+    // Validation for contactNumber - only 11 digits
+    if (name === 'contactNumber') {
+      const numbersOnly = /^[0-9]*$/;
+      if (!numbersOnly.test(value) || value.length > 11) {
+        return; // Don't update if invalid characters or more than 11 digits
+      }
+    }
+    
     setFormData({
       ...formData,
       [name]: value,
     });
 
-    // Mark field as completed if it has value
+    // Mark field as completed if it has value and meets requirements
+    const isCompleted = () => {
+      if (name === 'contactNumber') {
+        return value.length === 11;
+      }
+      if (name === 'fullName') {
+        const lettersCount = value.replace(/\s/g, '').length;
+        return lettersCount >= 3;
+      }
+      if (name === 'emailAddress') {
+        const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+        return emailPattern.test(value);
+      }
+      return value.length > 0;
+    };
+    
     setCompletedFields({
       ...completedFields,
-      [name]: value.length > 0,
+      [name]: isCompleted(),
     });
   };
 
@@ -299,14 +360,29 @@ const ApplicationForm = () => {
           name="fullName"
           value={formData.fullName}
           onChange={handleInputChange}
-          placeholder="Full Name"
+          placeholder="Full Name (minimum 3 letters)"
           required
-          className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:ring-0 transition-all duration-200 text-gray-700 placeholder-gray-400"
+          pattern="[a-zA-Z\s]+"
+          title="Please enter only letters and spaces, minimum 3 letters"
+          className={`w-full pl-12 pr-4 py-3 border-2 rounded-xl focus:ring-0 transition-all duration-200 text-gray-700 placeholder-gray-400 ${
+            fieldErrors.fullName 
+              ? 'border-red-500 focus:border-red-500' 
+              : 'border-gray-200 focus:border-green-500'
+          }`}
         />
-        {completedFields.fullName && (
+        {completedFields.fullName && !fieldErrors.fullName && (
           <CheckCircle className="absolute right-3 top-3 h-5 w-5 text-green-500" />
         )}
+        {fieldErrors.fullName && (
+          <AlertCircle className="absolute right-3 top-3 h-5 w-5 text-red-500" />
+        )}
       </div>
+      {fieldErrors.fullName && (
+        <div className="mt-1 text-sm text-red-600 flex items-center">
+          <AlertCircle className="h-4 w-4 mr-1" />
+          {fieldErrors.fullName}
+        </div>
+      )}
 
       <div className="relative">
         <Mail className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
@@ -317,12 +393,27 @@ const ApplicationForm = () => {
           onChange={handleInputChange}
           placeholder="Email Address"
           required
-          className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:ring-0 transition-all duration-200 text-gray-700 placeholder-gray-400"
+          pattern="[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}"
+          title="Please enter a valid email address"
+          className={`w-full pl-12 pr-4 py-3 border-2 rounded-xl focus:ring-0 transition-all duration-200 text-gray-700 placeholder-gray-400 ${
+            fieldErrors.emailAddress 
+              ? 'border-red-500 focus:border-red-500' 
+              : 'border-gray-200 focus:border-green-500'
+          }`}
         />
-        {completedFields.emailAddress && (
+        {completedFields.emailAddress && !fieldErrors.emailAddress && (
           <CheckCircle className="absolute right-3 top-3 h-5 w-5 text-green-500" />
         )}
+        {fieldErrors.emailAddress && (
+          <AlertCircle className="absolute right-3 top-3 h-5 w-5 text-red-500" />
+        )}
       </div>
+      {fieldErrors.emailAddress && (
+        <div className="mt-1 text-sm text-red-600 flex items-center">
+          <AlertCircle className="h-4 w-4 mr-1" />
+          {fieldErrors.emailAddress}
+        </div>
+      )}
 
       <div className="relative">
         <Phone className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
@@ -333,6 +424,9 @@ const ApplicationForm = () => {
           onChange={handleInputChange}
           placeholder="Contact Number"
           required
+          pattern="[0-9]{11}"
+          title="Please enter exactly 11 digits"
+          maxLength="11"
           className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:ring-0 transition-all duration-200 text-gray-700 placeholder-gray-400"
         />
         {completedFields.contactNumber && (
