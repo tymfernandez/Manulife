@@ -91,6 +91,24 @@ const Profile = () => {
     fetchProfile();
   }, []);
 
+<<<<<<< Updated upstream
+=======
+  useEffect(() => {
+    if (activeItem === "profile") {
+      fetchProfile();
+    }
+  }, [activeItem]);
+
+  const sidebarItems = [
+    { id: 1, label: "Personal Information", icon: "👤", active: true },
+
+
+
+
+
+  ];
+
+>>>>>>> Stashed changes
   const renderContent = () => {
     switch (activeItem) {
       case "profile":
