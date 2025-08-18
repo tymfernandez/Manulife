@@ -102,11 +102,7 @@ const Profile = () => {
 
   const sidebarItems = [
     { id: 1, label: "Personal Information", icon: "👤", active: true },
-    { id: 2, label: "Financial Information", icon: "💰", active: false },
-    { id: 3, label: "Health Plan", icon: "🏥", active: false },
-    { id: 4, label: "Retirement Plan", icon: "📊", active: false },
-    { id: 5, label: "Family Plan", icon: "👨‍👩‍👧‍👦", active: false },
-    { id: 6, label: "Education Plan", icon: "🎓", active: false },
+    
   ];
 
   const renderContent = () => {
