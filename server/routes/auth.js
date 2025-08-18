@@ -111,16 +111,22 @@ const signOut = async (c) => {
 
 const updateProfile = async (c) => {
   try {
-    const { first_name, last_name, contact_number, address, date_of_birth } = await c.req.json();
+    const { first_name, last_name, contact_number, address, date_of_birth, profile_photo } = await c.req.json();
+    
+    const updateData = {
+      first_name,
+      last_name,
+      contact_number,
+      address,
+      date_of_birth
+    };
+    
+    if (profile_photo) {
+      updateData.profile_photo = profile_photo;
+    }
     
     const { data, error } = await supabase.auth.updateUser({
-      data: {
-        first_name,
-        last_name,
-        contact_number,
-        address,
-        date_of_birth
-      }
+      data: updateData
     });
     
     if (error) throw error;
@@ -144,6 +150,10 @@ const getProfile = async (c) => {
       data: {
         first_name: session.user.user_metadata?.first_name || '',
         last_name: session.user.user_metadata?.last_name || '',
+        contact_number: session.user.user_metadata?.contact_number || '',
+        address: session.user.user_metadata?.address || '',
+        date_of_birth: session.user.user_metadata?.date_of_birth || '',
+        profile_photo: session.user.user_metadata?.profile_photo || '',
         email: session.user.email
       }
     });

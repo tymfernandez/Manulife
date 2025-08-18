@@ -14,7 +14,9 @@ const Profile = () => {
     day: "",
     month: "",
     year: "",
+    profilePhoto: "",
   });
+  const [selectedFile, setSelectedFile] = useState(null);
   const [loading, setLoading] = useState(false);
   const [activeItem, setActiveItem] = useState("profile");
 
@@ -44,10 +46,23 @@ const Profile = () => {
           day: dob ? dob.getDate().toString() : "",
           month: dob ? (dob.getMonth() + 1).toString() : "",
           year: dob ? dob.getFullYear().toString() : "",
+          profilePhoto: data.profile_photo || "",
         });
       }
     } catch (error) {
       console.error("Error fetching profile:", error);
+    }
+  };
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setSelectedFile(file);
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setFormData({ ...formData, profilePhoto: e.target.result });
+      };
+      reader.readAsDataURL(file);
     }
   };
 
@@ -62,18 +77,24 @@ const Profile = () => {
             )}-${formData.day.padStart(2, "0")}`
           : null;
 
+      const requestBody = {
+        first_name: formData.firstName,
+        last_name: formData.lastName,
+        contact_number: formData.contactNumber,
+        address: formData.address,
+        date_of_birth: dateOfBirth,
+      };
+
+      if (selectedFile) {
+        requestBody.profile_photo = formData.profilePhoto;
+      }
+
       const response = await fetch(
         "http://localhost:3000/api/auth/update-profile",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            first_name: formData.firstName,
-            last_name: formData.lastName,
-            contact_number: formData.contactNumber,
-            address: formData.address,
-            date_of_birth: dateOfBirth,
-          }),
+          body: JSON.stringify(requestBody),
           credentials: "include",
         }
       );
@@ -82,6 +103,7 @@ const Profile = () => {
       if (!result.success) throw new Error(result.message);
 
       await fetchProfile();
+      setSelectedFile(null);
       setIsEditing(false);
     } catch (error) {
       console.error("Error updating profile:", error);
@@ -117,18 +139,38 @@ const Profile = () => {
                   {/* Profile Avatar Section */}
                   <div className="text-center mb-10">
                     <div className="relative inline-block group">
-                      <div
-                        className="w-24 h-24 bg-gradient-to-br from-orange-300 to-orange-500
-                      -600 rounded-full flex items-center justify-center shadow-lg transform transition-transform group-hover:scale-105"
-                      >
-                        <svg
-                          className="w-12 h-12 text-white"
-                          fill="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path d="M24 20.993V24H0v-2.996A14.977 14.977 0 0112.004 15c4.904 0 9.26 2.354 11.996 5.993zM16.002 8.999a4 4 0 11-8 0 4 4 0 018 0z" />
-                        </svg>
+                      <div className="w-24 h-24 rounded-full overflow-hidden shadow-lg transform transition-transform group-hover:scale-105">
+                        {formData.profilePhoto ? (
+                          <img
+                            src={formData.profilePhoto}
+                            alt="Profile"
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div className="w-full h-full bg-gradient-to-br from-orange-300 to-orange-500 flex items-center justify-center">
+                            <svg
+                              className="w-12 h-12 text-white"
+                              fill="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path d="M24 20.993V24H0v-2.996A14.977 14.977 0 0112.004 15c4.904 0 9.26 2.354 11.996 5.993zM16.002 8.999a4 4 0 11-8 0 4 4 0 018 0z" />
+                            </svg>
+                          </div>
+                        )}
                       </div>
+                      {isEditing && (
+                        <label className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
+                          <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clipRule="evenodd" />
+                          </svg>
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={handleFileChange}
+                            className="hidden"
+                          />
+                        </label>
+                      )}
                       <div className="absolute -bottom-1 -right-1 w-8 h-8 bg-green-500 rounded-full flex items-center justify-center shadow-md border-2 border-white">
                         <svg
                           className="w-4 h-4 text-white"
