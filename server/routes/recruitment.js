@@ -27,6 +27,7 @@ const updateRecruit = async (c) => {
         email_address: recruitData.email,
         position_applied_for: recruitData.position,
         status: recruitData.status,
+        referral_name: recruitData.referralName,
         updated_at: new Date().toISOString()
       })
       .eq('id', id)

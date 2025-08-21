@@ -10,6 +10,28 @@ export const AuthProvider = ({ children }) => {
   const [userProfile, setUserProfile] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  // MFA verification function
+  const verifyMfaLogin = async (userId, code) => {
+    try {
+      const response = await fetch("http://localhost:3000/api/mfa/verify-login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId, code }),
+      });
+
+      const result = await response.json();
+      if (result.success && result.data.user) {
+        setUser(result.data.user);
+        // Log successful login
+        logLogin(result.data.user, null);
+        return { data: result.data, error: null };
+      }
+      return { data: null, error: { message: result.message } };
+    } catch (error) {
+      return { data: null, error: { message: error.message } };
+    }
+  };
+
   useEffect(() => {
     const getSession = async () => {
       try {
@@ -65,6 +87,17 @@ export const AuthProvider = ({ children }) => {
       }
 
       const result = await response.json();
+      
+      // Check if MFA is required
+      if (result.success && result.requiresMfa) {
+        return { 
+          data: null, 
+          error: null, 
+          requiresMfa: true, 
+          tempUserId: result.tempUserId 
+        };
+      }
+      
       if (result.success && result.data.user) {
         setUser(result.data.user);
         // Fetch user profile for activity logging
@@ -113,7 +146,7 @@ export const AuthProvider = ({ children }) => {
 
   return (
     <AuthContext.Provider
-      value={{ user, userProfile, signUp, signIn, signOut, loading }}
+      value={{ user, userProfile, signUp, signIn, signOut, verifyMfaLogin, loading }}
     >
       {children}
     </AuthContext.Provider>

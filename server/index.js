@@ -14,6 +14,7 @@ const { getAccounts, createAccount, updateAccount, deleteAccount } = require('./
 const { getRecruits, updateRecruit, deleteRecruit, getRecruitsWithDetails, getApplicationsWithRecruitment } = require('./routes/recruitment');
 const { getActivityLogs, createActivityLog, deleteActivityLog, exportActivityLogs } = require('./routes/activityLogs');
 const { getUserSettings, updateUserSettings, changePassword, exportUserData, submitSupportTicket, getUserTickets } = require('./routes/settings');
+const mfaRoutes = require('./routes/mfa');
 // const { migrateUsersToAccounts } = require('./routes/migration');
 
 
@@ -74,6 +75,9 @@ app.put('/api/settings/password', changePassword);
 app.post('/api/settings/export', exportUserData);
 app.post('/api/settings/support', submitSupportTicket);
 app.get('/api/settings/tickets', getUserTickets);
+
+// MFA routes
+app.route('/api/mfa', mfaRoutes);
 
 // Migration route
 // app.post('/api/migrate-users', migrateUsersToAccounts);

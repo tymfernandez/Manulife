@@ -85,6 +85,17 @@ const signIn = async (c) => {
       return c.json({ success: false, message }, status);
     }
 
+    // Check if user has MFA enabled
+    if (data.user?.user_metadata?.mfa_enabled) {
+      // Don't complete login yet - require MFA verification
+      return c.json({ 
+        success: true, 
+        requiresMfa: true,
+        tempUserId: data.user.id,
+        message: "MFA verification required" 
+      });
+    }
+
     return c.json({ success: true, data });
   } catch (error) {
     return c.json(

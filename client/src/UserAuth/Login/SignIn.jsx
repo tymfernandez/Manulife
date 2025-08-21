@@ -10,7 +10,10 @@ export default function SignIn() {
   const [error, setError] = useState("");
   const [keepSignedIn, setKeepSignedIn] = useState(false);
   const [currentSlide, setCurrentSlide] = useState(0);
-  const { signIn } = useAuth();
+  const [showMfaInput, setShowMfaInput] = useState(false);
+  const [mfaCode, setMfaCode] = useState("");
+  const [tempUserId, setTempUserId] = useState("");
+  const { signIn, verifyMfaLogin } = useAuth();
   const navigate = useNavigate();
 
   // Carousel content
@@ -45,9 +48,28 @@ export default function SignIn() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const { error } = await signIn(email, password);
-    if (error) setError(error.message);
-    else navigate("/dashboard");
+    const result = await signIn(email, password);
+    
+    if (result.error) {
+      setError(result.error.message);
+    } else if (result.requiresMfa) {
+      // Show MFA input
+      setShowMfaInput(true);
+      setTempUserId(result.tempUserId);
+      setError("");
+    } else {
+      navigate("/dashboard");
+    }
+  };
+
+  const handleMfaSubmit = async (e) => {
+    e.preventDefault();
+    const { error } = await verifyMfaLogin(tempUserId, mfaCode);
+    if (error) {
+      setError(error.message);
+    } else {
+      navigate("/dashboard");
+    }
   };
 
   return (
@@ -80,7 +102,60 @@ export default function SignIn() {
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          {showMfaInput ? (
+            // MFA Verification Form
+            <form onSubmit={handleMfaSubmit} className="space-y-4">
+              <div className="text-center mb-6">
+                <h2 className="text-xl font-medium text-gray-900 mb-2">
+                  Two-Factor Authentication
+                </h2>
+                <p className="text-sm text-gray-600">
+                  Enter the 6-digit code from your authenticator app
+                </p>
+              </div>
+              
+              <div>
+                <label
+                  htmlFor="mfaCode"
+                  className="block text-sm font-medium text-gray-700 mb-2"
+                >
+                  Verification Code
+                </label>
+                <input
+                  id="mfaCode"
+                  type="text"
+                  placeholder="123456"
+                  value={mfaCode}
+                  onChange={(e) => setMfaCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 text-gray-900 text-center text-lg tracking-widest"
+                  maxLength={6}
+                  required
+                />
+              </div>
+              
+              <button
+                type="submit"
+                disabled={mfaCode.length !== 6}
+                className="w-full bg-green-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Verify & Sign In
+              </button>
+              
+              <button
+                type="button"
+                onClick={() => {
+                  setShowMfaInput(false);
+                  setMfaCode("");
+                  setError("");
+                }}
+                className="w-full text-gray-600 hover:text-gray-800 py-2 text-sm"
+              >
+                Back to Login
+              </button>
+            </form>
+          ) : (
+            // Regular Login Form
+            <form onSubmit={handleSubmit} className="space-y-4">
             {/* Email field */}
             <div>
               <label
@@ -162,6 +237,7 @@ export default function SignIn() {
               Sign In
             </button>
           </form>
+          )}
         </div>
       </div>
 
