@@ -53,6 +53,8 @@ const RecruitmentManagement = () => {
         date: recruit.created_at,
         lastEdited: recruit.updated_at || recruit.created_at,
         daysOld: Math.floor((new Date() - new Date(recruit.created_at)) / (1000 * 60 * 60 * 24)),
+        daysLastEdited: Math.floor((new Date() - new Date(recruit.updated_at || recruit.created_at)) / (1000 * 60 * 60 * 24)),
+        referralName: recruit.referral_name || '',
         resumeUrl: recruit.resume_url
       }));
       
@@ -74,7 +76,9 @@ const RecruitmentManagement = () => {
       status: "Interview",
       date: "2025-07-30",
       lastEdited: "2025-08-01",
-      daysOld: 7
+      daysOld: 7,
+      daysLastEdited: 5,
+      referralCode: "John Smith"
     },
     {
       id: 2,
@@ -84,7 +88,9 @@ const RecruitmentManagement = () => {
       status: "Life Champion Event",
       date: "2025-07-31",
       lastEdited: "2025-08-02",
-      daysOld: 6
+      daysOld: 6,
+      daysLastEdited: 4,
+      referralCode: "Maria Garcia"
     },
     {
       id: 3,
@@ -94,7 +100,9 @@ const RecruitmentManagement = () => {
       status: "Pending",
       date: "2025-08-01",
       lastEdited: "2025-08-01",
-      daysOld: 5
+      daysOld: 5,
+      daysLastEdited: 5,
+      referralCode: ""
     },
     {
       id: 4,
@@ -104,7 +112,9 @@ const RecruitmentManagement = () => {
       status: "Approved",
       date: "2025-08-02",
       lastEdited: "2025-08-03",
-      daysOld: 4
+      daysOld: 4,
+      daysLastEdited: 3,
+      referralCode: "David Lee"
     },
     {
       id: 5,
@@ -114,7 +124,9 @@ const RecruitmentManagement = () => {
       status: "Rejected",
       date: "2025-08-03",
       lastEdited: "2025-08-03",
-      daysOld: 3
+      daysOld: 3,
+      daysLastEdited: 3,
+      referralCode: ""
     },
     {
       id: 6,
@@ -124,7 +136,9 @@ const RecruitmentManagement = () => {
       status: "Interview",
       date: "2025-08-04",
       lastEdited: "2025-08-05",
-      daysOld: 2
+      daysOld: 2,
+      daysLastEdited: 1,
+      referralCode: "Sarah Johnson"
     },
     {
       id: 7,
@@ -134,7 +148,9 @@ const RecruitmentManagement = () => {
       status: "Life Champion Event",
       date: "2025-08-05",
       lastEdited: "2025-08-05",
-      daysOld: 1
+      daysOld: 1,
+      daysLastEdited: 1,
+      referralCode: ""
     },
     {
       id: 8,
@@ -144,7 +160,9 @@ const RecruitmentManagement = () => {
       status: "Pending",
       date: "2025-07-29",
       lastEdited: "2025-07-30",
-      daysOld: 8
+      daysOld: 8,
+      daysLastEdited: 7,
+      referralCode: "Mike Chen"
     },
     {
       id: 9,
@@ -154,7 +172,9 @@ const RecruitmentManagement = () => {
       status: "Approved",
       date: "2025-07-28",
       lastEdited: "2025-07-29",
-      daysOld: 9
+      daysOld: 9,
+      daysLastEdited: 8,
+      referralCode: ""
     },
     {
       id: 10,
@@ -164,7 +184,9 @@ const RecruitmentManagement = () => {
       status: "Rejected",
       date: "2025-07-27",
       lastEdited: "2025-07-28",
-      daysOld: 10
+      daysOld: 10,
+      daysLastEdited: 9,
+      referralCode: "Lisa Wong"
     }
     ]);
   };
@@ -191,11 +213,14 @@ const RecruitmentManagement = () => {
       fullName: recruit.fullName,
       email: recruit.email,
       position: recruit.position,
-      status: recruit.status
+      status: recruit.status,
+      referralName: recruit.referralName
     });
   };
 
   const handleSave = async (id) => {
+    console.log('Save clicked for ID:', id);
+    console.log('Edit data:', editData);
     try {
       const response = await fetch(`http://localhost:3000/api/recruitment/${id}`, {
         method: 'PUT',
@@ -204,14 +229,20 @@ const RecruitmentManagement = () => {
           fullName: editData.fullName,
           email: editData.email,
           position: editData.position,
-          status: editData.status
+          status: editData.status,
+          referralName: editData.referralName || ''
         })
       });
       const result = await response.json();
 
       if (!result.success) throw new Error(result.message);
 
-      const updatedRecruit = { ...recruits.find(r => r.id === id), ...editData };
+      const updatedRecruit = { 
+        ...recruits.find(r => r.id === id), 
+        ...editData,
+        lastEdited: new Date().toISOString(),
+        daysLastEdited: 0
+      };
       setRecruits(recruits.map(recruit => 
         recruit.id === id 
           ? updatedRecruit
@@ -583,6 +614,32 @@ const RecruitmentManagement = () => {
                     </div>
                   </div>
                 </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase cursor-pointer hover:bg-opacity-80 w-32" onClick={() => handleSort('daysLastEdited')}>
+                  <div className="flex items-center gap-1">
+                    Days Last Edited
+                    <div className="flex flex-col -space-y-1">
+                      <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clipRule="evenodd" />
+                      </svg>
+                      <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+                      </svg>
+                    </div>
+                  </div>
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase cursor-pointer hover:bg-opacity-80 w-32" onClick={() => handleSort('referralCode')}>
+                  <div className="flex items-center gap-1">
+                    Referral Name
+                    <div className="flex flex-col -space-y-1">
+                      <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clipRule="evenodd" />
+                      </svg>
+                      <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+                      </svg>
+                    </div>
+                  </div>
+                </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase w-16">File</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase w-20">Actions</th>
               </tr>
@@ -651,6 +708,24 @@ const RecruitmentManagement = () => {
                   <td className="px-6 py-4 text-sm text-gray-500">{formatDate(recruit.date)}</td>
                   <td className="px-6 py-4 text-sm text-gray-500">{formatDate(recruit.lastEdited)}</td>
                   <td className="px-6 py-4 text-sm text-gray-500">{recruit.daysOld} days</td>
+                  <td className="px-6 py-4 text-sm text-gray-500">{recruit.daysLastEdited} days</td>
+                  <td className="px-6 py-4 text-sm text-gray-900">
+                    {editingId === recruit.id ? (
+                      <input
+                        type="text"
+                        value={editData.referralName}
+                        onChange={(e) => setEditData({...editData, referralName: e.target.value})}
+                        className="w-full px-2 py-1 border border-gray-300 rounded"
+                        placeholder="Enter name"
+                      />
+                    ) : (
+                      <span className={`px-2 py-1 rounded text-xs font-medium ${
+                        recruit.referralName ? 'bg-blue-100 text-blue-800' : 'text-gray-400'
+                      }`}>
+                        {recruit.referralName || '-'}
+                      </span>
+                    )}
+                  </td>
                   <td className="px-6 py-4 text-sm text-gray-500">
                     {recruit.resumeUrl ? (
                       <a href={recruit.resumeUrl} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800">
