@@ -7,7 +7,7 @@ const AccountTable = ({ accounts, onDelete, onUpdateRole }) => {
   const [editingRole, setEditingRole] = useState(null);
   const [selectedRole, setSelectedRole] = useState('');
   
-  const roles = ['Financial Adviser', 'Unit Head', 'Branch Leader', 'Region Head', 'Admin'];
+  const roles = ['Sys Admin', 'Region Head', 'BH', 'UH', 'UHA', 'FA'];
   
   const handleRoleEdit = (accountId, currentRole) => {
     setEditingRole(accountId);

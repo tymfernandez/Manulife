@@ -54,7 +54,7 @@ const SettingsPage = () => {
           </div>
         </div>
 
-        <style jsx>{`
+        <style>{`
           .toggle-checkbox:checked {
             right: 0;
             border-color: #10b981;

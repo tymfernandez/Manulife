@@ -22,15 +22,7 @@ const getRecruits = async (c) => {
       // Fallback: show all data if can't get role
       const { data, error } = await supabaseAdmin
         .from('Applications')
-        .select(`
-          *,
-          user_profiles(
-            id,
-            email,
-            full_name,
-            role
-          )
-        `)
+        .select('*')
         .order('created_at', { ascending: false });
       
       if (error) throw error;
@@ -58,15 +50,7 @@ const getRecruits = async (c) => {
       console.log('No hierarchy found, showing all data');
       const { data, error } = await supabaseAdmin
         .from('Applications')
-        .select(`
-          *,
-          user_profiles(
-            id,
-            email,
-            full_name,
-            role
-          )
-        `)
+        .select('*')
         .order('created_at', { ascending: false });
       
       if (error) throw error;
@@ -81,15 +65,7 @@ const getRecruits = async (c) => {
     // Fetch applications with user info, filtered by position
     const { data, error } = await supabaseAdmin
       .from('Applications')
-      .select(`
-        *,
-        user_profiles!inner(
-          id,
-          email,
-          full_name,
-          role
-        )
-      `)
+      .select('*')
       .in('position_applied_for', allowedRoles)
       .order('created_at', { ascending: false });
     

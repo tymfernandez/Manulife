@@ -130,16 +130,32 @@ const AccountManagement = () => {
             onUpdateRole={async (id, role) => {
               try {
                 const account = accounts.find(acc => acc.id === id);
-                await fetch(`http://localhost:3000/api/accounts/${id}`, {
+                console.log('Updating role for account:', id, 'to role:', role);
+                
+                const response = await fetch(`http://localhost:3000/api/accounts/${id}`, {
                   method: 'PUT',
                   headers: { 'Content-Type': 'application/json' },
                   body: JSON.stringify({ role })
                 });
-                // Log role update
-                logEdit('Account Role', `${account?.name || account?.email || `ID: ${id}`} → ${role}`);
-                fetchAccounts(); // Refresh the accounts list
+                
+                const result = await response.json();
+                console.log('Update response:', result);
+                
+                if (!response.ok) {
+                  throw new Error(result.message || 'Failed to update role');
+                }
+                
+                if (result.success) {
+                  // Log role update
+                  logEdit('Account Role', `${account?.name || account?.email || `ID: ${id}`} → ${role}`);
+                  fetchAccounts(); // Refresh the accounts list
+                  console.log('Role updated successfully');
+                } else {
+                  throw new Error(result.message || 'Failed to update role');
+                }
               } catch (error) {
                 console.error('Error updating role:', error);
+                alert('Failed to update role: ' + error.message);
               }
             }}
           />
