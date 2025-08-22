@@ -1,6 +1,5 @@
 # 🦅 Manulife Aquila Celestials Recruitment & Lead Management Platform
 
-THIS IS AN OJT REQUIREMENT PROJECT
 Developed by students of Cavite State University - Main Campus as part of On-the-Job Training.
 
 # 👩‍🎨 UI/UX Team
