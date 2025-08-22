@@ -10,6 +10,7 @@ import {
   ChevronRight,
   Activity
 } from 'lucide-react';
+import { useRole } from '../hooks/useRole';
 
 const Sidebar = ({ activeItem, setActiveItem, isMobileMenuOpen = false, setIsMobileMenuOpen = () => {} }) => {
   const [isCollapsed, setIsCollapsed] = useState(() => {
@@ -17,6 +18,7 @@ const Sidebar = ({ activeItem, setActiveItem, isMobileMenuOpen = false, setIsMob
     return saved !== null ? JSON.parse(saved) : true;
   });
   const [isMobile, setIsMobile] = useState(false);
+  const { canAccessPage } = useRole();
 
   useEffect(() => {
     const checkMobile = () => {
@@ -34,14 +36,17 @@ const Sidebar = ({ activeItem, setActiveItem, isMobileMenuOpen = false, setIsMob
   }, [isCollapsed, isMobile]);
   const navigate = useNavigate();
   
-  const menuItems = [
-    { id: 'dashboard', icon: BarChart3, label: 'Dashboard', path: '/dashboard' },
-    { id: 'recruits', icon: UserCheck, label: 'Recruits', path: '/recruitment' },
-    { id: 'accounts', icon: Users, label: 'Accounts', path: '/account-management' },
-    { id: 'activity-logs', icon: Activity, label: 'Activity Logs', path: '/activity-logs' },
-    { id: 'profile', icon: UserCheck, label: 'Profile', path: '/profile' },
-    { id: 'settings', icon: Settings, label: 'Settings', path: '/settings' },
+  const allMenuItems = [
+    { id: 'dashboard', icon: BarChart3, label: 'Dashboard', path: '/dashboard', page: 'dashboard' },
+    { id: 'recruits', icon: UserCheck, label: 'Recruits', path: '/recruitment', page: 'recruitment' },
+    { id: 'accounts', icon: Users, label: 'Accounts', path: '/account-management', page: 'accounts' },
+    { id: 'activity-logs', icon: Activity, label: 'Activity Logs', path: '/activity-logs', page: 'accounts' },
+    { id: 'profile', icon: UserCheck, label: 'Profile', path: '/profile', page: 'profile' },
+    { id: 'settings', icon: Settings, label: 'Settings', path: '/settings', page: 'settings' },
   ];
+
+  // Filter menu items based on user role
+  const menuItems = allMenuItems.filter(item => canAccessPage(item.page));
 
   if (isMobile) {
     return (
