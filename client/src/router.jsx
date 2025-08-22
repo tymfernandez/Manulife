@@ -9,6 +9,7 @@ import AccountManagement from "./AccountManagement/accountManagement";
 import RecruitmentManagement from "./RecruitmentManagement/recruitmentManagement";
 import ActivityLogs from "./ActivityLogs/activityLogs";
 import Settings from "./Settings/settings";
+import LandingPage from "./LandingPage/landingPage";
 
 const ProtectedRoute = () => {
   const { user, loading } = useAuth();
@@ -40,7 +41,7 @@ const PublicRoute = () => {
 export const router = createBrowserRouter([
   {
     path: "/",
-    element: <Navigate to="/signin" replace />,
+    element: <LandingPage />,
   },
   {
     path: "/signin",
@@ -84,7 +85,7 @@ export const router = createBrowserRouter([
   },
   {
     path: "/application-form",
-    element: <ProtectedRoute />,
+    element: <PublicRoute />,
     children: [
       {
         index: true,
@@ -103,33 +104,33 @@ export const router = createBrowserRouter([
     ],
   },
   {
-  path: "/recruitment",
-  element: <ProtectedRoute />,
-  children: [
-    {
-      index: true,
-      element: <RecruitmentManagement />,
-    },
-  ],
-},
-{
-  path: "/activity-logs",
-  element: <ProtectedRoute />,
-  children: [
-    {
-      index: true,
-      element: <ActivityLogs />,
-    },
-  ],
-},
-{
-  path: "/settings",
-  element: <ProtectedRoute />,
-  children: [
-    {
-      index: true,
-      element: <Settings />,
-    },
-  ],
-}
+    path: "/recruitment",
+    element: <ProtectedRoute />,
+    children: [
+      {
+        index: true,
+        element: <RecruitmentManagement />,
+      },
+    ],
+  },
+  {
+    path: "/activity-logs",
+    element: <ProtectedRoute />,
+    children: [
+      {
+        index: true,
+        element: <ActivityLogs />,
+      },
+    ],
+  },
+  {
+    path: "/settings",
+    element: <ProtectedRoute />,
+    children: [
+      {
+        index: true,
+        element: <Settings />,
+      },
+    ],
+  },
 ]);
