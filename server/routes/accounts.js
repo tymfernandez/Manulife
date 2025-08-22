@@ -64,9 +64,64 @@ const getAccounts = async (c) => {
   }
 };
 
-// Create new account (disabled - using Supabase Auth directly)
+// Create new account using Supabase Auth admin
 const createAccount = async (c) => {
-  return c.json({ success: false, message: 'Account creation handled by Supabase Auth' }, 400);
+  try {
+    const { email, password, full_name, role } = await c.req.json();
+    
+    console.log('createAccount called with:', { email, full_name, role });
+    
+    if (!supabaseAdmin) {
+      throw new Error('Admin access not configured');
+    }
+    
+    // Create user in Supabase Auth
+    const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({
+      email,
+      password,
+      email_confirm: true, // Auto-confirm email
+      user_metadata: {
+        full_name,
+        role
+      }
+    });
+    
+    if (authError) {
+      console.error('Error creating auth user:', authError);
+      throw authError;
+    }
+    
+    // Create user profile (this might be handled by database triggers)
+    const { data: profileData, error: profileError } = await supabaseAdmin
+      .from('user_profiles')
+      .upsert({
+        id: authData.user.id,
+        email: email,
+        full_name: full_name,
+        role: role || 'FA'
+      })
+      .select()
+      .single();
+    
+    if (profileError) {
+      console.error('Error creating user profile:', profileError);
+      // Don't throw here as the auth user was created successfully
+    }
+    
+    console.log('Account created successfully:', authData.user.id);
+    return c.json({ 
+      success: true, 
+      data: {
+        id: authData.user.id,
+        email: authData.user.email,
+        full_name: full_name,
+        role: role || 'FA'
+      }
+    });
+  } catch (error) {
+    console.error('createAccount error:', error);
+    return c.json({ success: false, message: error.message }, 500);
+  }
 };
 
 // Update account role via user_profiles table
@@ -98,9 +153,40 @@ const updateAccount = async (c) => {
   }
 };
 
-// Delete account (disabled - using Supabase Auth directly)
+// Delete account using Supabase Auth admin
 const deleteAccount = async (c) => {
-  return c.json({ success: false, message: 'Account deletion handled by Supabase Auth' }, 400);
+  try {
+    const id = c.req.param('id');
+    
+    console.log('deleteAccount called with id:', id);
+    
+    if (!supabaseAdmin) {
+      throw new Error('Admin access not configured');
+    }
+    
+    // First, try to delete the user from auth (this will cascade to user_profiles due to FK constraint)
+    const { data: deleteData, error: deleteError } = await supabaseAdmin.auth.admin.deleteUser(id);
+    
+    if (deleteError) {
+      console.error('Error deleting auth user:', deleteError);
+      // If auth deletion fails, try to delete just the profile
+      const { error: profileError } = await supabaseAdmin
+        .from('user_profiles')
+        .delete()
+        .eq('id', id);
+      
+      if (profileError) {
+        console.error('Error deleting user profile:', profileError);
+        throw new Error('Failed to delete account');
+      }
+    }
+    
+    console.log('Account deleted successfully:', id);
+    return c.json({ success: true, message: 'Account deleted successfully' });
+  } catch (error) {
+    console.error('deleteAccount error:', error);
+    return c.json({ success: false, message: error.message }, 500);
+  }
 };
 
 module.exports = { getAccounts, createAccount, updateAccount, deleteAccount };
