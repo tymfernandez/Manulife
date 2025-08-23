@@ -165,16 +165,33 @@ const getProfile = async (c) => {
 
 const changePassword = async (c) => {
   try {
-    const { newPassword, userId } = await c.req.json();
+    const { currentPassword, newPassword, userId } = await c.req.json();
     
-    if (!userId) {
-      return c.json({ success: false, message: 'User ID required' }, 400);
+    if (!userId || !currentPassword || !newPassword) {
+      return c.json({ success: false, message: 'Current password, new password, and user ID are required' }, 400);
     }
     
     const { supabaseAdmin } = require('../supabase');
     
     if (!supabaseAdmin) {
       return c.json({ success: false, message: 'Admin client not configured' }, 500);
+    }
+    
+    // First, get user's email to verify current password
+    const { data: userData, error: userError } = await supabaseAdmin.auth.admin.getUserById(userId);
+    
+    if (userError || !userData.user) {
+      return c.json({ success: false, message: 'User not found' }, 404);
+    }
+    
+    // Verify current password by attempting to sign in
+    const { error: signInError } = await supabase.auth.signInWithPassword({
+      email: userData.user.email,
+      password: currentPassword
+    });
+    
+    if (signInError) {
+      return c.json({ success: false, message: 'Current password is incorrect' }, 401);
     }
     
     // Update password using Supabase Admin API
@@ -190,4 +207,27 @@ const changePassword = async (c) => {
   }
 };
 
-module.exports = { signUp, signIn, signOut, updateProfile, getProfile, changePassword };
+const resetPassword = async (c) => {
+  try {
+    const { email } = await c.req.json();
+    
+    if (!email) {
+      return c.json({ success: false, message: 'Email is required' }, 400);
+    }
+    
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${process.env.CLIENT_URL || 'http://localhost:5173'}/reset-password`
+    });
+    
+    if (error) throw error;
+    
+    return c.json({ 
+      success: true, 
+      message: 'Password reset email sent successfully'
+    });
+  } catch (error) {
+    return c.json({ success: false, message: error.message }, 500);
+  }
+};
+
+module.exports = { signUp, signIn, signOut, updateProfile, getProfile, changePassword, resetPassword };

@@ -1,6 +1,6 @@
 export const passwordService = {
   // Change password for authenticated user
-  async changePassword(newPassword, userId) {
+  async changePassword(currentPassword, newPassword, userId) {
     try {
       const response = await fetch('http://localhost:3000/api/auth/change-password', {
         method: 'POST',
@@ -8,7 +8,7 @@ export const passwordService = {
           'Content-Type': 'application/json'
         },
         credentials: 'include',
-        body: JSON.stringify({ newPassword, userId })
+        body: JSON.stringify({ currentPassword, newPassword, userId })
       });
       
       if (!response.ok) {

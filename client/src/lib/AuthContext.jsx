@@ -82,11 +82,11 @@ export const AuthProvider = ({ children }) => {
         body: JSON.stringify({ email, password }),
       });
 
-      if (!response.ok) {
-        throw new Error(`Server error: ${response.status}`);
-      }
-
       const result = await response.json();
+      
+      if (!response.ok) {
+        return { data: null, error: { message: result.message || `Server error: ${response.status}` } };
+      }
       
       // Check if MFA is required
       if (result.success && result.requiresMfa) {

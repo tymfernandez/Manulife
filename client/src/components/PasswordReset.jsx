@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { supabase } from '../supabaseClient';
 import { passwordService } from '../services/passwordService';
 import { Eye, EyeOff } from 'lucide-react';
 
 const PasswordReset = () => {
-  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -15,21 +14,36 @@ const PasswordReset = () => {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    // Check if we have the necessary tokens from the URL
-    const accessToken = searchParams.get('access_token');
-    const refreshToken = searchParams.get('refresh_token');
+    const handleAuthStateChange = async () => {
+      // Check if this is a password recovery callback
+      const hashParams = new URLSearchParams(window.location.hash.substring(1));
+      const type = hashParams.get('type');
+      
+      if (type === 'recovery') {
+        const accessToken = hashParams.get('access_token');
+        const refreshToken = hashParams.get('refresh_token');
+        
+        if (accessToken && refreshToken) {
+          try {
+            await supabase.auth.setSession({
+              access_token: accessToken,
+              refresh_token: refreshToken
+            });
+            // Clear the hash from URL
+            window.history.replaceState(null, null, window.location.pathname);
+          } catch (error) {
+            setError('Invalid reset link. Please request a new password reset.');
+          }
+        } else {
+          setError('Invalid reset link. Please request a new password reset.');
+        }
+      } else {
+        setError('Invalid reset link. Please request a new password reset.');
+      }
+    };
     
-    if (!accessToken || !refreshToken) {
-      setError('Invalid reset link. Please request a new password reset.');
-      return;
-    }
-
-    // Set the session with the tokens from the URL
-    supabase.auth.setSession({
-      access_token: accessToken,
-      refresh_token: refreshToken
-    });
-  }, [searchParams]);
+    handleAuthStateChange();
+  }, []);
 
   const handlePasswordReset = async (e) => {
     e.preventDefault();
@@ -49,10 +63,12 @@ const PasswordReset = () => {
       setLoading(true);
       setError('');
       
-      const result = await passwordService.changePassword(password);
+      const { data, error } = await supabase.auth.updateUser({
+        password: password
+      });
       
-      if (!result.success) {
-        throw new Error(result.error);
+      if (error) {
+        throw new Error(error.message);
       }
       
       alert('Password updated successfully! You can now log in with your new password.');
@@ -91,6 +107,7 @@ const PasswordReset = () => {
               </label>
               <input
                 id="password"
+                name="password"
                 type={showPassword ? 'text' : 'password'}
                 required
                 value={password}
@@ -113,6 +130,7 @@ const PasswordReset = () => {
               </label>
               <input
                 id="confirmPassword"
+                name="confirmPassword"
                 type={showConfirmPassword ? 'text' : 'password'}
                 required
                 value={confirmPassword}
