@@ -22,7 +22,7 @@ const Header = ({
     lastName: "",
     email: "",
   });
-
+/*  */
   const notificationRef = useRef(null);
   const profileRef = useRef(null);
   const navigate = useNavigate();
@@ -47,9 +47,13 @@ const Header = ({
 
   useEffect(() => {
     const fetchUserProfile = async () => {
+      if (!user?.id) return;
+      
       try {
         const response = await fetch("http://localhost:3000/api/auth/profile", {
-          credentials: "include",
+          headers: {
+            'user-id': user.id
+          }
         });
         const result = await response.json();
 
