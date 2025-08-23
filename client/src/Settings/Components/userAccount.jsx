@@ -3,7 +3,7 @@ import { ChevronDown, Eye, EyeOff } from "lucide-react";
 import { settingsService } from '../../services/settingsService';
 import { supabase } from '../../supabaseClient';
 import { passwordService } from '../../services/passwordService';
-import { useAuth } from '../../lib/AuthContext';
+import { useAuth } from '../../lib/authContext';
 
 const UserAccount = ({ setShowChangePassword, setShowRecoverPassword }) => {
   const { user } = useAuth();

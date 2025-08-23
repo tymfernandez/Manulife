@@ -5,7 +5,7 @@ import Header from "../components/Header";
 import UserAccount from "./Components/userAccount";
 import HelpSupport from "./Components/helpSupport";
 import { passwordService } from '../services/passwordService';
-import { useAuth } from '../lib/AuthContext';
+import { useAuth } from '../lib/authContext';
 
 const SettingsPage = () => {
   const { user } = useAuth();

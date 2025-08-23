@@ -14,6 +14,7 @@ const Header = ({
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [isSigningOut, setIsSigningOut] = useState(false);
   const [userProfile, setUserProfile] = useState({
     firstName: "",
     lastName: "",
@@ -90,7 +91,6 @@ const Header = ({
             firstName: "",
             lastName: "",
             email: user?.email || "",
-            role: "Sys Admin", // FORCE Sys Admin role
           };
           console.log("⚠️ Using fallback profile:", fallbackProfile);
           setUserProfile(fallbackProfile);
@@ -516,6 +516,52 @@ const Header = ({
     console.log("✅ All notifications marked as read");
   };
 
+  // Enhanced sign out function with proper error handling
+  const handleSignOut = async () => {
+    if (isSigningOut) return; // Prevent multiple clicks
+    
+    try {
+      setIsSigningOut(true);
+      console.log("🔐 Starting sign out process...");
+      
+      // Close dropdowns first
+      setIsProfileOpen(false);
+      setIsNotificationOpen(false);
+      
+      // Call the auth context signOut function
+      console.log("📡 Calling signOut function...");
+      await signOut();
+      
+      console.log("✅ Sign out successful, navigating to signin...");
+      
+      // Clear any local state
+      setUserProfile({
+        firstName: "",
+        lastName: "",
+        email: "",
+        role: "",
+      });
+      setNotifications([]);
+      setUnreadCount(0);
+      
+      // Navigate to signin page
+      navigate("/signin", { replace: true });
+      
+    } catch (error) {
+      console.error("❌ Error during sign out:", error);
+      
+      // Even if signOut fails, still navigate to signin for security
+      console.log("🔄 Force navigating to signin despite error...");
+      navigate("/signin", { replace: true });
+      
+      // Force reload to clear any cached state
+      window.location.href = "/signin";
+      
+    } finally {
+      setIsSigningOut(false);
+    }
+  };
+
   // Debug logging when state changes
   useEffect(() => {
     console.log("🔔 Notifications state changed:");
@@ -721,14 +767,14 @@ const Header = ({
                 </div>
                 <div className="border-t border-gray-200 py-2">
                   <button
-                    onClick={async () => {
-                      await signOut();
-                      navigate("/signin");
-                    }}
-                    className="w-full flex items-center space-x-3 px-4 py-2 text-left hover:bg-gray-50 transition-colors text-red-600"
+                    onClick={handleSignOut}
+                    disabled={isSigningOut}
+                    className={`w-full flex items-center space-x-3 px-4 py-2 text-left hover:bg-gray-50 transition-colors text-red-600 ${
+                      isSigningOut ? "opacity-50 cursor-not-allowed" : ""
+                    }`}
                   >
                     <LogOut className="w-4 h-4" />
-                    <span>Sign Out</span>
+                    <span>{isSigningOut ? "Signing out..." : "Sign Out"}</span>
                   </button>
                 </div>
               </div>
