@@ -53,21 +53,10 @@ export const useAccounts = () => {
   const deleteAccount = async (id) => {
     try {
       const accountToDelete = accounts.find(acc => acc.id === id);
-      const accountName = accountToDelete?.name || accountToDelete?.email || `ID: ${id}`;
-      
-      // Show confirmation dialog
-      const confirmed = window.confirm(
-        `Are you sure you want to delete the account for "${accountName}"?\n\nThis action cannot be undone and will permanently remove the account and all associated data.`
-      );
-      
-      if (!confirmed) {
-        return; // User cancelled, don't proceed with deletion
-      }
-      
       await accountService.deleteAccount(id);
       setAccounts(prev => prev.filter(acc => acc.id !== id));
       // Log account deletion
-      logDelete('Account', accountName);
+      logDelete('Account', accountToDelete?.name || accountToDelete?.email || `ID: ${id}`);
     } catch (err) {
       setError(err.message);
       throw err;
