@@ -58,6 +58,7 @@ export const AuthProvider = ({ children }) => {
           password,
           fullName: additionalData.fullName || "",
           contactNumber: additionalData.contactNumber || "",
+          personalCode: additionalData.personalCode || "",
         }),
       });
 
@@ -67,7 +68,7 @@ export const AuthProvider = ({ children }) => {
 
       const result = await response.json();
       return result.success
-        ? { data: result.data, error: null }
+        ? { data: result.data, error: null, message: result.message }
         : { data: null, error: { message: result.message } };
     } catch (error) {
       return { data: null, error: { message: error.message } };
@@ -80,16 +81,17 @@ export const AuthProvider = ({ children }) => {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
+        credentials: "include"
       });
-
-      if (!response.ok) {
-        throw new Error(`Server error: ${response.status}`);
-      }
 
       const result = await response.json();
       
+      if (!result.success) {
+        return { data: null, error: { message: result.message } };
+      }
+      
       // Check if MFA is required
-      if (result.success && result.requiresMfa) {
+      if (result.requiresMfa) {
         return { 
           data: null, 
           error: null, 
@@ -98,7 +100,7 @@ export const AuthProvider = ({ children }) => {
         };
       }
       
-      if (result.success && result.data.user) {
+      if (result.data?.user) {
         setUser(result.data.user);
         // Fetch user profile for activity logging
         try {
@@ -120,9 +122,11 @@ export const AuthProvider = ({ children }) => {
         }
         return { data: result.data, error: null };
       }
-      return { data: null, error: { message: result.message } };
+      
+      return { data: null, error: { message: result.message || "Login failed" } };
     } catch (error) {
-      return { data: null, error: { message: error.message } };
+      console.error('SignIn client error:', error);
+      return { data: null, error: { message: "Network error. Please try again." } };
     }
   };
   const signOut = async () => {
