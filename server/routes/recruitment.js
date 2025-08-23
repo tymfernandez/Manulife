@@ -19,17 +19,19 @@ const getRecruits = async (c) => {
 
     if (roleError) {
       console.log('Role error, showing all data:', roleError);
-      // Fallback: show all data if can't get role
+      // Fallback: show all data if can't get role - REMOVED user_profiles join
       const { data, error } = await supabaseAdmin
         .from('Applications')
         .select(`
-          *,
-          user_profiles(
-            id,
-            email,
-            full_name,
-            role
-          )
+          id,
+          full_name,
+          email_address,
+          position_applied_for,
+          status,
+          created_at,
+          updated_at,
+          referral_name,
+          resume_url
         `)
         .order('created_at', { ascending: false });
       
@@ -53,19 +55,21 @@ const getRecruits = async (c) => {
     const allowedRoles = roleHierarchy[userRole];
     console.log('Allowed roles:', allowedRoles);
 
-    // If no role hierarchy defined, show all data
+    // If no role hierarchy defined, show all data - REMOVED user_profiles join
     if (!allowedRoles) {
       console.log('No hierarchy found, showing all data');
       const { data, error } = await supabaseAdmin
         .from('Applications')
         .select(`
-          *,
-          user_profiles(
-            id,
-            email,
-            full_name,
-            role
-          )
+          id,
+          full_name,
+          email_address,
+          position_applied_for,
+          status,
+          created_at,
+          updated_at,
+          referral_name,
+          resume_url
         `)
         .order('created_at', { ascending: false });
       
@@ -78,17 +82,19 @@ const getRecruits = async (c) => {
       return c.json({ success: true, data: [] });
     }
 
-    // Fetch applications with user info, filtered by position
+    // Fetch applications ONLY from Applications table, filtered by position - REMOVED user_profiles join
     const { data, error } = await supabaseAdmin
       .from('Applications')
       .select(`
-        *,
-        user_profiles!inner(
-          id,
-          email,
-          full_name,
-          role
-        )
+        id,
+        full_name,
+        email_address,
+        position_applied_for,
+        status,
+        created_at,
+        updated_at,
+        referral_name,
+        resume_url
       `)
       .in('position_applied_for', allowedRoles)
       .order('created_at', { ascending: false });
@@ -154,7 +160,17 @@ const getRecruitsWithDetails = async (c) => {
   try {
     const { data, error } = await supabase
       .from('Applications')
-      .select('*')
+      .select(`
+        id,
+        full_name,
+        email_address,
+        position_applied_for,
+        status,
+        created_at,
+        updated_at,
+        referral_name,
+        resume_url
+      `)
       .order('created_at', { ascending: false });
     
     if (error) throw error;
@@ -169,7 +185,17 @@ const getApplicationsWithRecruitment = async (c) => {
   try {
     const { data, error } = await supabase
       .from('Applications')
-      .select('*')
+      .select(`
+        id,
+        full_name,
+        email_address,
+        position_applied_for,
+        status,
+        created_at,
+        updated_at,
+        referral_name,
+        resume_url
+      `)
       .order('created_at', { ascending: false });
     
     if (error) throw error;
