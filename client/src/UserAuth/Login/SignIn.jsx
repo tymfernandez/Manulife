@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "../../lib/AuthContext";
+import { useAuth } from "../../lib/authContext";
 
 // Import images directly
 import carousel01 from "/Carousel01.png";
