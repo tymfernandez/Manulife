@@ -11,39 +11,55 @@ const Profile = () => {
     lastName: "",
     contactNumber: "",
     address: "",
-    day: "",
-    month: "",
-    year: "",
+  });
+  const [savedData, setSavedData] = useState({
+    contactNumber: "",
+    address: "",
   });
   const [loading, setLoading] = useState(false);
   const [activeItem, setActiveItem] = useState("profile");
 
   const handleInputChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+    const { name, value } = e.target;
+    
+    if (name === 'contactNumber') {
+      // Only allow digits and limit to 11 characters
+      const numericValue = value.replace(/\D/g, '').slice(0, 11);
+      setFormData({
+        ...formData,
+        [name]: numericValue,
+      });
+    } else {
+      setFormData({
+        ...formData,
+        [name]: value,
+      });
+    }
   };
 
   const fetchProfile = async () => {
+    if (!user?.id) return;
+    
     try {
       const response = await fetch("http://localhost:3000/api/auth/profile", {
-        credentials: "include",
+        headers: {
+          'user-id': user.id
+        }
       });
       const result = await response.json();
 
       if (result.success && result.data) {
         const data = result.data;
-        const dob = data.date_of_birth ? new Date(data.date_of_birth) : null;
-
+        
         setFormData({
           firstName: data.first_name || "",
           lastName: data.last_name || "",
           contactNumber: data.contact_number || "",
           address: data.address || "",
-          day: dob ? dob.getDate().toString() : "",
-          month: dob ? (dob.getMonth() + 1).toString() : "",
-          year: dob ? dob.getFullYear().toString() : "",
+        });
+        setSavedData({
+          contactNumber: data.contact_number || "",
+          address: data.address || "",
         });
       }
     } catch (error) {
@@ -52,39 +68,39 @@ const Profile = () => {
   };
 
   const handleSave = async () => {
+    if (!user?.id) {
+      alert("Please log in to save profile changes.");
+      return;
+    }
+    
     setLoading(true);
     try {
-      const dateOfBirth =
-        formData.day && formData.month && formData.year
-          ? `${formData.year}-${formData.month.padStart(
-              2,
-              "0"
-            )}-${formData.day.padStart(2, "0")}`
-          : null;
-
       const response = await fetch(
         "http://localhost:3000/api/auth/update-profile",
         {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: { 
+            "Content-Type": "application/json",
+            "user-id": user.id
+          },
           body: JSON.stringify({
             first_name: formData.firstName,
             last_name: formData.lastName,
             contact_number: formData.contactNumber,
             address: formData.address,
-            date_of_birth: dateOfBirth,
-          }),
-          credentials: "include",
+          })
         }
       );
 
       const result = await response.json();
       if (!result.success) throw new Error(result.message);
 
-      await fetchProfile();
       setIsEditing(false);
+      await fetchProfile();
+      alert("Profile saved successfully!");
     } catch (error) {
       console.error("Error updating profile:", error);
+      alert("Failed to save profile. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -102,11 +118,7 @@ const Profile = () => {
 
   const sidebarItems = [
     { id: 1, label: "Personal Information", icon: "👤", active: true },
-    { id: 2, label: "Financial Information", icon: "💰", active: false },
-    { id: 3, label: "Health Plan", icon: "🏥", active: false },
-    { id: 4, label: "Retirement Plan", icon: "📊", active: false },
-    { id: 5, label: "Family Plan", icon: "👨‍👩‍👧‍👦", active: false },
-    { id: 6, label: "Education Plan", icon: "🎓", active: false },
+
   ];
 
   const renderContent = () => {
@@ -330,77 +342,21 @@ const Profile = () => {
                           </div>
                           <div className="space-y-2">
                             <label className="block text-sm font-medium text-gray-700">
-                              Phone Number
+                              Phone Number (11 digits)
                             </label>
-                            <div className="flex gap-2">
-                              <select
-                                className="px-3 py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-50"
-                                disabled={!isEditing}
-                              >
-                                <option>+63</option>
-                                <option>+1</option>
-                                <option>+66</option>
-                              </select>
-                              <input
-                                type="tel"
-                                name="contactNumber"
-                                value={formData.contactNumber}
-                                onChange={handleInputChange}
-                                disabled={!isEditing}
-                                className="flex-1 px-4 py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-50 disabled:text-gray-500 transition-colors"
-                                placeholder="Enter your phone number"
-                              />
-                            </div>
+                            <input
+                              type="tel"
+                              name="contactNumber"
+                              value={formData.contactNumber}
+                              onChange={handleInputChange}
+                              disabled={!isEditing}
+                              maxLength="11"
+                              pattern="[0-9]{11}"
+                              className="w-full px-4 py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-50 disabled:text-gray-500 transition-colors"
+                              placeholder="Enter 11-digit phone number"
+                            />
                           </div>
-                          <div className="space-y-2">
-                            <label className="block text-sm font-medium text-gray-700">
-                              Date of Birth
-                            </label>
-                            <div className="flex gap-2">
-                              <select
-                                name="day"
-                                value={formData.day}
-                                onChange={handleInputChange}
-                                className="flex-1 px-3 py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-50"
-                                disabled={!isEditing}
-                              >
-                                <option value="">Day</option>
-                                {[...Array(31)].map((_, i) => (
-                                  <option key={i} value={i + 1}>
-                                    {(i + 1).toString().padStart(2, "0")}
-                                  </option>
-                                ))}
-                              </select>
-                              <select
-                                name="month"
-                                value={formData.month}
-                                onChange={handleInputChange}
-                                className="flex-1 px-3 py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-50"
-                                disabled={!isEditing}
-                              >
-                                <option value="">Month</option>
-                                {[...Array(12)].map((_, i) => (
-                                  <option key={i} value={i + 1}>
-                                    {(i + 1).toString().padStart(2, "0")}
-                                  </option>
-                                ))}
-                              </select>
-                              <select
-                                name="year"
-                                value={formData.year}
-                                onChange={handleInputChange}
-                                className="flex-1 px-3 py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-50"
-                                disabled={!isEditing}
-                              >
-                                <option value="">Year</option>
-                                {[...Array(100)].map((_, i) => (
-                                  <option key={i} value={2025 - i}>
-                                    {2025 - i}
-                                  </option>
-                                ))}
-                              </select>
-                            </div>
-                          </div>
+
                           <div className="space-y-2 md:col-span-2">
                             <label className="block text-sm font-medium text-gray-700">
                               Address
@@ -419,32 +375,7 @@ const Profile = () => {
                       </div>
                     </div>
 
-                    {/* Additional Information Card */}
-                    <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                      <div className="bg-gradient-to-r from-orange-100 to-emerald-50 px-6 py-4 border-b border-gray-200">
-                        <div className="flex items-center">
-                          <div className="w-2 h-8 bg-orange-500 rounded-full mr-4"></div>
-                          <h2 className="text-lg font-semibold text-gray-900">
-                            Additional Information
-                          </h2>
-                        </div>
-                      </div>
-                      <div className="p-6">
-                        <div className="space-y-4">
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                              Notes
-                            </label>
-                            <textarea
-                              placeholder="Add any additional notes or comments..."
-                              rows={4}
-                              className="w-full px-4 py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-50 disabled:text-gray-500 transition-colors resize-none"
-                              disabled={!isEditing}
-                            />
-                          </div>
-                        </div>
-                      </div>
-                    </div>
+
                   </div>
                 </div>
               </div>
