@@ -1,41 +1,58 @@
 const { supabase, supabaseAdmin } = require('../supabase');
 
-// Get all accounts from authenticated users
+// Get all accounts from user_profiles table
 const getAccounts = async (c) => {
   try {
-    console.log('Fetching authenticated users...');
+    console.log('Fetching user profiles...');
     
-    // Fetch authenticated users directly
-    const { data: authData, error: usersError } = await supabaseAdmin.auth.admin.listUsers();
+    // Fetch user profiles with auth user data joined
+    const { data: profiles, error: profilesError } = await supabaseAdmin
+      .from('user_profiles')
+      .select('*')
+      .order('created_at', { ascending: false });
     
-    console.log('Auth data:', authData);
-    console.log('Users error:', usersError);
-    console.log('Number of users:', authData?.users?.length || 0);
-    
-    if (usersError) {
-      console.error('Error fetching users:', usersError);
-      return c.json({ success: false, message: usersError.message }, 500);
+    if (profilesError) {
+      console.error('Error fetching user profiles:', profilesError);
+      return c.json({ success: false, message: profilesError.message }, 500);
     }
 
-    if (!authData?.users || authData.users.length === 0) {
-      console.log('No users found');
+    if (!profiles || profiles.length === 0) {
+      console.log('No user profiles found');
       return c.json({ success: true, data: [] });
     }
 
-    // Convert authenticated users to account format
-    const accounts = authData.users.map(user => {
-      console.log('Processing user:', user.email);
+    // Get auth user data to supplement profile data
+    const { data: authData, error: authError } = await supabaseAdmin.auth.admin.listUsers();
+    
+    if (authError) {
+      console.error('Error fetching auth users:', authError);
+      // Continue with just profile data if auth fetch fails
+    }
+
+    // Create a map of auth users for quick lookup
+    const authUsersMap = {};
+    if (authData?.users) {
+      authData.users.forEach(user => {
+        authUsersMap[user.id] = user;
+      });
+    }
+
+    // Convert user profiles to account format
+    const accounts = profiles.map(profile => {
+      const authUser = authUsersMap[profile.id];
+      console.log('Processing profile:', profile.email);
+      
       return {
-        id: user.id,
-        user_id: user.id,
-        name: user.user_metadata?.full_name || user.user_metadata?.name || user.email?.split('@')[0] || 'Unknown',
-        email: user.email,
-        role: user.user_metadata?.role || 'Financial Adviser',
-        status: 'Active',
-        joined_date: user.created_at,
-        last_online: user.last_sign_in_at || user.created_at,
-        created_at: user.created_at,
-        updated_at: user.updated_at || user.created_at
+        id: profile.id,
+        user_id: profile.id,
+        name: profile.full_name || profile.first_name || profile.email?.split('@')[0] || 'Unknown',
+        email: profile.email,
+        role: profile.role || 'FA',
+        status: authUser ? 'Active' : 'Inactive',
+        joined_date: profile.created_at || authUser?.created_at,
+        last_online: authUser?.last_sign_in_at || profile.created_at || authUser?.created_at,
+        created_at: profile.created_at || authUser?.created_at,
+        updated_at: profile.updated_at || authUser?.updated_at || profile.created_at || authUser?.created_at
       };
     });
     
@@ -52,20 +69,31 @@ const createAccount = async (c) => {
   return c.json({ success: false, message: 'Account creation handled by Supabase Auth' }, 400);
 };
 
-// Update account role via Supabase Auth
+// Update account role via user_profiles table
 const updateAccount = async (c) => {
   try {
     const id = c.req.param('id');
     const { role } = await c.req.json();
     
-    // Update user metadata with new role
-    const { data, error } = await supabaseAdmin.auth.admin.updateUserById(id, {
-      user_metadata: { role }
-    });
+    console.log('updateAccount called with id:', id, 'role:', role);
     
-    if (error) throw error;
+    // Update role in user_profiles table
+    const { data, error } = await supabaseAdmin
+      .from('user_profiles')
+      .update({ role })
+      .eq('id', id)
+      .select()
+      .single();
+    
+    if (error) {
+      console.error('Supabase error updating role:', error);
+      throw error;
+    }
+    
+    console.log('Role updated successfully:', data);
     return c.json({ success: true, data });
   } catch (error) {
+    console.error('updateAccount error:', error);
     return c.json({ success: false, message: error.message }, 500);
   }
 };

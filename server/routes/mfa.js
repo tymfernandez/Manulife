@@ -156,6 +156,10 @@ app.post('/verify-login', async (c) => {
     const { supabaseAdmin } = require('../supabase');
     const { userId, code } = await c.req.json();
 
+    if (!supabaseAdmin) {
+      return c.json({ success: false, message: 'Admin operations not available' }, 500);
+    }
+
     // Get user data
     const { data: userData, error: userError } = await supabaseAdmin.auth.admin.getUserById(userId);
     if (userError || !userData.user) {
@@ -179,6 +183,16 @@ app.post('/verify-login', async (c) => {
 
     if (!verified) {
       return c.json({ success: false, message: 'Invalid MFA code' }, 400);
+    }
+
+    // Create a session for the user after MFA verification
+    const { data: sessionData, error: sessionError } = await supabaseAdmin.auth.admin.generateLink({
+      type: 'magiclink',
+      email: user.email
+    });
+
+    if (sessionError) {
+      return c.json({ success: false, message: 'Failed to create session' }, 500);
     }
 
     // MFA verified - return user data for successful login

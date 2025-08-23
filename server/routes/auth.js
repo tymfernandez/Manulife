@@ -2,9 +2,19 @@ const { supabase } = require("../supabase");
 
 const signUp = async (c) => {
   try {
-    const { email, password, fullName, contactNumber } = await c.req.json();
+    const { email, password, fullName, contactNumber, personalCode } = await c.req.json();
 
-    const { data, error } = await supabase.auth.signUp({ email, password });
+    const { data, error } = await supabase.auth.signUp({ 
+      email, 
+      password,
+      options: {
+        data: {
+          full_name: fullName || null,
+          contact_number: contactNumber || null,
+          personal_code: personalCode || null
+        }
+      }
+    });
 
     if (error) {
       let message = "Registration failed";
@@ -28,20 +38,26 @@ const signUp = async (c) => {
     }
 
     if (data.user) {
-      // Create profile record
+      // Create profile record if needed
       if (fullName || contactNumber) {
-        await supabase.from("profiles").insert({
-          id: data.user.id,
-          full_name: fullName || null,
-          contact_number: contactNumber || null,
-          email: email,
-        });
+        try {
+          await supabase.from("profiles").insert({
+            id: data.user.id,
+            full_name: fullName || null,
+            contact_number: contactNumber || null,
+            email: email,
+          });
+        } catch (profileError) {
+          console.error('Profile creation error:', profileError);
+        }
       }
-      
-
     }
 
-    return c.json({ success: true, data });
+    return c.json({ 
+      success: true, 
+      data,
+      message: data.user && !data.session ? "Please check your email to confirm your account" : "Account created successfully"
+    });
   } catch (error) {
     return c.json(
       {
@@ -63,21 +79,19 @@ const signIn = async (c) => {
     });
 
     if (error) {
+      console.error('Supabase signin error:', error);
       let message = "Sign in failed";
       let status = 400;
 
       if (error.message.includes("Invalid login credentials")) {
-        message = "Invalid email or password";
+        message = "Invalid email or password. Make sure you've confirmed your email.";
         status = 401;
       } else if (error.message.includes("Email not confirmed")) {
-        message =
-          "Please check your email and confirm your account before signing in";
+        message = "Please check your email and confirm your account before signing in";
         status = 403;
       } else if (error.message.includes("Too many requests")) {
         message = "Too many login attempts. Please try again later";
         status = 429;
-      } else if (error.message.includes("Invalid email")) {
-        message = "Please enter a valid email address";
       } else {
         message = error.message;
       }
@@ -85,9 +99,13 @@ const signIn = async (c) => {
       return c.json({ success: false, message }, status);
     }
 
+    if (!data.user) {
+      return c.json({ success: false, message: "No user data returned" }, 400);
+    }
+
     // Check if user has MFA enabled
-    if (data.user?.user_metadata?.mfa_enabled) {
-      // Don't complete login yet - require MFA verification
+    if (data.user.user_metadata?.mfa_enabled) {
+      // Return MFA requirement without signing out
       return c.json({ 
         success: true, 
         requiresMfa: true,
@@ -98,6 +116,7 @@ const signIn = async (c) => {
 
     return c.json({ success: true, data });
   } catch (error) {
+    console.error('SignIn error:', error);
     return c.json(
       {
         success: false,

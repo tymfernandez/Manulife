@@ -15,6 +15,7 @@ const { getRecruits, updateRecruit, deleteRecruit, getRecruitsWithDetails, getAp
 const { getActivityLogs, createActivityLog, deleteActivityLog, exportActivityLogs } = require('./routes/activityLogs');
 const { getUserSettings, updateUserSettings, exportUserData, submitSupportTicket, getUserTickets } = require('./routes/settings');
 const mfaRoutes = require('./routes/mfa');
+const { getUserRole } = require('./routes/roles');
 // const { migrateUsersToAccounts } = require('./routes/migration');
 
 
@@ -81,6 +82,9 @@ app.get('/api/settings/tickets', getUserTickets);
 // MFA routes
 app.route('/api/mfa', mfaRoutes);
 
+// Role routes
+app.get('/api/user/role', getUserRole);
+
 // Migration route
 // app.post('/api/migrate-users', migrateUsersToAccounts);
 
@@ -109,17 +113,26 @@ app.get('/api/debug', async (c) => {
       }, 400);
     }
 
+    // Check user_profiles table structure
+    const { data: profiles, error: profilesError } = await supabaseAdmin
+      .from('user_profiles')
+      .select('*')
+      .limit(1);
+
     // Check authenticated users (requires service role key)
     const { data: authData, error: usersError } = await supabaseAdmin.auth.admin.listUsers();
 
     console.log('Auth response:', { authData, usersError });
+    console.log('Profiles response:', { profiles, profilesError });
 
     return c.json({
       success: true,
       serviceKeyExists,
       users: authData?.users?.length || 0,
       usersError: usersError?.message || null,
-      firstUser: authData?.users?.[0]?.email || null
+      firstUser: authData?.users?.[0]?.email || null,
+      profilesError: profilesError?.message || null,
+      sampleProfile: profiles?.[0] || null
     });
   } catch (error) {
     console.error('Debug error:', error);

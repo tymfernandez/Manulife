@@ -3,7 +3,6 @@ import { Eye, EyeOff } from "lucide-react";
 import SideBar from "../components/Sidebar";
 import Header from "../components/Header";
 import UserAccount from "./Components/userAccount";
-import DataExports from "./Components/dataExports";
 import HelpSupport from "./Components/helpSupport";
 import { passwordService } from '../services/passwordService';
 import { useAuth } from '../lib/AuthContext';
@@ -11,7 +10,7 @@ import { useAuth } from '../lib/AuthContext';
 const SettingsPage = () => {
   const { user } = useAuth();
   const [activeItem, setActiveItem] = useState("settings");
-  const tabs = ["User Account", "Data & Exports", "Support & Help"];
+  const tabs = ["User Account", "Support & Help"];
   const [activeTab, setActiveTab] = useState("User Account");
   
   // Modal states
@@ -99,7 +98,7 @@ const SettingsPage = () => {
         <div className="flex-1 overflow-y-auto">
           {/* Top Header */}
           <div className="flex items-center justify-between p-6 ">
-            <h1 className="text-2xl font-semibold text-emerald-800">
+            <h1 className="text-3xl font-bold text-green-800text-3xl font-bold text-emerald-800">
               SETTINGS
             </h1>
           </div>
@@ -298,7 +297,7 @@ const SettingsPage = () => {
           </div>
         )}
 
-        <style jsx>{`
+        <style>{`
           .toggle-checkbox:checked {
             right: 0;
             border-color: #10b981;

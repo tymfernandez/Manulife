@@ -3,6 +3,11 @@ import { Eye, EyeOff } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../lib/authContext";
 
+// Import images directly
+import carousel01 from "/Carousel01.png";
+import carousel02 from "/Carousel02.png";
+import carousel03 from "/Carousel03.png";
+
 export default function SignIn() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -19,19 +24,19 @@ export default function SignIn() {
   // Carousel content
   const slides = [
     {
-      image: "/Carousel01.JPG",
+      image: carousel01,
       title: "Decisions made easier. Lives made better",
       description:
         "For your security — Sign in via your email password, your passcode, PIN, or Touch ID where available.",
     },
     {
-      image: "/Carousel03.JPG",
+      image: carousel03,
       title: "Secure your future today",
       description:
         "Advanced security measures to protect your financial information and personal data.",
     },
     {
-      image: "/Carousel02.JPG",
+      image: carousel02,
       title: "Your financial partner",
       description:
         "Comprehensive solutions tailored to your unique needs and goals.",
@@ -49,7 +54,7 @@ export default function SignIn() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const result = await signIn(email, password);
-    
+
     if (result.error) {
       setError(result.error.message);
     } else if (result.requiresMfa) {
@@ -82,7 +87,7 @@ export default function SignIn() {
             <h1 className="text-3xl font-semibold text-gray-900 mb-2">
               Welcome!
             </h1>
-            <p className="text-gray-600">Start your Manulife journey</p>
+            <p className="text-gray-600">Start your Life Champion journey</p>
           </div>
 
           {/* Sign up link */}
@@ -113,7 +118,7 @@ export default function SignIn() {
                   Enter the 6-digit code from your authenticator app
                 </p>
               </div>
-              
+
               <div>
                 <label
                   htmlFor="mfaCode"
@@ -126,13 +131,15 @@ export default function SignIn() {
                   type="text"
                   placeholder="123456"
                   value={mfaCode}
-                  onChange={(e) => setMfaCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                  onChange={(e) =>
+                    setMfaCode(e.target.value.replace(/\D/g, "").slice(0, 6))
+                  }
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 text-gray-900 text-center text-lg tracking-widest"
                   maxLength={6}
                   required
                 />
               </div>
-              
+
               <button
                 type="submit"
                 disabled={mfaCode.length !== 6}
@@ -140,7 +147,7 @@ export default function SignIn() {
               >
                 Verify & Sign In
               </button>
-              
+
               <button
                 type="button"
                 onClick={() => {
@@ -156,87 +163,87 @@ export default function SignIn() {
           ) : (
             // Regular Login Form
             <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Email field */}
-            <div>
-              <label
-                htmlFor="email"
-                className="block text-sm font-medium text-gray-700 mb-2"
-              >
-                Email
-              </label>
-              <div className="relative">
-                <input
-                  id="email"
-                  type="email"
-                  placeholder="your@email.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 text-gray-900"
-                  required
-                />
-              </div>
-            </div>
-
-            {/* Password field */}
-            <div>
-              <div className="flex justify-between items-center mb-2">
+              {/* Email field */}
+              <div>
                 <label
-                  htmlFor="password"
-                  className="block text-sm font-medium text-gray-700"
+                  htmlFor="email"
+                  className="block text-sm font-medium text-gray-700 mb-2"
                 >
-                  Password
+                  Email
                 </label>
-                <Link
-                  to="/forgot-password"
-                  className="text-sm text-green-600 hover:text-green-700"
-                >
-                  Forgot password?
-                </Link>
+                <div className="relative">
+                  <input
+                    id="email"
+                    type="email"
+                    placeholder="your@email.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 text-gray-900"
+                    required
+                  />
+                </div>
               </div>
-              <div className="relative">
+
+              {/* Password field */}
+              <div>
+                <div className="flex justify-between items-center mb-2">
+                  <label
+                    htmlFor="password"
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    Password
+                  </label>
+                  <Link
+                    to="/forgot-password"
+                    className="text-sm text-green-600 hover:text-green-700"
+                  >
+                    Forgot password?
+                  </Link>
+                </div>
+                <div className="relative">
+                  <input
+                    id="password"
+                    type={showPassword ? "text" : "password"}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 text-gray-900 pr-12"
+                    required
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                  >
+                    {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                  </button>
+                </div>
+              </div>
+
+              {/* Keep me signed in */}
+              <div className="flex items-center">
                 <input
-                  id="password"
-                  type={showPassword ? "text" : "password"}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 text-gray-900 pr-12"
-                  required
+                  id="keepSignedIn"
+                  type="checkbox"
+                  checked={keepSignedIn}
+                  onChange={(e) => setKeepSignedIn(e.target.checked)}
+                  className="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded"
                 />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                <label
+                  htmlFor="keepSignedIn"
+                  className="ml-2 text-sm text-gray-700"
                 >
-                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-                </button>
+                  Keep me signed in
+                </label>
               </div>
-            </div>
 
-            {/* Keep me signed in */}
-            <div className="flex items-center">
-              <input
-                id="keepSignedIn"
-                type="checkbox"
-                checked={keepSignedIn}
-                onChange={(e) => setKeepSignedIn(e.target.checked)}
-                className="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded"
-              />
-              <label
-                htmlFor="keepSignedIn"
-                className="ml-2 text-sm text-gray-700"
+              {/* Submit button */}
+              <button
+                type="submit"
+                className="w-full bg-green-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors duration-200"
               >
-                Keep me signed in
-              </label>
-            </div>
-
-            {/* Submit button */}
-            <button
-              type="submit"
-              className="w-full bg-green-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors duration-200"
-            >
-              Sign In
-            </button>
-          </form>
+                Sign In
+              </button>
+            </form>
           )}
         </div>
       </div>
@@ -247,12 +254,12 @@ export default function SignIn() {
         <div className="absolute top-6 right-6 z-10">
           <div className="bg-green-600 text-white px-3 py-1 rounded text-sm font-medium flex items-center">
             <div className="w-2 h-2 bg-white rounded-full mr-2"></div>
-            Manulife
+            Royal Eagles
           </div>
         </div>
 
         {/* Carousel */}
-        <div className="relative h-full">
+        <div className="relative h-full bg-gray-200">
           {slides.map((slide, index) => (
             <div
               key={index}
@@ -265,12 +272,15 @@ export default function SignIn() {
                 alt={slide.title}
                 className="w-full h-full object-cover"
                 onError={(e) => {
-                  console.error("Image failed to load:", slide.image);
-                  e.target.style.display = "none";
+                  console.error("Image failed to load:", slide.image, e);
+                  console.log("Attempted path:", e.target.src);
                 }}
-                onLoad={() => console.log("Image loaded:", slide.image)}
+                onLoad={(e) => {
+                  console.log("Image loaded successfully:", slide.image);
+                  console.log("Actual path:", e.target.src);
+                }}
               />
-              <div className="absolute inset-0 bg-black bg-opacity-40"></div>
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
             </div>
           ))}
 
