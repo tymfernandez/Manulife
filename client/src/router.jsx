@@ -9,6 +9,7 @@ import AccountManagement from "./AccountManagement/accountManagement";
 import RecruitmentManagement from "./RecruitmentManagement/recruitmentManagement";
 import ActivityLogs from "./ActivityLogs/activityLogs";
 import Settings from "./Settings/settings";
+import PasswordReset from "./components/PasswordReset";
 
 const ProtectedRoute = () => {
   const { user, loading } = useAuth();
@@ -61,6 +62,10 @@ export const router = createBrowserRouter([
         element: <SignUp />,
       },
     ],
+  },
+  {
+    path: "/reset-password",
+    element: <PasswordReset />,
   },
   {
     path: "/dashboard",

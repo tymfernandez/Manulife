@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, Eye, EyeOff } from "lucide-react";
 import { settingsService } from '../../services/settingsService';
 import { supabase } from '../../supabaseClient';
+import { passwordService } from '../../services/passwordService';
+import { useAuth } from '../../lib/AuthContext';
 
 const UserAccount = () => {
+  const { user } = useAuth();
   const [selectedLanguage, setSelectedLanguage] = useState("English");
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [settings, setSettings] = useState({
@@ -19,6 +22,22 @@ const UserAccount = () => {
   const [qrCode, setQrCode] = useState(''); // QR code for authenticator app
   const [verificationCode, setVerificationCode] = useState(''); // User input code
   const [mfaSecret, setMfaSecret] = useState(''); // Temporary secret storage
+  
+  // Password management state
+  const [showChangePassword, setShowChangePassword] = useState(false);
+  const [showRecoverPassword, setShowRecoverPassword] = useState(false);
+  const [passwordData, setPasswordData] = useState({
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: ''
+  });
+  const [recoverEmail, setRecoverEmail] = useState('');
+  const [showPasswords, setShowPasswords] = useState({
+    current: false,
+    new: false,
+    confirm: false
+  });
+  const [passwordLoading, setPasswordLoading] = useState(false);
 
   useEffect(() => {
     loadSettings();
@@ -153,6 +172,68 @@ const UserAccount = () => {
     }
   };
 
+  // Change password functionality
+  const handleChangePassword = async () => {
+    if (!passwordService.validatePasswordMatch(passwordData.newPassword, passwordData.confirmPassword)) {
+      alert('New passwords do not match');
+      return;
+    }
+
+    const validation = passwordService.validatePassword(passwordData.newPassword);
+    if (!validation.isValid) {
+      alert(validation.errors[0]); // Show first error
+      return;
+    }
+
+    try {
+      setPasswordLoading(true);
+      const result = await passwordService.changePassword(passwordData.newPassword, user?.id);
+      
+      if (!result.success) {
+        throw new Error(result.error);
+      }
+      
+      alert('Password updated successfully!');
+      setShowChangePassword(false);
+      setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
+    } catch (error) {
+      console.error('Error changing password:', error);
+      alert('Failed to change password: ' + error.message);
+    } finally {
+      setPasswordLoading(false);
+    }
+  };
+
+  // Recover password functionality
+  const handleRecoverPassword = async () => {
+    if (!recoverEmail) {
+      alert('Please enter your email address');
+      return;
+    }
+
+    try {
+      setPasswordLoading(true);
+      const result = await passwordService.sendPasswordResetEmail(recoverEmail);
+      
+      if (!result.success) {
+        throw new Error(result.error);
+      }
+      
+      alert('Password reset link sent to your email!');
+      setShowRecoverPassword(false);
+      setRecoverEmail('');
+    } catch (error) {
+      console.error('Error sending recovery email:', error);
+      alert('Failed to send recovery email: ' + error.message);
+    } finally {
+      setPasswordLoading(false);
+    }
+  };
+
+  const togglePasswordVisibility = (field) => {
+    setShowPasswords(prev => ({ ...prev, [field]: !prev[field] }));
+  };
+
   return (
     <>
     <div className="space-y-6">
@@ -173,7 +254,7 @@ const UserAccount = () => {
               </p>
             </div>
             <button 
-              onClick={() => alert('Password change functionality')}
+              onClick={() => setShowChangePassword(true)}
               className="px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-md hover:bg-green-700"
             >
               Change Password
@@ -186,17 +267,127 @@ const UserAccount = () => {
                 Recover Password
               </h4>
               <p className="text-sm text-gray-500">
-                Set Up Password Recovery Options For Your Account.
+                Send A Password Reset Link To Your Email.
               </p>
             </div>
             <button 
-              onClick={() => alert('Recovery setup functionality')}
+              onClick={() => setShowRecoverPassword(true)}
               className="px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-md hover:bg-green-700"
             >
-              Configure Recovery
+              Send Reset Link
             </button>
           </div>
         </div>
+
+        {/* Change Password Modal */}
+        {showChangePassword && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg p-6 w-full max-w-md">
+              <h3 className="text-lg font-medium mb-4">Change Password</h3>
+              
+              <div className="space-y-4">
+                <div className="relative">
+                  <input
+                    type={showPasswords.new ? 'text' : 'password'}
+                    placeholder="New Password"
+                    value={passwordData.newPassword}
+                    onChange={(e) => setPasswordData(prev => ({ ...prev, newPassword: e.target.value }))}
+                    className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => togglePasswordVisibility('new')}
+                    className="absolute right-3 top-2.5 text-gray-400 hover:text-gray-600"
+                  >
+                    {showPasswords.new ? <EyeOff size={16} /> : <Eye size={16} />}
+                  </button>
+                </div>
+                
+                <div className="relative">
+                  <input
+                    type={showPasswords.confirm ? 'text' : 'password'}
+                    placeholder="Confirm New Password"
+                    value={passwordData.confirmPassword}
+                    onChange={(e) => setPasswordData(prev => ({ ...prev, confirmPassword: e.target.value }))}
+                    className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => togglePasswordVisibility('confirm')}
+                    className="absolute right-3 top-2.5 text-gray-400 hover:text-gray-600"
+                  >
+                    {showPasswords.confirm ? <EyeOff size={16} /> : <Eye size={16} />}
+                  </button>
+                </div>
+              </div>
+              
+              <div className="flex gap-3 mt-6">
+                <button
+                  onClick={() => {
+                    setShowChangePassword(false);
+                    setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
+                  }}
+                  className="flex-1 px-4 py-2 text-gray-700 border border-gray-300 rounded-md hover:bg-gray-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleChangePassword}
+                  disabled={passwordLoading || !passwordData.newPassword || !passwordData.confirmPassword}
+                  className="flex-1 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50"
+                >
+                  {passwordLoading ? 'Updating...' : 'Update Password'}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Recover Password Modal */}
+        {showRecoverPassword && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg p-6 w-full max-w-md">
+              <h3 className="text-lg font-medium mb-4">Password Recovery</h3>
+              
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Email Address
+                  </label>
+                  <input
+                    type="email"
+                    placeholder="Enter your email address"
+                    value={recoverEmail}
+                    onChange={(e) => setRecoverEmail(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                  />
+                </div>
+                <p className="text-sm text-gray-500">
+                  We'll send a password reset link to this email address.
+                </p>
+              </div>
+              
+              <div className="flex gap-3 mt-6">
+                <button
+                  onClick={() => {
+                    setShowRecoverPassword(false);
+                    setRecoverEmail('');
+                  }}
+                  className="flex-1 px-4 py-2 text-gray-700 border border-gray-300 rounded-md hover:bg-gray-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleRecoverPassword}
+                  disabled={passwordLoading || !recoverEmail}
+                  className="flex-1 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50"
+                >
+                  {passwordLoading ? 'Sending...' : 'Send Reset Link'}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Two-Factor Authentication */}

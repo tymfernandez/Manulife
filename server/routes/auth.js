@@ -163,4 +163,31 @@ const getProfile = async (c) => {
   }
 };
 
-module.exports = { signUp, signIn, signOut, updateProfile, getProfile };
+const changePassword = async (c) => {
+  try {
+    const { newPassword, userId } = await c.req.json();
+    
+    if (!userId) {
+      return c.json({ success: false, message: 'User ID required' }, 400);
+    }
+    
+    const { supabaseAdmin } = require('../supabase');
+    
+    if (!supabaseAdmin) {
+      return c.json({ success: false, message: 'Admin client not configured' }, 500);
+    }
+    
+    // Update password using Supabase Admin API
+    const { data, error } = await supabaseAdmin.auth.admin.updateUserById(userId, {
+      password: newPassword
+    });
+    
+    if (error) throw error;
+    
+    return c.json({ success: true, message: 'Password updated successfully' });
+  } catch (error) {
+    return c.json({ success: false, message: error.message }, 500);
+  }
+};
+
+module.exports = { signUp, signIn, signOut, updateProfile, getProfile, changePassword };
