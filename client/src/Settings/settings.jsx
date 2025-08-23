@@ -19,7 +19,7 @@ const SettingsPage = () => {
         <div className="flex-1 overflow-y-auto">
           {/* Top Header */}
           <div className="flex items-center justify-between p-6 ">
-            <h1 className="text-2xl font-semibold text-emerald-800">
+            <h1 className="text-3xl font-bold text-green-800text-3xl font-bold text-emerald-800">
               SETTINGS
             </h1>
           </div>

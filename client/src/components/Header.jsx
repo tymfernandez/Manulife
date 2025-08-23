@@ -5,13 +5,23 @@ import { useAuth } from "../lib/authContext";
 import Avatar from "./Avatar";
 import EagleLogo from "./eagleLogo";
 
-const Header = ({ onMenuClick, activeItem, setActiveItem, isMobileMenuOpen = false, setIsMobileMenuOpen = () => {} }) => {
+const Header = ({
+  onMenuClick,
+  activeItem,
+  setActiveItem,
+  isMobileMenuOpen = false,
+  setIsMobileMenuOpen = () => {},
+}) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
-  const [userProfile, setUserProfile] = useState({ firstName: "", lastName: "", email: "" });
+  const [userProfile, setUserProfile] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+  });
 
   const notificationRef = useRef(null);
   const profileRef = useRef(null);
@@ -103,12 +113,12 @@ const Header = ({ onMenuClick, activeItem, setActiveItem, isMobileMenuOpen = fal
     { id: "settings", label: "Settings" },
   ];
   return (
-    <header className="bg-white border-b border-gray-200 px-6 py-4 flex-shrink-0">
+    <header className="bg-white border-b border-gray-200 px-6 py-2 flex-shrink-0">
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
           <button
             onClick={() => {
-              console.log('Hamburger clicked', isMobileMenuOpen);
+              console.log("Hamburger clicked", isMobileMenuOpen);
               setIsMobileMenuOpen && setIsMobileMenuOpen(!isMobileMenuOpen);
             }}
             className="p-2 rounded-lg hover:bg-gray-100 lg:hidden relative z-50"
@@ -121,13 +131,7 @@ const Header = ({ onMenuClick, activeItem, setActiveItem, isMobileMenuOpen = fal
           </button>
 
           <div className="flex items-center space-x-3">
-            <EagleLogo className="w-8 h-8 sm:w-10 sm:h-10" />
-            <div className="hidden sm:block">
-              <div className="text-lg sm:text-xl font-bold text-gray-900">
-                Royal Eagles
-              </div>
-              <div className="text-xs sm:text-sm text-emerald-600 font-medium">Region</div>
-            </div>
+            <img src="/Dark-Logo-Name.png" width={120} height={100} />
           </div>
         </div>
 
@@ -242,7 +246,14 @@ const Header = ({ onMenuClick, activeItem, setActiveItem, isMobileMenuOpen = fal
               onClick={() => setIsProfileOpen(!isProfileOpen)}
               className="flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-100 transition-colors"
             >
-              <Avatar name={userProfile.firstName && userProfile.lastName ? `${userProfile.firstName} ${userProfile.lastName}` : userProfile.email?.split('@')[0] || "User"} className="w-6 h-6 sm:w-8 sm:h-8" />
+              <Avatar
+                name={
+                  userProfile.firstName && userProfile.lastName
+                    ? `${userProfile.firstName} ${userProfile.lastName}`
+                    : userProfile.email?.split("@")[0] || "User"
+                }
+                className="w-6 h-6 sm:w-8 sm:h-8"
+              />
               <span className="w-2 h-2 bg-emerald-500 rounded-full hidden sm:block"></span>
             </button>
 
@@ -251,12 +262,19 @@ const Header = ({ onMenuClick, activeItem, setActiveItem, isMobileMenuOpen = fal
               <div className="absolute top-full right-0 mt-2 w-64 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
                 <div className="p-4 border-b border-gray-200">
                   <div className="flex items-center space-x-3">
-                    <Avatar name={userProfile.firstName && userProfile.lastName ? `${userProfile.firstName} ${userProfile.lastName}` : userProfile.email?.split('@')[0] || "User"} className="w-12 h-12" />
+                    <Avatar
+                      name={
+                        userProfile.firstName && userProfile.lastName
+                          ? `${userProfile.firstName} ${userProfile.lastName}`
+                          : userProfile.email?.split("@")[0] || "User"
+                      }
+                      className="w-12 h-12"
+                    />
                     <div>
                       <div className="font-semibold text-gray-900">
-                        {userProfile.firstName && userProfile.lastName 
-                          ? `${userProfile.firstName} ${userProfile.lastName}` 
-                          : userProfile.email?.split('@')[0] || "User"}
+                        {userProfile.firstName && userProfile.lastName
+                          ? `${userProfile.firstName} ${userProfile.lastName}`
+                          : userProfile.email?.split("@")[0] || "User"}
                       </div>
                       <div className="text-sm text-gray-600">
                         {userProfile.email}
@@ -268,9 +286,9 @@ const Header = ({ onMenuClick, activeItem, setActiveItem, isMobileMenuOpen = fal
                   </div>
                 </div>
                 <div className="py-2">
-                  <button 
+                  <button
                     onClick={() => {
-                      navigate('/profile');
+                      navigate("/profile");
                       setIsProfileOpen(false);
                     }}
                     className="w-full flex items-center space-x-3 px-4 py-2 text-left hover:bg-gray-50 transition-colors"
@@ -278,9 +296,9 @@ const Header = ({ onMenuClick, activeItem, setActiveItem, isMobileMenuOpen = fal
                     <User className="w-4 h-4 text-gray-500" />
                     <span className="text-gray-700">View Profile</span>
                   </button>
-                  <button 
+                  <button
                     onClick={() => {
-                      navigate('/settings');
+                      navigate("/settings");
                       setIsProfileOpen(false);
                     }}
                     className="w-full flex items-center space-x-3 px-4 py-2 text-left hover:bg-gray-50 transition-colors"
@@ -306,8 +324,6 @@ const Header = ({ onMenuClick, activeItem, setActiveItem, isMobileMenuOpen = fal
           </div>
         </div>
       </div>
-
-
     </header>
   );
 };

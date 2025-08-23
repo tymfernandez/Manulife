@@ -14,7 +14,7 @@ import {
 
 const CustomTooltip = ({ children, content }) => {
   const [isVisible, setIsVisible] = useState(false);
-  
+
   return (
     <div className="relative inline-block">
       <div
@@ -35,7 +35,7 @@ const CustomTooltip = ({ children, content }) => {
 import Layout from "../components/Layout";
 
 const Dashboard = () => {
-  const [activeItem, setActiveItem] = useState('dashboard');
+  const [activeItem, setActiveItem] = useState("dashboard");
   const [recruitsCounts, setRecruitsCounts] = useState({
     regionHead: 0,
     branchHead: 0,
@@ -57,7 +57,7 @@ const Dashboard = () => {
       unitHead: 0,
       unitHeadAssociate: 0,
       financialAdvisor: 0,
-    }
+    },
   });
 
   // Function to convert role string to camelCase
@@ -68,8 +68,6 @@ const Dashboard = () => {
 
   // UseEffect hook to fetch data from Applications table
   useEffect(() => {
-
-    
     const fetchApplicationsData = async () => {
       try {
         // Fetch total applications count
@@ -108,10 +106,11 @@ const Dashboard = () => {
         }
 
         // Fetch total applications from previous period for comparison
-        const { count: previousTotalCount, error: prevTotalError } = await supabase
-          .from("Applications")
-          .select("*", { count: "exact", head: true })
-          .lt("created_at", thirtyDaysAgo.toISOString());
+        const { count: previousTotalCount, error: prevTotalError } =
+          await supabase
+            .from("Applications")
+            .select("*", { count: "exact", head: true })
+            .lt("created_at", thirtyDaysAgo.toISOString());
 
         // Fetch role-based counts
         const roles = [
@@ -155,7 +154,7 @@ const Dashboard = () => {
         setPreviousPeriodData({
           totalApplications: previousTotalCount || 0,
           newRecruits: previousNewCount || 0,
-          rolesCounts: previousRoleCounts
+          rolesCounts: previousRoleCounts,
         });
 
         // Generate chart data from Applications table
@@ -233,127 +232,173 @@ const Dashboard = () => {
     return Math.round(((current - previous) / previous) * 100);
   };
 
-  const newRecruitsPercentage = calculatePercentageChange(newRecruits, previousPeriodData.newRecruits);
-  const totalRecruitsPercentage = calculatePercentageChange(totalApplications, previousPeriodData.totalApplications);
+  const newRecruitsPercentage = calculatePercentageChange(
+    newRecruits,
+    previousPeriodData.newRecruits
+  );
+  const totalRecruitsPercentage = calculatePercentageChange(
+    totalApplications,
+    previousPeriodData.totalApplications
+  );
 
   return (
     <Layout activeItem={activeItem} setActiveItem={setActiveItem}>
-          {/* Dashboard Header */}
-          <div className="flex justify-between items-center mb-8">
-            <h1 className="text-3xl font-bold text-green-800">DASHBOARD</h1>
-            <button 
-              onClick={() => logExport('dashboard-data')}
-              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-            >
-              Export
-            </button>
-          </div>
+      {/* Dashboard Header */}
+      <div className="flex justify-between items-center mb-8">
+        <h1 className="text-3xl font-bold text-emerald-800">DASHBOARD</h1>
+        <button
+          onClick={() => logExport("dashboard-data")}
+          className="bg-emerald-800 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+        >
+          Export
+        </button>
+      </div>
 
-          {/* Top Metrics - Smaller boxes */}
-          <div className="grid grid-cols-2 gap-4 mb-8 max-w-md">
-            <SmallMetricCard
-              title="New Recruits"
-              value={newRecruits}
-              percentage={Math.abs(newRecruitsPercentage)}
-              isPositive={newRecruitsPercentage >= 0}
-            />
-            <SmallMetricCard
-              title="Total Recruits"
-              value={totalApplications}
-              percentage={Math.abs(totalRecruitsPercentage)}
-              isPositive={totalRecruitsPercentage >= 0}
-            />
-          </div>
+      {/* Top Metrics - Smaller boxes */}
+      <div className="grid grid-cols-2 gap-4 mb-8 max-w-md">
+        <SmallMetricCard
+          title="New Recruits"
+          value={newRecruits}
+          percentage={Math.abs(newRecruitsPercentage)}
+          isPositive={newRecruitsPercentage >= 0}
+        />
+        <SmallMetricCard
+          title="Total Recruits"
+          value={totalApplications}
+          percentage={Math.abs(totalRecruitsPercentage)}
+          isPositive={totalRecruitsPercentage >= 0}
+        />
+      </div>
 
-          {/* Recruitment Report Section */}
-          <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200 mb-8">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-lg font-semibold text-gray-800">
-                RECRUITMENT REPORT
-              </h2>
-              <div className="flex space-x-2">
-                {["3 Months", "6 Months", "12 Months"].map((period) => (
-                  <button
-                    key={period}
-                    onClick={() => setSelectedPeriod(period)}
-                    className={`px-4 py-2 text-sm rounded ${
-                      selectedPeriod === period
-                        ? "bg-gray-800 text-white"
-                        : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-                    }`}
-                  >
-                    {period}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Chart */}
-            <div className="h-64">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={chartData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                  <XAxis
-                    dataKey="month"
-                    stroke="#6b7280"
-                    fontSize={12}
-                    axisLine={false}
-                    tickLine={false}
-                  />
-                  <YAxis
-                    stroke="#6b7280"
-                    fontSize={12}
-                    axisLine={false}
-                    tickLine={false}
-                  />
-                  <ChartTooltip
-                    contentStyle={{
-                      backgroundColor: "white",
-                      border: "1px solid #e5e7eb",
-                      borderRadius: "8px",
-                      boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
-                    }}
-                  />
-                  <Line
-                    type="monotone"
-                    dataKey="recruits"
-                    stroke="#f59e0b"
-                    strokeWidth={3}
-                    dot={{ fill: "#f59e0b", strokeWidth: 2, r: 4 }}
-                    activeDot={{ r: 6, fill: "#f59e0b" }}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
+      {/* Recruitment Report Section */}
+      <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200 mb-8">
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-lg font-semibold text-gray-800">
+            RECRUITMENT REPORT
+          </h2>
+          <div className="flex space-x-2">
+            {["3 Months", "6 Months", "12 Months"].map((period) => (
+              <button
+                key={period}
+                onClick={() => setSelectedPeriod(period)}
+                className={`px-4 py-2 text-sm rounded ${
+                  selectedPeriod === period
+                    ? "bg-orange-500 text-white"
+                    : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                }`}
+              >
+                {period}
+              </button>
+            ))}
           </div>
+        </div>
 
-          {/* Role-based Metrics */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <RoleCard
-              title="Branch Head"
-              value={recruitsCounts.branchHead}
-              percentage={Math.abs(calculatePercentageChange(recruitsCounts.branchHead, previousPeriodData.rolesCounts.branchHead))}
-              isPositive={calculatePercentageChange(recruitsCounts.branchHead, previousPeriodData.rolesCounts.branchHead) >= 0}
-            />
-            <RoleCard
-              title="Unit Head"
-              value={recruitsCounts.unitHead}
-              percentage={Math.abs(calculatePercentageChange(recruitsCounts.unitHead, previousPeriodData.rolesCounts.unitHead))}
-              isPositive={calculatePercentageChange(recruitsCounts.unitHead, previousPeriodData.rolesCounts.unitHead) >= 0}
-            />
-            <RoleCard
-              title="Unit Head Associate"
-              value={recruitsCounts.unitHeadAssociate}
-              percentage={Math.abs(calculatePercentageChange(recruitsCounts.unitHeadAssociate, previousPeriodData.rolesCounts.unitHeadAssociate))}
-              isPositive={calculatePercentageChange(recruitsCounts.unitHeadAssociate, previousPeriodData.rolesCounts.unitHeadAssociate) >= 0}
-            />
-            <RoleCard
-              title="Financial Advisors"
-              value={recruitsCounts.financialAdvisor}
-              percentage={Math.abs(calculatePercentageChange(recruitsCounts.financialAdvisor, previousPeriodData.rolesCounts.financialAdvisor))}
-              isPositive={calculatePercentageChange(recruitsCounts.financialAdvisor, previousPeriodData.rolesCounts.financialAdvisor) >= 0}
-            />
-          </div>
+        {/* Chart */}
+        <div className="h-64">
+          <ResponsiveContainer width="100%" height="100%">
+            <LineChart data={chartData}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+              <XAxis
+                dataKey="month"
+                stroke="#6b7280"
+                fontSize={12}
+                axisLine={false}
+                tickLine={false}
+              />
+              <YAxis
+                stroke="#6b7280"
+                fontSize={12}
+                axisLine={false}
+                tickLine={false}
+              />
+              <ChartTooltip
+                contentStyle={{
+                  backgroundColor: "white",
+                  border: "1px solid #e5e7eb",
+                  borderRadius: "8px",
+                  boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
+                }}
+              />
+              <Line
+                type="monotone"
+                dataKey="recruits"
+                stroke="#f59e0b"
+                strokeWidth={3}
+                dot={{ fill: "#f59e0b", strokeWidth: 2, r: 4 }}
+                activeDot={{ r: 6, fill: "#f59e0b" }}
+              />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+
+      {/* Role-based Metrics */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <RoleCard
+          title="Branch Head"
+          value={recruitsCounts.branchHead}
+          percentage={Math.abs(
+            calculatePercentageChange(
+              recruitsCounts.branchHead,
+              previousPeriodData.rolesCounts.branchHead
+            )
+          )}
+          isPositive={
+            calculatePercentageChange(
+              recruitsCounts.branchHead,
+              previousPeriodData.rolesCounts.branchHead
+            ) >= 0
+          }
+        />
+        <RoleCard
+          title="Unit Head"
+          value={recruitsCounts.unitHead}
+          percentage={Math.abs(
+            calculatePercentageChange(
+              recruitsCounts.unitHead,
+              previousPeriodData.rolesCounts.unitHead
+            )
+          )}
+          isPositive={
+            calculatePercentageChange(
+              recruitsCounts.unitHead,
+              previousPeriodData.rolesCounts.unitHead
+            ) >= 0
+          }
+        />
+        <RoleCard
+          title="Unit Head Associate"
+          value={recruitsCounts.unitHeadAssociate}
+          percentage={Math.abs(
+            calculatePercentageChange(
+              recruitsCounts.unitHeadAssociate,
+              previousPeriodData.rolesCounts.unitHeadAssociate
+            )
+          )}
+          isPositive={
+            calculatePercentageChange(
+              recruitsCounts.unitHeadAssociate,
+              previousPeriodData.rolesCounts.unitHeadAssociate
+            ) >= 0
+          }
+        />
+        <RoleCard
+          title="Financial Advisors"
+          value={recruitsCounts.financialAdvisor}
+          percentage={Math.abs(
+            calculatePercentageChange(
+              recruitsCounts.financialAdvisor,
+              previousPeriodData.rolesCounts.financialAdvisor
+            )
+          )}
+          isPositive={
+            calculatePercentageChange(
+              recruitsCounts.financialAdvisor,
+              previousPeriodData.rolesCounts.financialAdvisor
+            ) >= 0
+          }
+        />
+      </div>
     </Layout>
   );
 };

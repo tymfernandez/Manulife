@@ -63,8 +63,8 @@ const RoyalEaglesTemplate = () => {
       <header className="bg-white shadow-lg border-b border-gray-200">
         <div className="py-1 mx-auto px-4 max-w-7xl">
           <div className="flex justify-between items-center">
-            <div className="flex items-center ">
-              <img src="/RoyalEaglesLogo.png" width={150} height={130} />
+            <div className="flex items-center pb-2">
+              <img src="/Dark-Logo-Name.png" width={150} height={130} />
             </div>
             <button
               className="bg-emerald-800 hover:bg-orange-500 text-white px-6 py-2 rounded-lg font-medium text-md transition-colors duration-200 shadow-md hover:shadow-lg"
@@ -118,7 +118,7 @@ const RoyalEaglesTemplate = () => {
               <div className="bg-white rounded-2xl shadow-2xl p-8 relative z-10">
                 <div className="flex items-center space-x-4 mb-6">
                   <img
-                    src="/RoyalEaglesLogo1.png"
+                    src="/Dark-Logo.png"
                     alt="Team Success"
                     className="w-20 h-20 rounded-full object-cover border-4 border-green-100"
                   />
