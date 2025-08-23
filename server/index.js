@@ -8,12 +8,12 @@ const { serve } = require('@hono/node-server');
 const { cors } = require('hono/cors');
 const { supabase } = require('./supabase');
 const { submitApplication } = require('./routes/Applications');
-const { signUp, signIn, signOut, updateProfile, getProfile } = require('./routes/auth');
+const { signUp, signIn, signOut, updateProfile, getProfile, changePassword, resetPassword } = require('./routes/auth');
 const { getSession } = require('./routes/session');
 const { getAccounts, createAccount, updateAccount, deleteAccount } = require('./routes/accounts');
 const { getRecruits, updateRecruit, deleteRecruit, getRecruitsWithDetails, getApplicationsWithRecruitment } = require('./routes/recruitment');
 const { getActivityLogs, createActivityLog, deleteActivityLog, exportActivityLogs } = require('./routes/activityLogs');
-const { getUserSettings, updateUserSettings, changePassword, exportUserData, submitSupportTicket, getUserTickets } = require('./routes/settings');
+const { getUserSettings, updateUserSettings, exportUserData, submitSupportTicket, getUserTickets } = require('./routes/settings');
 const mfaRoutes = require('./routes/mfa');
 const { getUserRole } = require('./routes/roles');
 // const { migrateUsersToAccounts } = require('./routes/migration');
@@ -48,6 +48,8 @@ app.post('/api/auth/signin', signIn);
 app.post('/api/auth/signout', signOut);
 app.post('/api/auth/update-profile', updateProfile);
 app.get('/api/auth/profile', getProfile);
+app.post('/api/auth/change-password', changePassword);
+app.post('/api/auth/reset-password', resetPassword);
 app.get('/api/auth/session', getSession);
 
 // Account management routes

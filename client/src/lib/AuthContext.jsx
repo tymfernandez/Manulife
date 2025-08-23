@@ -85,6 +85,12 @@ export const AuthProvider = ({ children }) => {
       });
 
       const result = await response.json();
+
+      
+      if (!response.ok) {
+        return { data: null, error: { message: result.message || `Server error: ${response.status}` } };
+      }
+
       
       if (!result.success) {
         return { data: null, error: { message: result.message } };

@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, Eye, EyeOff } from "lucide-react";
 import { settingsService } from '../../services/settingsService';
 import { supabase } from '../../supabaseClient';
+import { passwordService } from '../../services/passwordService';
+import { useAuth } from '../../lib/AuthContext';
 
-const UserAccount = () => {
+const UserAccount = ({ setShowChangePassword, setShowRecoverPassword }) => {
+  const { user } = useAuth();
   const [selectedLanguage, setSelectedLanguage] = useState("English");
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [settings, setSettings] = useState({
@@ -16,6 +19,8 @@ const UserAccount = () => {
   const [qrCode, setQrCode] = useState(''); // QR code for authenticator app
   const [verificationCode, setVerificationCode] = useState(''); // User input code
   const [mfaSecret, setMfaSecret] = useState(''); // Temporary secret storage
+  
+
 
   useEffect(() => {
     loadSettings();
@@ -150,6 +155,12 @@ const UserAccount = () => {
     }
   };
 
+
+
+
+
+
+
   return (
     <>
     <div className="space-y-6">
@@ -170,7 +181,7 @@ const UserAccount = () => {
               </p>
             </div>
             <button 
-              onClick={() => alert('Password change functionality')}
+              onClick={() => setShowChangePassword?.(true)}
               className="px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-md hover:bg-green-700"
             >
               Change Password
@@ -183,17 +194,21 @@ const UserAccount = () => {
                 Recover Password
               </h4>
               <p className="text-sm text-gray-500">
-                Set Up Password Recovery Options For Your Account.
+                Send A Password Reset Link To Your Email.
               </p>
             </div>
             <button 
-              onClick={() => alert('Recovery setup functionality')}
+              onClick={() => setShowRecoverPassword?.(true)}
               className="px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-md hover:bg-green-700"
             >
-              Configure Recovery
+              Send Reset Link
             </button>
           </div>
         </div>
+
+
+
+
       </div>
 
       {/* Two-Factor Authentication */}
