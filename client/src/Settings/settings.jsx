@@ -2,12 +2,11 @@ import React, { useState } from "react";
 import SideBar from "../components/Sidebar";
 import Header from "../components/Header";
 import UserAccount from "./Components/userAccount";
-import DataExports from "./Components/dataExports";
 import HelpSupport from "./Components/helpSupport";
 
 const SettingsPage = () => {
   const [activeItem, setActiveItem] = useState("settings");
-  const tabs = ["User Account", "Data & Exports", "Support & Help"];
+  const tabs = ["User Account", "Support & Help"];
   const [activeTab, setActiveTab] = useState("User Account");
 
   return (
@@ -54,7 +53,7 @@ const SettingsPage = () => {
           </div>
         </div>
 
-        <style jsx>{`
+        <style>{`
           .toggle-checkbox:checked {
             right: 0;
             border-color: #10b981;
