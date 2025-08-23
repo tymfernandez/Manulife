@@ -141,21 +141,41 @@ const signOut = async (c) => {
 
 const updateProfile = async (c) => {
   try {
-    const { first_name, last_name, contact_number, address, date_of_birth } = await c.req.json();
+    const { first_name, last_name, contact_number, address } = await c.req.json();
+    const userId = c.req.header('user-id');
     
-    const { data, error } = await supabase.auth.updateUser({
-      data: {
-        first_name,
-        last_name,
-        contact_number,
-        address,
-        date_of_birth
-      }
-    });
+    if (!userId) {
+      return c.json({ success: false, message: 'User ID required' }, 401);
+    }
     
-    if (error) throw error;
+    const { supabaseAdmin } = require('../supabase');
     
-    return c.json({ success: true, data });
+    // Update user metadata
+    if (supabaseAdmin) {
+      await supabaseAdmin.auth.admin.updateUserById(userId, {
+        user_metadata: {
+          first_name,
+          last_name,
+          contact_number,
+          address
+        }
+      });
+    }
+    
+    // Try to update user_profiles table, but don't fail if it doesn't work
+    try {
+      await supabase
+        .from('user_profiles')
+        .upsert({
+          id: userId,
+          number: contact_number,
+          address: address
+        }, { onConflict: 'id' });
+    } catch (profileError) {
+      console.error('Profile table update failed (non-critical):', profileError);
+    }
+    
+    return c.json({ success: true });
   } catch (error) {
     return c.json({ success: false, message: error.message }, 400);
   }
@@ -163,18 +183,41 @@ const updateProfile = async (c) => {
 
 const getProfile = async (c) => {
   try {
-    const { data: { session }, error } = await supabase.auth.getSession();
+    const userId = c.req.header('user-id');
     
-    if (error || !session?.user) {
-      return c.json({ success: false, message: 'Not authenticated' }, 401);
+    if (!userId) {
+      return c.json({ success: false, message: 'User ID required' }, 401);
+    }
+    
+    const { supabaseAdmin } = require('../supabase');
+    
+    // Get user data
+    const { data: userData, error: userError } = await supabaseAdmin.auth.admin.getUserById(userId);
+    if (userError || !userData.user) {
+      return c.json({ success: false, message: 'User not found' }, 404);
+    }
+
+    // Get profile data from user_profiles table
+    let profileData = null;
+    try {
+      const { data, error: profileError } = await supabase
+        .from('user_profiles')
+        .select('number, address')
+        .eq('id', userId)
+        .single();
+      profileData = data;
+    } catch (profileError) {
+      console.error('Profile fetch error (non-critical):', profileError);
     }
 
     return c.json({ 
       success: true, 
       data: {
-        first_name: session.user.user_metadata?.first_name || '',
-        last_name: session.user.user_metadata?.last_name || '',
-        email: session.user.email
+        first_name: userData.user.user_metadata?.first_name || '',
+        last_name: userData.user.user_metadata?.last_name || '',
+        contact_number: profileData?.number || userData.user.user_metadata?.contact_number || '',
+        address: profileData?.address || userData.user.user_metadata?.address || '',
+        email: userData.user.email
       }
     });
   } catch (error) {

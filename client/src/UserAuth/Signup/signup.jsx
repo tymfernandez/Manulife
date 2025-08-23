@@ -1,64 +1,67 @@
-import { useState, useEffect } from 'react'
-import { Eye, EyeOff } from 'lucide-react'
-import { Link, useNavigate } from 'react-router-dom'
-import { useAuth } from '../../lib/authContext'
+import { useState, useEffect } from "react";
+import { Eye, EyeOff } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../../lib/authContext";
 
 export default function SignUp() {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [confirmPassword, setConfirmPassword] = useState('')
-  const [personalCode, setPersonalCode] = useState('')
-  const [showPassword, setShowPassword] = useState(false)
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
-  const [error, setError] = useState('')
-  const [message, setMessage] = useState('')
-  const [currentSlide, setCurrentSlide] = useState(0)
-  const { signUp } = useAuth()
-  const navigate = useNavigate()
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [personalCode, setPersonalCode] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [error, setError] = useState("");
+  const [message, setMessage] = useState("");
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const { signUp } = useAuth();
+  const navigate = useNavigate();
 
   // Carousel content
   const slides = [
     {
-      image: "/Carousel01.JPG",
+      image: "/Carousel01.png",
       title: "Join the Manulife Family",
-      description: "Create your account to access exclusive Manulife services and benefits."
+      description:
+        "Create your account to access exclusive Manulife services and benefits.",
     },
     {
-      image: "/Carousel03.JPG",
+      image: "/Carousel03.png",
       title: "Secure Registration",
-      description: "Your information is protected with enterprise-grade security measures."
+      description:
+        "Your information is protected with enterprise-grade security measures.",
     },
     {
-      image: "/Carousel02.JPG",
+      image: "/Carousel02.png",
       title: "Get Started Today",
-      description: "Begin your journey with Manulife's comprehensive financial solutions."
-    }
-  ]
+      description:
+        "Begin your journey with Manulife's comprehensive financial solutions.",
+    },
+  ];
 
   // Auto-scroll carousel
   useEffect(() => {
     const timer = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % slides.length)
-    }, 5000)
-    return () => clearInterval(timer)
-  }, [slides.length])
+      setCurrentSlide((prev) => (prev + 1) % slides.length);
+    }, 5000);
+    return () => clearInterval(timer);
+  }, [slides.length]);
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
-    
+    e.preventDefault();
+
     if (password !== confirmPassword) {
-      setError('Passwords do not match')
-      return
+      setError("Passwords do not match");
+      return;
     }
-    
-    const { error, message } = await signUp(email, password, { personalCode })
+
+    const { error, message } = await signUp(email, password, { personalCode });
     if (error) {
-      setError(error.message)
+      setError(error.message);
     } else {
-      setMessage(message || 'Check your email for confirmation link')
-      setTimeout(() => navigate('/signin'), 2000)
+      setMessage(message || "Check your email for confirmation link");
+      setTimeout(() => navigate("/signin"), 2000);
     }
-  }
+  };
 
   return (
     <div className="min-h-screen flex p-20">
@@ -75,7 +78,9 @@ export default function SignUp() {
 
           {/* Sign in link */}
           <div className="text-right mb-6">
-            <span className="text-sm text-gray-600">Already have account? </span>
+            <span className="text-sm text-gray-600">
+              Already have account?{" "}
+            </span>
             <Link
               to="/signin"
               className="text-sm text-green-600 hover:text-green-700 font-medium"
@@ -184,7 +189,11 @@ export default function SignUp() {
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                   className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
                 >
-                  {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                  {showConfirmPassword ? (
+                    <EyeOff size={20} />
+                  ) : (
+                    <Eye size={20} />
+                  )}
                 </button>
               </div>
             </div>
@@ -218,17 +227,13 @@ export default function SignUp() {
               className={`absolute inset-0 transition-opacity duration-1000 ${
                 index === currentSlide ? "opacity-100" : "opacity-0"
               }`}
+              style={{
+                backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url(${slide.image})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                backgroundRepeat: 'no-repeat'
+              }}
             >
-              <img
-                src={slide.image}
-                alt={slide.title}
-                className="w-full h-full object-cover"
-                onError={(e) => {
-                  console.error("Image failed to load:", slide.image)
-                  e.target.style.display = "none"
-                }}
-              />
-              <div className="absolute inset-0 bg-black bg-opacity-40"></div>
             </div>
           ))}
 
@@ -261,5 +266,5 @@ export default function SignUp() {
         </div>
       </div>
     </div>
-  )
+  );
 }

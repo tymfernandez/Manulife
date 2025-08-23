@@ -43,6 +43,11 @@ const ApplicationForm = () => {
       description: "Lead and manage financial advisory teams",
     },
     {
+      value: "Unit Head",
+      icon: "🏆",
+      description: "Manage and develop unit operations and team leadership",
+    },
+    {
       value: "Branch Head",
       icon: "👑",
       description: "Oversee branch operations and strategy",
