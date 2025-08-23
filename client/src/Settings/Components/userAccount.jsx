@@ -382,7 +382,7 @@ const UserAccount = () => {
         </div>
       </div>
     </div>
-    <style>{`
+    <style jsx>{`
       .toggle-checkbox:checked {
         right: 0;
         border-color: #10b981;
