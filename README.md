@@ -18,7 +18,9 @@ Developed by students of Cavite State University - Main Campus as part of On-the
 
 - John Tymothy Fernandez
 
-- Kobi Pareje
+- Orchard Hernandez
+
+- Kobi Pareja
 
 - Juztine Jade Villanueva
 
