@@ -22,7 +22,7 @@ const { getUserRole } = require('./routes/roles');
 const app = new Hono();
 
 // Enable CORS for client requests
-app.use('/*', cors({
+app.use('*', cors({
   origin: ['http://localhost:5174', 'https://manulife-client.vercel.app'],
   allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowHeaders: ['Content-Type', 'Authorization', 'user-id'],
@@ -30,7 +30,7 @@ app.use('/*', cors({
 }));
 
 // Handle preflight requests
-app.options('/*', (c) => {
+app.options('*', (c) => {
   return c.text('', 200);
 });
 
