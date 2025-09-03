@@ -4,7 +4,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import SignIn from "./UserAuth/Login/SignIn";
 import SignUp from "./UserAuth/Signup/signup";
 import Dashboard from "./Dashboard/dashboard";
-import Profile from "./Profile/profile";
+import Profile from "./Profile/Profile";
 import ApplicationForm from "./ApplicationForm/applicationForm";
 import AccountManagement from "./AccountManagement/accountManagement";
 import RecruitmentManagement from "./RecruitmentManagement/recruitmentManagement";

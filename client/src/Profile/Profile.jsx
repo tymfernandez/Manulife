@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useAuth } from "../lib/authContext";
+import { useAuth } from "../lib/AuthContext";
 import Header from "../components/Header";
 import SideBar from "../components/Sidebar";
 
