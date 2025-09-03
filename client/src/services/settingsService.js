@@ -1,4 +1,4 @@
-const API_BASE = 'http://localhost:3000/api';
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
 const TEST_USER_ID = '00000000-0000-0000-0000-000000000000';
 
 export const settingsService = {

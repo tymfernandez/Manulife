@@ -23,7 +23,7 @@ const app = new Hono();
 
 // Enable CORS for client requests
 app.use('/*', cors({
-  origin: 'http://localhost:5174',
+  origin: ['http://localhost:5174', 'https://manulife-client.vercel.app'],
   allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowHeaders: ['Content-Type', 'Authorization', 'user-id'],
   credentials: true

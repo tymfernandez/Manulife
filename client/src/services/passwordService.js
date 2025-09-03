@@ -2,7 +2,7 @@ export const passwordService = {
   // Change password for authenticated user
   async changePassword(currentPassword, newPassword, userId) {
     try {
-      const response = await fetch('http://localhost:3000/api/auth/change-password', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3000/api'}/auth/change-password`, {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json'
@@ -30,7 +30,7 @@ export const passwordService = {
   // Send password reset email
   async sendPasswordResetEmail(email) {
     try {
-      const response = await fetch('http://localhost:3000/api/auth/reset-password', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3000/api'}/auth/reset-password`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email })

@@ -13,7 +13,7 @@ export const AuthProvider = ({ children }) => {
   // MFA verification function
   const verifyMfaLogin = async (userId, code) => {
     try {
-      const response = await fetch("http://localhost:3000/api/mfa/verify-login", {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3000/api'}/mfa/verify-login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ userId, code }),
@@ -35,7 +35,7 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const getSession = async () => {
       try {
-        const response = await fetch("http://localhost:3000/api/auth/session");
+        const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3000/api'}/auth/session`);
         const result = await response.json();
         setUser(result.success && result.session ? result.session.user : null);
       } catch (error) {
@@ -50,7 +50,7 @@ export const AuthProvider = ({ children }) => {
 
   const signUp = async (email, password, additionalData = {}) => {
     try {
-      const response = await fetch("http://localhost:3000/api/auth/signup", {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3000/api'}/auth/signup`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -77,7 +77,7 @@ export const AuthProvider = ({ children }) => {
 
   const signIn = async (email, password) => {
     try {
-      const response = await fetch("http://localhost:3000/api/auth/signin", {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3000/api'}/auth/signin`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
@@ -110,7 +110,7 @@ export const AuthProvider = ({ children }) => {
         setUser(result.data.user);
         // Fetch user profile for activity logging
         try {
-          const profileResponse = await fetch("http://localhost:3000/api/auth/profile", {
+          const profileResponse = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3000/api'}/auth/profile`, {
             credentials: "include",
           });
           const profileResult = await profileResponse.json();
@@ -137,7 +137,7 @@ export const AuthProvider = ({ children }) => {
   };
   const signOut = async () => {
     try {
-      const response = await fetch("http://localhost:3000/api/auth/signout", {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3000/api'}/auth/signout`, {
         method: "POST",
       });
       const result = await response.json();
