@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Bell, Menu, X, User, Settings, LogOut } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../lib/authContext";
+import { useAuth } from "../lib/AuthContext";
 import Avatar from "./Avatar";
 
 const Header = ({

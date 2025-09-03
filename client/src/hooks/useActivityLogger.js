@@ -1,4 +1,4 @@
-import { useAuth } from '../lib/authContext';
+import { useAuth } from '../lib/AuthContext';
 import { logActivity, ACTIVITY_TYPES } from '../utils/activityLogger';
 import { useState, useEffect } from 'react';
 
