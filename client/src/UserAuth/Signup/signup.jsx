@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "../../lib/authContext";
+import { useAuth } from "../../lib/AuthContext";
 
 export default function SignUp() {
   const [email, setEmail] = useState("");
