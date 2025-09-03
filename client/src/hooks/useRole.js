@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 // Cache role globally to prevent refetching
 let cachedRole = null;
 let rolePromise = null;
+let currentUserId = null;
 
 export const useRole = () => {
   const [role, setRole] = useState(cachedRole);
@@ -43,6 +44,13 @@ export const useRole = () => {
         console.log('No session token, defaulting to FA');
         return 'FA';
       }
+      
+      // Clear cache if different user
+      if (currentUserId && currentUserId !== session.user.id) {
+        cachedRole = null;
+        rolePromise = null;
+      }
+      currentUserId = session.user.id;
       
       const apiUrl = `${import.meta.env.VITE_API_URL || 'http://localhost:3000/api'}/user/role`;
       console.log('Fetching role from:', apiUrl);
@@ -94,5 +102,18 @@ export const useRole = () => {
     return hasPageAccess;
   };
 
-  return { role, loading, hasAccess, canAccessPage };
+  const clearRoleCache = () => {
+    cachedRole = null;
+    rolePromise = null;
+    currentUserId = null;
+  };
+
+  return { role, loading, hasAccess, canAccessPage, clearRoleCache };
+};
+
+// Export function to clear cache from outside
+export const clearRoleCache = () => {
+  cachedRole = null;
+  rolePromise = null;
+  currentUserId = null;
 };

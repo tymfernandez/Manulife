@@ -155,6 +155,11 @@ export const AuthProvider = ({ children }) => {
       if (result.success) {
         // Log logout activity before clearing user
         if (user) logLogout(user, userProfile);
+        
+        // Clear role cache
+        const { clearRoleCache } = await import('../hooks/useRole');
+        clearRoleCache();
+        
         setUser(null);
         setUserProfile(null);
         return { error: null };
