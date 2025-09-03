@@ -90,7 +90,7 @@ const Header = ({
           const fallbackProfile = {
             firstName: "",
             lastName: "",
-            email: user?.email || "",
+            email: user?.email || "",r
           };
           console.log("⚠️ Using fallback profile:", fallbackProfile);
           setUserProfile(fallbackProfile);
