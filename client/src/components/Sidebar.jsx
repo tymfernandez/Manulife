@@ -68,7 +68,7 @@ const Sidebar = ({
       icon: Activity,
       label: "Activity Logs",
       path: "/activity-logs",
-      page: "accounts",
+      page: "activity-logs",
     },
     {
       id: "profile",

@@ -143,9 +143,10 @@ app.get('/api/debug', async (c) => {
 const port = process.env.PORT || 3000;
 
 // For Vercel deployment
-if (process.env.VERCEL) {
-  module.exports = app;
-} else {
+export default app;
+
+// For local development
+if (!process.env.VERCEL) {
   serve({ fetch: app.fetch, port }, () => {
     console.log(`Server running on port ${port}`);
   });

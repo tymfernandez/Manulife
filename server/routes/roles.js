@@ -2,22 +2,31 @@ const { supabase } = require('../supabase');
 
 const getUserRole = async (c) => {
   try {
-    const { supabaseAdmin } = require('../supabase');
-    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-    if (sessionError || !session?.user) {
+    const authHeader = c.req.header('Authorization');
+    
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return c.json({ success: false, message: 'Not authenticated' }, 401);
+    }
+
+    const token = authHeader.substring(7);
+    const { supabaseAdmin } = require('../supabase');
+    
+    const { data: { user }, error: userError } = await supabaseAdmin.auth.getUser(token);
+    
+    if (userError || !user) {
+      return c.json({ success: false, message: 'Invalid token' }, 401);
     }
 
     // Try to get role from user_profiles using admin client (bypasses RLS)
     const { data, error } = await supabaseAdmin
       .from('user_profiles')
       .select('role')
-      .eq('id', session.user.id)
-      .maybeSingle(); // Use maybeSingle instead of single
+      .eq('id', user.id)
+      .maybeSingle();
 
     if (error) {
       console.error('Error fetching role:', error);
-      return c.json({ success: true, role: 'FA' }); // Default to FA
+      return c.json({ success: true, role: 'FA' });
     }
 
     // If no profile exists, create one with FA role
@@ -25,8 +34,8 @@ const getUserRole = async (c) => {
       const { error: insertError } = await supabaseAdmin
         .from('user_profiles')
         .insert({
-          id: session.user.id,
-          email: session.user.email,
+          id: user.id,
+          email: user.email,
           role: 'FA'
         });
       
@@ -40,7 +49,7 @@ const getUserRole = async (c) => {
     return c.json({ success: true, role: data.role || 'FA' });
   } catch (error) {
     console.error('Role fetch error:', error);
-    return c.json({ success: true, role: 'Sys Admin' }); // Default fallback
+    return c.json({ success: true, role: 'FA' });
   }
 };
 

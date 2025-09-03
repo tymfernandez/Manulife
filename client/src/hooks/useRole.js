@@ -36,18 +36,37 @@ export const useRole = () => {
 
   const fetchRole = async () => {
     try {
-      const response = await fetch('http://localhost:3000/api/user/role', {
+      const { supabase } = await import('../supabaseClient');
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session?.access_token) {
+        console.log('No session token, defaulting to FA');
+        return 'FA';
+      }
+      
+      const apiUrl = `${import.meta.env.VITE_API_URL || 'http://localhost:3000/api'}/user/role`;
+      console.log('Fetching role from:', apiUrl);
+      
+      const response = await fetch(apiUrl, {
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`
+        },
         credentials: 'include'
       });
       const result = await response.json();
+      
+      console.log('Role fetch response:', result);
+      
       if (result.success) {
+        console.log('User role:', result.role);
         return result.role;
       } else {
-        return 'FA'; // Default fallback
+        console.log('Role fetch failed, defaulting to FA');
+        return 'FA';
       }
     } catch (error) {
       console.error('Error fetching role:', error);
-      return 'FA'; // Default fallback
+      return 'FA';
     }
   };
 
@@ -65,11 +84,14 @@ export const useRole = () => {
       dashboard: ['FA', 'BH', 'UH', 'UHA', 'Region Head', 'Sys Admin'],
       recruitment: ['BH', 'UH', 'UHA', 'Region Head', 'Sys Admin'],
       accounts: ['Region Head', 'Sys Admin'],
+      'activity-logs': ['Region Head', 'Sys Admin'],
       settings: ['FA', 'BH', 'UH', 'UHA', 'Region Head', 'Sys Admin'],
       profile: ['FA', 'BH', 'UH', 'UHA', 'Region Head', 'Sys Admin']
     };
 
-    return hasAccess(pagePermissions[page] || []);
+    const hasPageAccess = hasAccess(pagePermissions[page] || []);
+    console.log(`Role check for page '${page}': role='${role}', hasAccess=${hasPageAccess}`);
+    return hasPageAccess;
   };
 
   return { role, loading, hasAccess, canAccessPage };
