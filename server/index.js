@@ -23,9 +23,9 @@ const app = new Hono();
 
 // Enable CORS for client requests
 app.use('*', cors({
-  origin: ['http://localhost:5174', 'https://manulife-client.vercel.app'],
+  origin: ['http://localhost:5173', 'http://localhost:5174', 'https://manulife-client.vercel.app'],
   allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowHeaders: ['Content-Type', 'Authorization', 'user-id'],
+  allowHeaders: ['Content-Type', 'Authorization', 'user-id', 'Cookie'],
   credentials: true
 }));
 
@@ -143,7 +143,7 @@ app.get('/api/debug', async (c) => {
 const port = process.env.PORT || 3000;
 
 // For Vercel deployment
-export default app;
+module.exports = app;
 
 // For local development
 if (!process.env.VERCEL) {

@@ -37,28 +37,10 @@ export const useRole = () => {
 
   const fetchRole = async () => {
     try {
-      const { supabase } = await import('../supabaseClient');
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      if (!session?.access_token) {
-        console.log('No session token, defaulting to FA');
-        return 'FA';
-      }
-      
-      // Clear cache if different user
-      if (currentUserId && currentUserId !== session.user.id) {
-        cachedRole = null;
-        rolePromise = null;
-      }
-      currentUserId = session.user.id;
-      
       const apiUrl = `${import.meta.env.VITE_API_URL || 'http://localhost:3000/api'}/user/role`;
       console.log('Fetching role from:', apiUrl);
       
       const response = await fetch(apiUrl, {
-        headers: {
-          'Authorization': `Bearer ${session.access_token}`
-        },
         credentials: 'include'
       });
       const result = await response.json();

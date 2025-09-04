@@ -35,20 +35,9 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const getSession = async () => {
       try {
-        const { supabase } = await import('../supabaseClient');
-        const { data: { session } } = await supabase.auth.getSession();
-        
-        if (session?.access_token) {
-          const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3000/api'}/auth/session`, {
-            headers: {
-              'Authorization': `Bearer ${session.access_token}`
-            }
-          });
-          const result = await response.json();
-          setUser(result.success && result.session ? result.session.user : null);
-        } else {
-          setUser(null);
-        }
+        const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3000/api'}/auth/session`);
+        const result = await response.json();
+        setUser(result.success && result.session ? result.session.user : null);
       } catch (error) {
         setUser(null);
       } finally {

@@ -2,16 +2,20 @@ const { supabase } = require('../supabase');
 
 const getUserRole = async (c) => {
   try {
-    const authHeader = c.req.header('Authorization');
+    const cookies = c.req.header('Cookie');
+    let accessToken = null;
     
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    if (cookies) {
+      const tokenMatch = cookies.match(/sb-access-token=([^;]+)/);
+      accessToken = tokenMatch ? tokenMatch[1] : null;
+    }
+    
+    if (!accessToken) {
       return c.json({ success: false, message: 'Not authenticated' }, 401);
     }
 
-    const token = authHeader.substring(7);
     const { supabaseAdmin } = require('../supabase');
-    
-    const { data: { user }, error: userError } = await supabaseAdmin.auth.getUser(token);
+    const { data: { user }, error: userError } = await supabaseAdmin.auth.getUser(accessToken);
     
     if (userError || !user) {
       return c.json({ success: false, message: 'Invalid token' }, 401);

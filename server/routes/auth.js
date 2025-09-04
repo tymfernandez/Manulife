@@ -114,6 +114,10 @@ const signIn = async (c) => {
       });
     }
 
+    // Set session cookie for this specific user
+    c.header('Set-Cookie', `sb-access-token=${data.session.access_token}; HttpOnly; Secure; SameSite=None; Path=/`);
+    c.header('Set-Cookie', `sb-refresh-token=${data.session.refresh_token}; HttpOnly; Secure; SameSite=None; Path=/`);
+
     return c.json({ success: true, data });
   } catch (error) {
     console.error('SignIn error:', error);
