@@ -52,7 +52,6 @@ const UserAccount = ({ setShowChangePassword, setShowRecoverPassword }) => {
         setMfaEnabled(result.enabled);
       }
     } catch (error) {
-      console.error('Error checking MFA status:', error);
       setMfaEnabled(false);
     }
   };
@@ -90,7 +89,6 @@ const UserAccount = ({ setShowChangePassword, setShowRecoverPassword }) => {
       setQrCode(result.data.qrCode);
       setShowMfaSetup(true);
     } catch (error) {
-      console.error('Error enabling MFA:', error);
       alert('Failed to enable MFA: ' + error.message);
     } finally {
       setLoading(false);
@@ -137,7 +135,6 @@ const UserAccount = ({ setShowChangePassword, setShowRecoverPassword }) => {
       setMfaSecret('');
       alert('MFA enabled successfully!');
     } catch (error) {
-      console.error('Error verifying MFA:', error);
       alert('Invalid verification code');
     } finally {
       setLoading(false);
@@ -175,7 +172,6 @@ const UserAccount = ({ setShowChangePassword, setShowRecoverPassword }) => {
       setMfaEnabled(false);
       alert('MFA disabled successfully');
     } catch (error) {
-      console.error('Error disabling MFA:', error);
       alert('Failed to disable MFA');
     } finally {
       setLoading(false);
@@ -188,7 +184,7 @@ const UserAccount = ({ setShowChangePassword, setShowRecoverPassword }) => {
       setSettings(userSettings);
       setSelectedLanguage(userSettings.language || 'English');
     } catch (error) {
-      console.error('Error loading settings:', error);
+      // Handle error silently
     }
   };
 
@@ -199,7 +195,7 @@ const UserAccount = ({ setShowChangePassword, setShowRecoverPassword }) => {
       await settingsService.updateSettings(updatedSettings);
       setSettings(updatedSettings);
     } catch (error) {
-      console.error('Error updating setting:', error);
+      // Handle error silently
     } finally {
       setLoading(false);
     }

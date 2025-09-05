@@ -36,7 +36,6 @@ const RecruitmentManagement = () => {
 
   const fetchRecruits = async () => {
     try {
-      console.log('Fetching recruits from API...');
       
       const storedSession = localStorage.getItem('supabase.auth.token');
       if (!storedSession) {
@@ -55,8 +54,6 @@ const RecruitmentManagement = () => {
       });
       const result = await response.json();
       
-      console.log('API response:', result);
-      
       if (!result.success) throw new Error(result.message);
       
       const processedData = result.data.map(recruit => ({
@@ -72,11 +69,8 @@ const RecruitmentManagement = () => {
         referralName: recruit.referral_name || '',
         resumeUrl: recruit.resume_url
       }));
-      
-      console.log('Processed data:', processedData);
       setRecruits(processedData);
     } catch (error) {
-      console.error('Error fetching recruits, using sample data:', error);
       setSampleData();
     }
   };
@@ -234,8 +228,6 @@ const RecruitmentManagement = () => {
   };
 
   const handleSave = async (id) => {
-    console.log('Save clicked for ID:', id);
-    console.log('Edit data:', editData);
     try {
       const storedSession = localStorage.getItem('supabase.auth.token');
       if (!storedSession) {
@@ -281,7 +273,7 @@ const RecruitmentManagement = () => {
       setEditingId(null);
       setEditData({});
     } catch (error) {
-      console.error('Error updating recruit:', error);
+      // Handle error silently
     }
   };
 
@@ -318,7 +310,7 @@ const RecruitmentManagement = () => {
         logDelete('Recruitment Record', `${deletedRecruit?.fullName || 'Unknown'}`);
       }
     } catch (error) {
-      console.error('Delete error:', error);
+      // Handle error silently
     }
     
     setShowDeleteModal(false);

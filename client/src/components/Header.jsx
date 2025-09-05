@@ -56,7 +56,7 @@ const Header = ({
 
       try {
         setIsLoading(true);
-        console.log("🔍 Fetching user profile for:", user.email);
+
         
         const storedSession = localStorage.getItem('supabase.auth.token');
         if (!storedSession) {
@@ -76,15 +76,11 @@ const Header = ({
           }
         });
 
-        console.log("📊 Profile API status:", response.status);
-        
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
 
         const result = await response.json();
-        console.log("📋 Full profile response:", result);
-        console.log("👤 Role from API:", result.data?.role);
 
         if (result.success && result.data) {
           const profileData = {
@@ -94,7 +90,7 @@ const Header = ({
             role: result.data.role || "Sys Admin", // Use actual role or fallback
           };
           
-          console.log("✅ Profile data set:", profileData);
+
           setUserProfile(profileData);
         } else {
           // Fallback with forced role
@@ -103,19 +99,16 @@ const Header = ({
             lastName: "",
             email: user?.email || "",r
           };
-          console.log("⚠️ Using fallback profile:", fallbackProfile);
+
           setUserProfile(fallbackProfile);
         }
       } catch (error) {
-        console.error("❌ Error fetching user profile:", error);
-        // Fallback with forced role
         const errorProfile = {
           firstName: "",
           lastName: "",
           email: user?.email || "",
-          role: "Sys Admin", // FORCE Sys Admin role
+          role: "Sys Admin",
         };
-        console.log("🔧 Using error fallback profile:", errorProfile);
         setUserProfile(errorProfile);
       } finally {
         setIsLoading(false);
@@ -130,10 +123,7 @@ const Header = ({
 
   // Fetch notifications function with enhanced debugging
   const fetchNotifications = async () => {
-    console.log("📡 Starting fetchNotifications...");
-    
     try {
-      console.log("🌐 Making request to activity-logs API...");
       const storedSession = localStorage.getItem('supabase.auth.token');
       if (!storedSession) {
         throw new Error('No session available');
@@ -152,33 +142,14 @@ const Header = ({
         }
       });
 
-      console.log("📊 Activity logs API response:");
-      console.log("  - Status:", response.status);
-      console.log("  - Status Text:", response.statusText);
-
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
 
       const result = await response.json();
-      console.log("📋 Raw activity logs response:", result);
-      console.log("  - Success:", result.success);
-      console.log("  - Data type:", typeof result.data);
-      console.log("  - Data is array:", Array.isArray(result.data));
-      console.log("  - Data length:", result.data?.length || 0);
 
       if (result.success && result.data && Array.isArray(result.data)) {
-        console.log("🔄 Processing", result.data.length, "activity logs...");
-        
-        // Log first few items to see structure
-        if (result.data.length > 0) {
-          console.log("📝 Sample activity log structure:");
-          console.log("  - First item:", result.data[0]);
-          console.log("  - Keys:", Object.keys(result.data[0]));
-        }
-
         const notificationsData = result.data.map((log, index) => {
-          console.log(`🔧 Processing log ${index + 1}:`, log);
           
           try {
             const notification = {
@@ -196,10 +167,8 @@ const Header = ({
               details: log.details
             };
             
-            console.log(`✅ Processed notification ${index + 1}:`, notification);
             return notification;
           } catch (error) {
-            console.error(`❌ Error processing log ${index + 1}:`, error, log);
             // Return a fallback notification
             return {
               id: log.id || `error-${index}`,
@@ -222,32 +191,14 @@ const Header = ({
         notificationsData.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
         const recentNotifications = notificationsData.slice(0, 20);
         
-        console.log("🎯 Final processed notifications:");
-        console.log("  - Total processed:", notificationsData.length);
-        console.log("  - Recent (showing):", recentNotifications.length);
-        console.log("  - Sample titles:", recentNotifications.slice(0, 3).map(n => n.title));
-        
         setNotifications(recentNotifications);
         setUnreadCount(recentNotifications.length);
         
-        console.log("✅ Notifications state updated!");
-        console.log("  - Notifications count:", recentNotifications.length);
-        console.log("  - Unread count:", recentNotifications.length);
-        
       } else {
-        console.log("⚠️ Invalid response format:");
-        console.log("  - Success:", result.success);
-        console.log("  - Data exists:", !!result.data);
-        console.log("  - Data is array:", Array.isArray(result.data));
-        
         setNotifications([]);
         setUnreadCount(0);
       }
     } catch (error) {
-      console.error('❌ Error fetching notifications:', error);
-      console.error('  - Message:', error.message);
-      
-      // Set empty state on error
       setNotifications([]);
       setUnreadCount(0);
     }
@@ -255,39 +206,24 @@ const Header = ({
 
   // Fetch notifications when role changes to BH or Sys Admin
   useEffect(() => {
-    console.log("🔄 Role check effect triggered:");
-    console.log("  - Current role:", userProfile.role);
-    console.log("  - Can view notifications:", canViewNotifications);
-    console.log("  - User object:", user);
-    
     if (canViewNotifications && user) {
-      console.log("🚀 Fetching notifications for role:", userProfile.role);
       fetchNotifications();
       
-      // Set up polling for new notifications every 30 seconds
       const interval = setInterval(() => {
-        console.log("⏰ Auto-fetching notifications (30s interval)");
         fetchNotifications();
       }, 30000);
       
       return () => {
-        console.log("🧹 Cleaning up notification interval");
         clearInterval(interval);
       };
     } else {
-      console.log("❌ Cannot view notifications - clearing state");
-      console.log("  - Role:", userProfile.role);
-      console.log("  - User exists:", !!user);
-      // Clear notifications if user doesn't have permission
       setNotifications([]);
       setUnreadCount(0);
     }
-  }, [userProfile.role, user]); // Added user as dependency
+  }, [userProfile.role, user]);
 
   // Enhanced notification helper functions with debugging
   const getNotificationTitle = (action, resourceType) => {
-    console.log(`🏷️ Getting title for action: "${action}", resource: "${resourceType}"`);
-    
     const actionMap = {
       'CREATE': {
         'user_profiles': 'New User Account Created',
@@ -354,13 +290,11 @@ const Header = ({
       title = 'System Activity';
     }
     
-    console.log(`📝 Generated title: "${title}"`);
     return title;
   };
 
   const getNotificationMessage = (log) => {
     const { action, resource_type, user_name, details } = log;
-    console.log(`💬 Getting message for:`, { action, resource_type, user_name });
     
     // Safe function to handle resource_type formatting
     const formatResourceType = (resourceType) => {
@@ -472,7 +406,6 @@ const Header = ({
         message = `${action || 'Action'} performed by ${user_name || 'someone'} on ${formatResourceType(resource_type)}`;
     }
     
-    console.log(`📨 Generated message: "${message}"`);
     return message;
   };
 
@@ -535,7 +468,6 @@ const Header = ({
     );
     // Set unread count to 0
     setUnreadCount(0);
-    console.log("✅ All notifications marked as read");
   };
 
   // Enhanced sign out function with proper error handling
@@ -544,17 +476,11 @@ const Header = ({
     
     try {
       setIsSigningOut(true);
-      console.log("🔐 Starting sign out process...");
       
-      // Close dropdowns first
       setIsProfileOpen(false);
       setIsNotificationOpen(false);
       
-      // Call the auth context signOut function
-      console.log("📡 Calling signOut function...");
       await signOut();
-      
-      console.log("✅ Sign out successful, navigating to signin...");
       
       // Clear any local state
       setUserProfile({
@@ -570,13 +496,7 @@ const Header = ({
       navigate("/signin", { replace: true });
       
     } catch (error) {
-      console.error("❌ Error during sign out:", error);
-      
-      // Even if signOut fails, still navigate to signin for security
-      console.log("🔄 Force navigating to signin despite error...");
       navigate("/signin", { replace: true });
-      
-      // Force reload to clear any cached state
       window.location.href = "/signin";
       
     } finally {
@@ -584,13 +504,7 @@ const Header = ({
     }
   };
 
-  // Debug logging when state changes
-  useEffect(() => {
-    console.log("🔔 Notifications state changed:");
-    console.log("  - Count:", notifications.length);
-    console.log("  - Unread:", unreadCount);
-    console.log("  - Sample:", notifications.slice(0, 2));
-  }, [notifications, unreadCount]);
+
 
   return (
     <header className="bg-white border-b border-gray-200 px-6 py-2 flex-shrink-0">
@@ -620,9 +534,6 @@ const Header = ({
             <div className="relative" ref={notificationRef}>
               <button
                 onClick={() => {
-                  console.log("🔔 Notification bell clicked");
-                  console.log("  - Current notifications:", notifications.length);
-                  console.log("  - Unread count:", unreadCount);
                   setIsNotificationOpen(!isNotificationOpen);
                 }}
                 className="relative p-2 rounded-lg hover:bg-gray-100 transition-colors"
