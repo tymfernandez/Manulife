@@ -148,6 +148,9 @@ export const AuthProvider = ({ children }) => {
         try {
           const profileResponse = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3000/api'}/auth/profile`, {
             credentials: "include",
+            headers: {
+              'Authorization': `Bearer ${result.data.session.access_token}`
+            }
           });
           const profileResult = await profileResponse.json();
           const profile = profileResult.success && profileResult.data ? {

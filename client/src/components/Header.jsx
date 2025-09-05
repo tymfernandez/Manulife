@@ -60,12 +60,13 @@ const Header = ({
         
         const storedSession = localStorage.getItem('supabase.auth.token');
         if (!storedSession) {
-          throw new Error('No session available');
+          return;
         }
         
         const sessionData = JSON.parse(storedSession);
-        if (!sessionData.access_token) {
-          throw new Error('No access token available');
+        if (!sessionData.access_token || sessionData.expires_at <= Date.now() / 1000) {
+          localStorage.removeItem('supabase.auth.token');
+          return;
         }
         
         const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3000/api'}/auth/profile`, {

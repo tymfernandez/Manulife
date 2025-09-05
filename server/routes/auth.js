@@ -212,12 +212,12 @@ const getProfile = async (c) => {
     try {
       const { data, error: profileError } = await supabase
         .from('user_profiles')
-        .select('number, address')
+        .select('number, address, role')
         .eq('id', userId)
         .single();
       profileData = data;
     } catch (profileError) {
-      console.error('Profile fetch error (non-critical):', profileError);
+      // Non-critical error
     }
 
     return c.json({ 
@@ -227,7 +227,8 @@ const getProfile = async (c) => {
         last_name: userData.user.user_metadata?.last_name || '',
         contact_number: profileData?.number || userData.user.user_metadata?.contact_number || '',
         address: profileData?.address || userData.user.user_metadata?.address || '',
-        email: userData.user.email
+        email: userData.user.email,
+        role: profileData?.role || 'Sys Admin'
       }
     });
   } catch (error) {
