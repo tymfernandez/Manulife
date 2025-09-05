@@ -2,22 +2,18 @@ const { supabase } = require('../supabase');
 
 const getSession = async (c) => {
   try {
-    const cookies = c.req.header('Cookie');
-    let accessToken = null;
+    const cookies = c.req.header('Cookie') || '';
+    const accessToken = cookies.match(/sb-access-token=([^;]+)/)?.[1];
+    const userId = cookies.match(/sb-user-id=([^;]+)/)?.[1];
     
-    if (cookies) {
-      const tokenMatch = cookies.match(/sb-access-token=([^;]+)/);
-      accessToken = tokenMatch ? tokenMatch[1] : null;
-    }
-    
-    if (!accessToken) {
+    if (!accessToken || !userId) {
       return c.json({ success: true, session: null });
     }
 
     const { supabaseAdmin } = require('../supabase');
     const { data: { user }, error } = await supabaseAdmin.auth.getUser(accessToken);
     
-    if (error || !user) {
+    if (error || !user || user.id !== userId) {
       return c.json({ success: true, session: null });
     }
 

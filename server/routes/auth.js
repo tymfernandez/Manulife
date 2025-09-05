@@ -114,10 +114,6 @@ const signIn = async (c) => {
       });
     }
 
-    // Set session cookie for this specific user
-    c.header('Set-Cookie', `sb-access-token=${data.session.access_token}; HttpOnly; Secure; SameSite=None; Path=/`);
-    c.header('Set-Cookie', `sb-refresh-token=${data.session.refresh_token}; HttpOnly; Secure; SameSite=None; Path=/`);
-
     return c.json({ success: true, data });
   } catch (error) {
     console.error('SignIn error:', error);
@@ -133,9 +129,10 @@ const signIn = async (c) => {
 
 const signOut = async (c) => {
   try {
-    const { error } = await supabase.auth.signOut();
-
-    if (error) throw error;
+    // Clear session cookies
+    c.header('Set-Cookie', 'sb-access-token=; HttpOnly; SameSite=None; Secure; Path=/; Max-Age=0');
+    c.header('Set-Cookie', 'sb-refresh-token=; HttpOnly; SameSite=None; Secure; Path=/; Max-Age=0');
+    c.header('Set-Cookie', 'sb-user-id=; HttpOnly; SameSite=None; Secure; Path=/; Max-Age=0');
 
     return c.json({ success: true });
   } catch (error) {
@@ -187,17 +184,24 @@ const updateProfile = async (c) => {
 
 const getProfile = async (c) => {
   try {
-    const userId = c.req.header('user-id');
+    const cookies = c.req.header('Cookie') || '';
+    const accessToken = cookies.match(/sb-access-token=([^;]+)/)?.[1];
+    const userId = cookies.match(/sb-user-id=([^;]+)/)?.[1];
     
-    if (!userId) {
-      return c.json({ success: false, message: 'User ID required' }, 401);
+    if (!accessToken || !userId) {
+      return c.json({ success: false, message: 'Not authenticated' }, 401);
+    }
+
+    const { supabaseAdmin } = require('../supabase');
+    const { data: { user }, error: userError } = await supabaseAdmin.auth.getUser(accessToken);
+    
+    if (userError || !user || user.id !== userId) {
+      return c.json({ success: false, message: 'Invalid session' }, 401);
     }
     
-    const { supabaseAdmin } = require('../supabase');
-    
     // Get user data
-    const { data: userData, error: userError } = await supabaseAdmin.auth.admin.getUserById(userId);
-    if (userError || !userData.user) {
+    const { data: userData, error: userDataError } = await supabaseAdmin.auth.admin.getUserById(userId);
+    if (userDataError || !userData.user) {
       return c.json({ success: false, message: 'User not found' }, 404);
     }
 

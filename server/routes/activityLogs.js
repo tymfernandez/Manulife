@@ -2,6 +2,21 @@ const { supabase } = require('../supabase');
 
 const getActivityLogs = async (c) => {
   try {
+    const cookies = c.req.header('Cookie') || '';
+    const accessToken = cookies.match(/sb-access-token=([^;]+)/)?.[1];
+    const userId = cookies.match(/sb-user-id=([^;]+)/)?.[1];
+    
+    if (!accessToken || !userId) {
+      return c.json({ success: false, message: 'Not authenticated' }, 401);
+    }
+
+    const { supabaseAdmin } = require('../supabase');
+    const { data: { user }, error: userError } = await supabaseAdmin.auth.getUser(accessToken);
+    
+    if (userError || !user || user.id !== userId) {
+      return c.json({ success: false, message: 'Invalid session' }, 401);
+    }
+    
     const { page = 1, limit = 10, search = '', role = '', activityType = '', dateFrom = '', dateTo = '' } = c.req.query();
     
     let query = supabase

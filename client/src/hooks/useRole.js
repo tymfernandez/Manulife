@@ -37,25 +37,36 @@ export const useRole = () => {
 
   const fetchRole = async () => {
     try {
+      const storedSession = localStorage.getItem('supabase.auth.token');
+      
+      if (!storedSession) {
+        return 'FA';
+      }
+      
+      const sessionData = JSON.parse(storedSession);
+      
+      if (!sessionData.access_token || sessionData.expires_at <= Date.now() / 1000) {
+        localStorage.removeItem('supabase.auth.token');
+        return 'FA';
+      }
+      
       const apiUrl = `${import.meta.env.VITE_API_URL || 'http://localhost:3000/api'}/user/role`;
-      console.log('Fetching role from:', apiUrl);
       
       const response = await fetch(apiUrl, {
+        headers: {
+          'Authorization': `Bearer ${sessionData.access_token}`
+        },
         credentials: 'include'
       });
+      
       const result = await response.json();
       
-      console.log('Role fetch response:', result);
-      
       if (result.success) {
-        console.log('User role:', result.role);
         return result.role;
       } else {
-        console.log('Role fetch failed, defaulting to FA');
         return 'FA';
       }
     } catch (error) {
-      console.error('Error fetching role:', error);
       return 'FA';
     }
   };

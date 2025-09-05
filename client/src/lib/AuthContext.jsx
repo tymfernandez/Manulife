@@ -21,6 +21,16 @@ export const AuthProvider = ({ children }) => {
 
       const result = await response.json();
       if (result.success && result.data.user) {
+        // Store session in localStorage after MFA verification
+        const sessionData = {
+          access_token: result.data.session.access_token,
+          refresh_token: result.data.session.refresh_token,
+          expires_at: result.data.session.expires_at,
+          user: result.data.user
+        };
+        localStorage.setItem('supabase.auth.token', JSON.stringify(sessionData));
+        localStorage.removeItem('supabase.auth.temp');
+        
         setUser(result.data.user);
         // Log successful login
         logLogin(result.data.user, null);
@@ -35,9 +45,19 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const getSession = async () => {
       try {
-        const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3000/api'}/auth/session`);
-        const result = await response.json();
-        setUser(result.success && result.session ? result.session.user : null);
+        // Get session from localStorage (per-user storage)
+        const storedSession = localStorage.getItem('supabase.auth.token');
+        if (storedSession) {
+          const sessionData = JSON.parse(storedSession);
+          if (sessionData.access_token && sessionData.expires_at > Date.now() / 1000) {
+            setUser(sessionData.user);
+          } else {
+            localStorage.removeItem('supabase.auth.token');
+            setUser(null);
+          }
+        } else {
+          setUser(null);
+        }
       } catch (error) {
         setUser(null);
       } finally {
@@ -98,6 +118,13 @@ export const AuthProvider = ({ children }) => {
       
       // Check if MFA is required
       if (result.requiresMfa) {
+        // Store temp session for MFA verification
+        const tempSessionData = {
+          tempUserId: result.tempUserId,
+          requiresMfa: true
+        };
+        localStorage.setItem('supabase.auth.temp', JSON.stringify(tempSessionData));
+        
         return { 
           data: null, 
           error: null, 
@@ -107,6 +134,15 @@ export const AuthProvider = ({ children }) => {
       }
       
       if (result.data?.user) {
+        // Store session in localStorage for this specific user
+        const sessionData = {
+          access_token: result.data.session.access_token,
+          refresh_token: result.data.session.refresh_token,
+          expires_at: result.data.session.expires_at,
+          user: result.data.user
+        };
+        localStorage.setItem('supabase.auth.token', JSON.stringify(sessionData));
+        
         setUser(result.data.user);
         // Fetch user profile for activity logging
         try {
@@ -144,6 +180,9 @@ export const AuthProvider = ({ children }) => {
       if (result.success) {
         // Log logout activity before clearing user
         if (user) logLogout(user, userProfile);
+        
+        // Clear localStorage session
+        localStorage.removeItem('supabase.auth.token');
         
         // Clear role cache
         const { clearRoleCache } = await import('../hooks/useRole');

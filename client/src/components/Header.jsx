@@ -58,7 +58,7 @@ const Header = ({
         setIsLoading(true);
         console.log("🔍 Fetching user profile for:", user.email);
         
-        const response = await fetch("http://localhost:3000/api/auth/profile", {
+        const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3000/api'}/auth/profile`, {
           credentials: "include",
           headers: {
             'Content-Type': 'application/json'
@@ -123,7 +123,7 @@ const Header = ({
     
     try {
       console.log("🌐 Making request to activity-logs API...");
-      const response = await fetch('http://localhost:3000/api/activity-logs', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3000/api'}/activity-logs`, {
         credentials: 'include',
         headers: {
           'Content-Type': 'application/json'
