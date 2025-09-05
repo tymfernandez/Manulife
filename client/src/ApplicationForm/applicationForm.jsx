@@ -241,37 +241,40 @@ const ApplicationForm = () => {
   };
 
   const renderStepIndicator = () => (
-    <div className="flex justify-between items-center mb-8">
+    <div className="flex flex-col sm:flex-row justify-between items-center mb-6 sm:mb-8 space-y-4 sm:space-y-0">
       {steps.map((step, index) => (
-        <div key={step.id} className="flex items-center">
+        <div key={step.id} className="flex items-center w-full sm:w-auto">
           <div
-            className={`flex items-center justify-center w-10 h-10 rounded-full border-2 transition-all duration-300 ${
+            className={`flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-full border-2 transition-all duration-300 ${
               currentStep >= step.id
                 ? "bg-gradient-to-r from-green-500 to-emerald-600 border-transparent text-white"
                 : "border-gray-300 text-gray-400"
             }`}
           >
             {currentStep > step.id ? (
-              <CheckCircle size={20} />
+              <CheckCircle size={16} className="sm:w-5 sm:h-5" />
             ) : (
-              <span className="font-semibold">{step.id}</span>
+              <span className="font-semibold text-sm sm:text-base">{step.id}</span>
             )}
           </div>
-          <div className="ml-3">
+          <div className="ml-3 flex-1">
             <div
-              className={`text-sm font-medium ${
+              className={`text-xs sm:text-sm font-medium ${
                 currentStep >= step.id ? "text-gray-900" : "text-gray-400"
               }`}
             >
               {step.title}
             </div>
-            <div className="w-20 bg-gray-200 rounded-full h-1 mt-1">
+            <div className="w-full sm:w-20 bg-gray-200 rounded-full h-1 mt-1">
               <div
                 className="bg-gradient-to-r from-green-500 to-emerald-600 h-1 rounded-full transition-all duration-500"
                 style={{ width: `${getStepProgress(step.id)}%` }}
               ></div>
             </div>
           </div>
+          {index < steps.length - 1 && (
+            <div className="hidden sm:block w-8 h-px bg-gray-300 mx-4"></div>
+          )}
         </div>
       ))}
     </div>
@@ -321,13 +324,13 @@ const ApplicationForm = () => {
             </div>
           </div>
         </div>
-        <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+        <div className="flex flex-col gap-4 justify-center items-center">
           <button
             onClick={() => {
               setIsSubmitted(false);
               setMessage("");
             }}
-            className="px-6 py-3 border border-gray-300 rounded-xl text-gray-600 font-medium hover:bg-gray-50 transition-all duration-200 flex items-center"
+            className="w-full sm:w-auto px-6 py-3 border border-gray-300 rounded-xl text-gray-600 font-medium hover:bg-gray-50 transition-all duration-200 flex items-center justify-center"
           >
             <ArrowLeft className="h-5 w-5 mr-2" />
             Submit Another Application
@@ -337,7 +340,7 @@ const ApplicationForm = () => {
               // Replace with your actual home page navigation
               window.location.href = "/";
             }}
-            className="px-8 py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-xl font-medium hover:from-green-600 hover:to-emerald-700 transition-all duration-200 shadow-lg hover:shadow-xl flex items-center"
+            className="w-full sm:w-auto px-8 py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-xl font-medium hover:from-green-600 hover:to-emerald-700 transition-all duration-200 shadow-lg hover:shadow-xl flex items-center justify-center"
           >
             <Home className="h-5 w-5 mr-2" />
             Back to Home
@@ -348,12 +351,12 @@ const ApplicationForm = () => {
   );
 
   const renderStep1 = () => (
-    <div className="space-y-6 animate-fadeIn">
-      <div className="text-center mb-8">
-        <h3 className="text-2xl font-bold text-gray-800 mb-2">
+    <div className="space-y-4 sm:space-y-6 animate-fadeIn">
+      <div className="text-center mb-6 sm:mb-8">
+        <h3 className="text-xl sm:text-2xl font-bold text-gray-800 mb-2">
           Let's get to know you
         </h3>
-        <p className="text-gray-600">
+        <p className="text-sm sm:text-base text-gray-600">
           Tell us a bit about yourself to get started
         </p>
       </div>
@@ -442,17 +445,17 @@ const ApplicationForm = () => {
   );
 
   const renderStep2 = () => (
-    <div className="space-y-6 animate-fadeIn">
-      <div className="text-center mb-8">
-        <h3 className="text-2xl font-bold text-gray-800 mb-2">
+    <div className="space-y-4 sm:space-y-6 animate-fadeIn">
+      <div className="text-center mb-6 sm:mb-8">
+        <h3 className="text-xl sm:text-2xl font-bold text-gray-800 mb-2">
           Choose your path
         </h3>
-        <p className="text-gray-600">
+        <p className="text-sm sm:text-base text-gray-600">
           Select the position that excites you most
         </p>
       </div>
 
-      <div className="space-y-4">
+      <div className="space-y-3 sm:space-y-4">
         {positionOptions.map((position) => (
           <div
             key={position.value}
@@ -461,24 +464,24 @@ const ApplicationForm = () => {
                 target: { name: "positionAppliedFor", value: position.value },
               })
             }
-            className={`p-4 border-2 rounded-xl cursor-pointer transition-all duration-300 hover:shadow-lg ${
+            className={`p-3 sm:p-4 border-2 rounded-xl cursor-pointer transition-all duration-300 hover:shadow-lg ${
               formData.positionAppliedFor === position.value
                 ? "border-green-500 bg-green-50 shadow-md"
                 : "border-gray-200 hover:border-gray-300"
             }`}
           >
             <div className="flex items-center">
-              <span className="text-2xl mr-4">{position.icon}</span>
+              <span className="text-xl sm:text-2xl mr-3 sm:mr-4">{position.icon}</span>
               <div className="flex-1">
-                <h4 className="font-semibold text-gray-800">
+                <h4 className="font-semibold text-sm sm:text-base text-gray-800">
                   {position.value}
                 </h4>
-                <p className="text-sm text-gray-600 mt-1">
+                <p className="text-xs sm:text-sm text-gray-600 mt-1">
                   {position.description}
                 </p>
               </div>
               {formData.positionAppliedFor === position.value && (
-                <CheckCircle className="h-6 w-6 text-green-500" />
+                <CheckCircle className="h-5 w-5 sm:h-6 sm:w-6 text-green-500" />
               )}
             </div>
           </div>
@@ -544,10 +547,10 @@ const ApplicationForm = () => {
   );
 
   const renderStep3 = () => (
-    <div className="space-y-6 animate-fadeIn">
-      <div className="text-center mb-8">
-        <h3 className="text-2xl font-bold text-gray-800 mb-2">Almost done!</h3>
-        <p className="text-gray-600">Just one more optional detail</p>
+    <div className="space-y-4 sm:space-y-6 animate-fadeIn">
+      <div className="text-center mb-6 sm:mb-8">
+        <h3 className="text-xl sm:text-2xl font-bold text-gray-800 mb-2">Almost done!</h3>
+        <p className="text-sm sm:text-base text-gray-600">Just one more optional detail</p>
       </div>
 
       <div className="relative">
@@ -562,26 +565,26 @@ const ApplicationForm = () => {
         />
       </div>
 
-      <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-6 mt-8">
-        <h4 className="font-semibold text-gray-800 mb-3">
+      <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-4 sm:p-6 mt-6 sm:mt-8">
+        <h4 className="font-semibold text-base sm:text-lg text-gray-800 mb-3">
           Application Summary
         </h4>
-        <div className="space-y-2 text-sm">
-          <div className="flex justify-between">
-            <span className="text-gray-600">Name:</span>
-            <span className="font-medium">{formData.fullName}</span>
+        <div className="space-y-2 text-xs sm:text-sm">
+          <div className="flex flex-col sm:flex-row sm:justify-between">
+            <span className="text-gray-600 font-medium sm:font-normal">Name:</span>
+            <span className="font-medium break-words">{formData.fullName}</span>
           </div>
-          <div className="flex justify-between">
-            <span className="text-gray-600">Email:</span>
-            <span className="font-medium">{formData.emailAddress}</span>
+          <div className="flex flex-col sm:flex-row sm:justify-between">
+            <span className="text-gray-600 font-medium sm:font-normal">Email:</span>
+            <span className="font-medium break-all">{formData.emailAddress}</span>
           </div>
-          <div className="flex justify-between">
-            <span className="text-gray-600">Position:</span>
+          <div className="flex flex-col sm:flex-row sm:justify-between">
+            <span className="text-gray-600 font-medium sm:font-normal">Position:</span>
             <span className="font-medium">{formData.positionAppliedFor}</span>
           </div>
-          <div className="flex justify-between">
-            <span className="text-gray-600">Resume:</span>
-            <span className="font-medium">
+          <div className="flex flex-col sm:flex-row sm:justify-between">
+            <span className="text-gray-600 font-medium sm:font-normal">Resume:</span>
+            <span className="font-medium break-words">
               {resumeFile ? resumeFile.name : "Not uploaded"}
             </span>
           </div>
@@ -591,18 +594,18 @@ const ApplicationForm = () => {
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-emerald-50 py-12 px-4">
+    <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-emerald-50 py-6 sm:py-8 md:py-12 px-4">
       <div className="max-w-3xl mx-auto">
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent mb-4">
+        <div className="text-center mb-8 sm:mb-12">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent mb-4">
             Join Our Team
           </h1>
-          <p className="text-xl text-gray-600">
+          <p className="text-base sm:text-lg md:text-xl text-gray-600">
             Start your journey with us today
           </p>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-xl p-8">
+        <div className="bg-white rounded-2xl shadow-xl p-4 sm:p-6 md:p-8">
           {!isSubmitted ? (
             <>
               {renderStepIndicator()}
@@ -624,22 +627,22 @@ const ApplicationForm = () => {
                 </div>
               )}
 
-              <div className="min-h-[400px]">
+              <div className="min-h-[300px] sm:min-h-[400px]">
                 {currentStep === 1 && renderStep1()}
                 {currentStep === 2 && renderStep2()}
                 {currentStep === 3 && renderStep3()}
               </div>
 
-              <div className="flex justify-between items-center mt-8 pt-6 border-t">
+              <div className="flex flex-col sm:flex-row justify-between items-center mt-6 sm:mt-8 pt-4 sm:pt-6 border-t space-y-4 sm:space-y-0">
                 <button
                   onClick={() => setCurrentStep(Math.max(1, currentStep - 1))}
                   disabled={currentStep === 1}
-                  className="px-6 py-3 border border-gray-300 rounded-xl text-gray-600 font-medium hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+                  className="w-full sm:w-auto px-4 sm:px-6 py-3 border border-gray-300 rounded-xl text-gray-600 font-medium hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 order-2 sm:order-1"
                 >
                   Previous
                 </button>
 
-                <div className="text-sm text-gray-500">
+                <div className="text-xs sm:text-sm text-gray-500 order-1 sm:order-2">
                   Step {currentStep} of {steps.length}
                 </div>
 
@@ -647,7 +650,7 @@ const ApplicationForm = () => {
                   <button
                     onClick={() => setCurrentStep(currentStep + 1)}
                     disabled={!canProceedToStep(currentStep + 1)}
-                    className="px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-xl font-medium hover:from-green-600 hover:to-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-xl"
+                    className="w-full sm:w-auto px-4 sm:px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-xl font-medium hover:from-green-600 hover:to-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-xl order-3"
                   >
                     Next Step
                   </button>
@@ -655,7 +658,7 @@ const ApplicationForm = () => {
                   <button
                     onClick={handleSubmit}
                     disabled={isSubmitting}
-                    className="px-8 py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-xl font-medium hover:from-green-600 hover:to-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-xl flex items-center"
+                    className="w-full sm:w-auto px-6 sm:px-8 py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-xl font-medium hover:from-green-600 hover:to-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-xl flex items-center justify-center order-3"
                   >
                     {isSubmitting ? (
                       <>

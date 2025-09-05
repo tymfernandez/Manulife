@@ -78,31 +78,31 @@ export default function SignIn() {
   };
 
   return (
-    <div className="min-h-screen flex p-20">
+    <div className="min-h-screen flex flex-col lg:flex-row p-4 sm:p-8 md:p-12 lg:p-20">
       {/* Left side - Form */}
-      <div className="flex-1 bg-gray-50 flex items-center justify-center p-8 rounded-l-2xl shadow-2xl">
+      <div className="flex-1 bg-gray-50 flex items-center justify-center p-4 sm:p-6 md:p-8 rounded-t-2xl lg:rounded-l-2xl lg:rounded-tr-none shadow-2xl">
         <div className="w-full max-w-md">
           {/* Header */}
-          <div className="text-center mb-8">
-            <h1 className="text-3xl font-semibold text-gray-900 mb-2">
+          <div className="text-center mb-6 sm:mb-8">
+            <h1 className="text-2xl sm:text-3xl font-semibold text-gray-900 mb-2">
               Welcome!
             </h1>
-            <p className="text-gray-600">Start your Life Champion journey</p>
+            <p className="text-sm sm:text-base text-gray-600">Start your Life Champion journey</p>
           </div>
 
           {/* Sign up link */}
-          <div className="text-right mb-6">
-            <span className="text-sm text-gray-600">Don't have account? </span>
+          <div className="text-center sm:text-right mb-4 sm:mb-6">
+            <span className="text-xs sm:text-sm text-gray-600">Don't have account? </span>
             <Link
               to="/signup"
-              className="text-sm text-green-600 hover:text-green-700 font-medium"
+              className="text-xs sm:text-sm text-green-600 hover:text-green-700 font-medium"
             >
               Signup
             </Link>
           </div>
 
           {error && (
-            <div className="bg-red-50 text-red-700 p-3 rounded-lg text-sm mb-6">
+            <div className="bg-red-50 text-red-700 p-3 rounded-lg text-xs sm:text-sm mb-4 sm:mb-6">
               {error}
             </div>
           )}
@@ -110,11 +110,11 @@ export default function SignIn() {
           {showMfaInput ? (
             // MFA Verification Form
             <form onSubmit={handleMfaSubmit} className="space-y-4">
-              <div className="text-center mb-6">
-                <h2 className="text-xl font-medium text-gray-900 mb-2">
+              <div className="text-center mb-4 sm:mb-6">
+                <h2 className="text-lg sm:text-xl font-medium text-gray-900 mb-2">
                   Two-Factor Authentication
                 </h2>
-                <p className="text-sm text-gray-600">
+                <p className="text-xs sm:text-sm text-gray-600">
                   Enter the 6-digit code from your authenticator app
                 </p>
               </div>
@@ -122,7 +122,7 @@ export default function SignIn() {
               <div>
                 <label
                   htmlFor="mfaCode"
-                  className="block text-sm font-medium text-gray-700 mb-2"
+                  className="block text-xs sm:text-sm font-medium text-gray-700 mb-2"
                 >
                   Verification Code
                 </label>
@@ -134,7 +134,7 @@ export default function SignIn() {
                   onChange={(e) =>
                     setMfaCode(e.target.value.replace(/\D/g, "").slice(0, 6))
                   }
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 text-gray-900 text-center text-lg tracking-widest"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 text-gray-900 text-center text-base sm:text-lg tracking-widest"
                   maxLength={6}
                   required
                 />
@@ -167,7 +167,7 @@ export default function SignIn() {
               <div>
                 <label
                   htmlFor="email"
-                  className="block text-sm font-medium text-gray-700 mb-2"
+                  className="block text-xs sm:text-sm font-medium text-gray-700 mb-2"
                 >
                   Email
                 </label>
@@ -189,13 +189,13 @@ export default function SignIn() {
                 <div className="flex justify-between items-center mb-2">
                   <label
                     htmlFor="password"
-                    className="block text-sm font-medium text-gray-700"
+                    className="block text-xs sm:text-sm font-medium text-gray-700"
                   >
                     Password
                   </label>
                   <Link
                     to="/forgot-password"
-                    className="text-sm text-green-600 hover:text-green-700"
+                    className="text-xs sm:text-sm text-green-600 hover:text-green-700"
                   >
                     Forgot password?
                   </Link>
@@ -230,7 +230,7 @@ export default function SignIn() {
                 />
                 <label
                   htmlFor="keepSignedIn"
-                  className="ml-2 text-sm text-gray-700"
+                  className="ml-2 text-xs sm:text-sm text-gray-700"
                 >
                   Keep me signed in
                 </label>
@@ -249,10 +249,10 @@ export default function SignIn() {
       </div>
 
       {/* Right side - Carousel */}
-      <div className="flex-1 relative overflow-hidden rounded-r-2xl shadow-2xl">
+      <div className="flex-1 relative overflow-hidden rounded-b-2xl lg:rounded-r-2xl lg:rounded-bl-none shadow-2xl min-h-[300px] lg:min-h-full">
         {/* Manulife logo */}
-        <div className="absolute top-6 right-6 z-10">
-          <div className="bg-green-600 text-white px-3 py-1 rounded text-sm font-medium flex items-center">
+        <div className="absolute top-4 right-4 sm:top-6 sm:right-6 z-10">
+          <div className="bg-green-600 text-white px-2 py-1 sm:px-3 sm:py-1 rounded text-xs sm:text-sm font-medium flex items-center">
             <div className="w-2 h-2 bg-white rounded-full mr-2"></div>
             Royal Eagles
           </div>
@@ -285,12 +285,12 @@ export default function SignIn() {
           ))}
 
           {/* Content overlay */}
-          <div className="absolute bottom-0 left-0 right-0 p-8 text-white">
-            <div className="mb-6">
-              <h2 className="text-2xl font-semibold mb-4">
+          <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-6 md:p-8 text-white">
+            <div className="mb-4 sm:mb-6">
+              <h2 className="text-lg sm:text-xl md:text-2xl font-semibold mb-2 sm:mb-4">
                 {slides[currentSlide].title}
               </h2>
-              <p className="text-sm opacity-90 leading-relaxed max-w-md">
+              <p className="text-xs sm:text-sm opacity-90 leading-relaxed max-w-md">
                 {slides[currentSlide].description}
               </p>
             </div>
