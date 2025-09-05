@@ -63,13 +63,22 @@ app.post('/enroll', async (c) => {
 // Verify TOTP code
 app.post('/verify', async (c) => {
   try {
-    const { supabase } = require('../supabase');
     const { secret, code } = await c.req.json();
 
-    // Get current user session
-    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-    if (sessionError || !session?.user) {
+    // Get current user from Authorization header
+    const authHeader = c.req.header('Authorization');
+    
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return c.json({ success: false, message: 'Not authenticated' }, 401);
+    }
+
+    const token = authHeader.substring(7);
+    const { supabaseAdmin } = require('../supabase');
+    
+    const { data: { user }, error: userError } = await supabaseAdmin.auth.getUser(token);
+    
+    if (userError || !user) {
+      return c.json({ success: false, message: 'Invalid token' }, 401);
     }
 
     // Verify the TOTP code
@@ -85,9 +94,9 @@ app.post('/verify', async (c) => {
     }
 
     // Enable MFA in user metadata
-    const { error: updateError } = await supabase.auth.updateUser({
-      data: {
-        ...session.user.user_metadata,
+    const { error: updateError } = await supabaseAdmin.auth.admin.updateUserById(user.id, {
+      user_metadata: {
+        ...user.user_metadata,
         mfa_enabled: true
       }
     });
@@ -107,18 +116,26 @@ app.post('/verify', async (c) => {
 // Check MFA status
 app.get('/status', async (c) => {
   try {
-    const { supabase } = require('../supabase');
+    // Get current user from Authorization header
+    const authHeader = c.req.header('Authorization');
     
-    // Get current user session
-    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-    if (sessionError || !session?.user) {
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return c.json({ success: false, message: 'Not authenticated' }, 401);
+    }
+
+    const token = authHeader.substring(7);
+    const { supabaseAdmin } = require('../supabase');
+    
+    const { data: { user }, error: userError } = await supabaseAdmin.auth.getUser(token);
+    
+    if (userError || !user) {
+      return c.json({ success: false, message: 'Invalid token' }, 401);
     }
 
     // Check MFA status from user metadata
     return c.json({ 
       success: true, 
-      enabled: session.user.user_metadata?.mfa_enabled || false 
+      enabled: user.user_metadata?.mfa_enabled || false 
     });
   } catch (error) {
     return c.json({ success: false, message: error.message }, 500);
@@ -128,19 +145,27 @@ app.get('/status', async (c) => {
 // Disable MFA
 app.delete('/disable', async (c) => {
   try {
-    const { supabase } = require('../supabase');
+    // Get current user from Authorization header
+    const authHeader = c.req.header('Authorization');
     
-    // Get current user session
-    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-    if (sessionError || !session?.user) {
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return c.json({ success: false, message: 'Not authenticated' }, 401);
     }
 
-    // Disable MFA and remove secret from user metadata
-    const { mfa_secret, mfa_enabled, ...otherMetadata } = session.user.user_metadata || {};
+    const token = authHeader.substring(7);
+    const { supabaseAdmin } = require('../supabase');
     
-    const { error: updateError } = await supabase.auth.updateUser({
-      data: {
+    const { data: { user }, error: userError } = await supabaseAdmin.auth.getUser(token);
+    
+    if (userError || !user) {
+      return c.json({ success: false, message: 'Invalid token' }, 401);
+    }
+
+    // Disable MFA and remove secret from user metadata
+    const { mfa_secret, mfa_enabled, ...otherMetadata } = user.user_metadata || {};
+    
+    const { error: updateError } = await supabaseAdmin.auth.admin.updateUserById(user.id, {
+      user_metadata: {
         ...otherMetadata,
         mfa_enabled: false,
         mfa_secret: null

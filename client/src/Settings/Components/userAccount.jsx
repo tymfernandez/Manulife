@@ -30,8 +30,22 @@ const UserAccount = ({ setShowChangePassword, setShowRecoverPassword }) => {
   // Check if user has MFA enabled
   const checkMfaStatus = async () => {
     try {
-      const response = await fetch('http://localhost:3000/api/mfa/status', {
-        credentials: 'include'
+      const storedSession = localStorage.getItem('supabase.auth.token');
+      if (!storedSession) {
+        setMfaEnabled(false);
+        return;
+      }
+      
+      const sessionData = JSON.parse(storedSession);
+      if (!sessionData.access_token) {
+        setMfaEnabled(false);
+        return;
+      }
+      
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3000/api'}/mfa/status`, {
+        headers: {
+          'Authorization': `Bearer ${sessionData.access_token}`
+        }
       });
       const result = await response.json();
       if (result.success) {
@@ -48,10 +62,22 @@ const UserAccount = ({ setShowChangePassword, setShowRecoverPassword }) => {
     try {
       setLoading(true);
       
+      const storedSession = localStorage.getItem('supabase.auth.token');
+      if (!storedSession) {
+        throw new Error('No session available');
+      }
+      
+      const sessionData = JSON.parse(storedSession);
+      if (!sessionData.access_token) {
+        throw new Error('No access token available');
+      }
+      
       // Call custom MFA enroll endpoint
-      const response = await fetch('http://localhost:3000/api/mfa/enroll', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3000/api'}/mfa/enroll`, {
         method: 'POST',
-        credentials: 'include'
+        headers: {
+          'Authorization': `Bearer ${sessionData.access_token}`
+        }
       });
       
       const result = await response.json();
@@ -75,11 +101,23 @@ const UserAccount = ({ setShowChangePassword, setShowRecoverPassword }) => {
     try {
       setLoading(true);
       
+      const storedSession = localStorage.getItem('supabase.auth.token');
+      if (!storedSession) {
+        throw new Error('No session available');
+      }
+      
+      const sessionData = JSON.parse(storedSession);
+      if (!sessionData.access_token) {
+        throw new Error('No access token available');
+      }
+      
       // Call custom verify endpoint
-      const response = await fetch('http://localhost:3000/api/mfa/verify', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3000/api'}/mfa/verify`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${sessionData.access_token}`
+        },
         body: JSON.stringify({
           secret: mfaSecret,
           code: verificationCode
@@ -111,10 +149,22 @@ const UserAccount = ({ setShowChangePassword, setShowRecoverPassword }) => {
     try {
       setLoading(true);
       
+      const storedSession = localStorage.getItem('supabase.auth.token');
+      if (!storedSession) {
+        throw new Error('No session available');
+      }
+      
+      const sessionData = JSON.parse(storedSession);
+      if (!sessionData.access_token) {
+        throw new Error('No access token available');
+      }
+      
       // Call disable endpoint
-      const response = await fetch('http://localhost:3000/api/mfa/disable', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3000/api'}/mfa/disable`, {
         method: 'DELETE',
-        credentials: 'include'
+        headers: {
+          'Authorization': `Bearer ${sessionData.access_token}`
+        }
       });
       
       const result = await response.json();

@@ -4,6 +4,16 @@ export const activityLogService = {
   // Get activity logs with pagination and filters
   async getActivityLogs(params = {}) {
     try {
+      const storedSession = localStorage.getItem('supabase.auth.token');
+      if (!storedSession) {
+        throw new Error('No session available');
+      }
+      
+      const sessionData = JSON.parse(storedSession);
+      if (!sessionData.access_token) {
+        throw new Error('No access token available');
+      }
+      
       const queryParams = new URLSearchParams();
       
       Object.entries(params).forEach(([key, value]) => {
@@ -12,7 +22,11 @@ export const activityLogService = {
         }
       });
 
-      const response = await fetch(`${API_BASE}/activity-logs?${queryParams}`);
+      const response = await fetch(`${API_BASE}/activity-logs?${queryParams}`, {
+        headers: {
+          'Authorization': `Bearer ${sessionData.access_token}`
+        }
+      });
       if (!response.ok) {
         throw new Error(`Server error: ${response.status}`);
       }
@@ -32,9 +46,22 @@ export const activityLogService = {
   // Create new activity log
   async createActivityLog(logData) {
     try {
+      const storedSession = localStorage.getItem('supabase.auth.token');
+      if (!storedSession) {
+        throw new Error('No session available');
+      }
+      
+      const sessionData = JSON.parse(storedSession);
+      if (!sessionData.access_token) {
+        throw new Error('No access token available');
+      }
+      
       const response = await fetch(`${API_BASE}/activity-logs`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${sessionData.access_token}`
+        },
         body: JSON.stringify(logData)
       });
       
@@ -50,8 +77,21 @@ export const activityLogService = {
   // Delete activity log
   async deleteActivityLog(id) {
     try {
+      const storedSession = localStorage.getItem('supabase.auth.token');
+      if (!storedSession) {
+        throw new Error('No session available');
+      }
+      
+      const sessionData = JSON.parse(storedSession);
+      if (!sessionData.access_token) {
+        throw new Error('No access token available');
+      }
+      
       const response = await fetch(`${API_BASE}/activity-logs/${id}`, {
-        method: 'DELETE'
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${sessionData.access_token}`
+        }
       });
       
       const result = await response.json();
@@ -74,7 +114,21 @@ export const activityLogService = {
         }
       });
 
-      const response = await fetch(`${API_BASE}/activity-logs/export?${queryParams}`);
+      const storedSession = localStorage.getItem('supabase.auth.token');
+      if (!storedSession) {
+        throw new Error('No session available');
+      }
+      
+      const sessionData = JSON.parse(storedSession);
+      if (!sessionData.access_token) {
+        throw new Error('No access token available');
+      }
+      
+      const response = await fetch(`${API_BASE}/activity-logs/export?${queryParams}`, {
+        headers: {
+          'Authorization': `Bearer ${sessionData.access_token}`
+        }
+      });
       if (!response.ok) {
         throw new Error(`Server error: ${response.status}`);
       }
