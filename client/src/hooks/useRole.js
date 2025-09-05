@@ -79,7 +79,7 @@ export const useRole = () => {
   };
 
   const canAccessPage = (page) => {
-    if (loading && !cachedRole) return false; // Only block if no cached role
+    if (loading && !cachedRole) return false;
     
     const pagePermissions = {
       dashboard: ['FA', 'BH', 'UH', 'UHA', 'Region Head', 'Sys Admin'],
@@ -90,9 +90,7 @@ export const useRole = () => {
       profile: ['FA', 'BH', 'UH', 'UHA', 'Region Head', 'Sys Admin']
     };
 
-    const hasPageAccess = hasAccess(pagePermissions[page] || []);
-    console.log(`Role check for page '${page}': role='${role}', hasAccess=${hasPageAccess}`);
-    return hasPageAccess;
+    return hasAccess(pagePermissions[page] || []);
   };
 
   const clearRoleCache = () => {

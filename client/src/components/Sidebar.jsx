@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   BarChart3,
@@ -87,7 +87,10 @@ const Sidebar = ({
   ];
 
   // Filter menu items based on user role
-  const menuItems = allMenuItems.filter((item) => canAccessPage(item.page));
+  const menuItems = useMemo(() => 
+    allMenuItems.filter((item) => canAccessPage(item.page)),
+    [canAccessPage]
+  );
 
   if (isMobile) {
     return (
@@ -222,4 +225,4 @@ const Sidebar = ({
   );
 };
 
-export default Sidebar;
+export default React.memo(Sidebar);

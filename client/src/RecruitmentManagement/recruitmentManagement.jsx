@@ -31,7 +31,11 @@ const RecruitmentManagement = () => {
   const [recruits, setRecruits] = useState([]);
 
   useEffect(() => {
-    fetchRecruits();
+    const timeoutId = setTimeout(() => {
+      fetchRecruits();
+    }, 100); // Debounce initial load
+    
+    return () => clearTimeout(timeoutId);
   }, []);
 
   const fetchRecruits = async () => {

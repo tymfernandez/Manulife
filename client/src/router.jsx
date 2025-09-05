@@ -1,17 +1,27 @@
+import React, { Suspense, lazy } from "react";
 import { createBrowserRouter, Navigate, Outlet } from "react-router-dom";
 import { useAuth } from "./lib/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
-import SignIn from "./UserAuth/Login/SignIn";
-import SignUp from "./UserAuth/Signup/signup";
-import Dashboard from "./Dashboard/dashboard";
-import Profile from "./Profile/Profile";
-import ApplicationForm from "./ApplicationForm/applicationForm";
-import AccountManagement from "./AccountManagement/accountManagement";
-import RecruitmentManagement from "./RecruitmentManagement/recruitmentManagement";
-import ActivityLogs from "./ActivityLogs/activityLogs";
-import Settings from "./Settings/settings";
-import PasswordReset from "./components/PasswordReset";
-import LandingPage from "./LandingPage/landingPage";
+
+// Lazy load components for better performance
+const SignIn = lazy(() => import("./UserAuth/Login/SignIn"));
+const SignUp = lazy(() => import("./UserAuth/Signup/signup"));
+const Dashboard = lazy(() => import("./Dashboard/dashboard"));
+const Profile = lazy(() => import("./Profile/Profile"));
+const ApplicationForm = lazy(() => import("./ApplicationForm/applicationForm"));
+const AccountManagement = lazy(() => import("./AccountManagement/accountManagement"));
+const RecruitmentManagement = lazy(() => import("./RecruitmentManagement/recruitmentManagement"));
+const ActivityLogs = lazy(() => import("./ActivityLogs/activityLogs"));
+const Settings = lazy(() => import("./Settings/settings"));
+const PasswordReset = lazy(() => import("./components/PasswordReset"));
+const LandingPage = lazy(() => import("./LandingPage/landingPage"));
+
+// Loading component
+const LoadingSpinner = () => (
+  <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-600"></div>
+  </div>
+);
 
 const AuthProtectedRoute = () => {
   const { user, loading } = useAuth();
@@ -43,7 +53,11 @@ const PublicRoute = () => {
 export const router = createBrowserRouter([
   {
     path: "/",
-    element: <LandingPage />,
+    element: (
+      <Suspense fallback={<LoadingSpinner />}>
+        <LandingPage />
+      </Suspense>
+    ),
   },
   {
     path: "/signin",
@@ -51,7 +65,11 @@ export const router = createBrowserRouter([
     children: [
       {
         index: true,
-        element: <SignIn />,
+        element: (
+          <Suspense fallback={<LoadingSpinner />}>
+            <SignIn />
+          </Suspense>
+        ),
       },
     ],
   },
@@ -61,7 +79,11 @@ export const router = createBrowserRouter([
     children: [
       {
         index: true,
-        element: <SignUp />,
+        element: (
+          <Suspense fallback={<LoadingSpinner />}>
+            <SignUp />
+          </Suspense>
+        ),
       },
     ],
   },
@@ -86,7 +108,9 @@ export const router = createBrowserRouter([
               "Sys Admin",
             ]}
           >
-            <Dashboard />
+            <Suspense fallback={<LoadingSpinner />}>
+              <Dashboard />
+            </Suspense>
           </ProtectedRoute>
         ),
       },

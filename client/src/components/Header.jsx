@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useMemo, useCallback } from "react";
 import { Bell, Menu, X, User, Settings, LogOut } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../lib/AuthContext";
@@ -119,10 +119,13 @@ const Header = ({
   }, [user]);
 
   // Check if user can view notifications (BH or Sys Admin)
-  const canViewNotifications = userProfile.role === "BH" || userProfile.role === "Sys Admin";
+  const canViewNotifications = useMemo(() => 
+    userProfile.role === "BH" || userProfile.role === "Sys Admin",
+    [userProfile.role]
+  );
 
-  // Fetch notifications function with enhanced debugging
-  const fetchNotifications = async () => {
+  // Fetch notifications function
+  const fetchNotifications = useCallback(async () => {
     try {
       const storedSession = localStorage.getItem('supabase.auth.token');
       if (!storedSession) {
@@ -202,7 +205,7 @@ const Header = ({
       setNotifications([]);
       setUnreadCount(0);
     }
-  };
+  }, []);
 
   // Fetch notifications when role changes to BH or Sys Admin
   useEffect(() => {
@@ -719,4 +722,4 @@ const Header = ({
   );
 };
 
-export default Header;
+export default React.memo(Header);
