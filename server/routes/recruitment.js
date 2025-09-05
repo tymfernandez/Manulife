@@ -4,17 +4,25 @@ const getRecruits = async (c) => {
   try {
     const { supabaseAdmin } = require('../supabase');
     
-    // Get current user's session and role
-    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-    if (sessionError || !session?.user) {
+    // Get current user from Authorization header
+    const authHeader = c.req.header('Authorization');
+    
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return c.json({ success: false, message: 'Not authenticated' }, 401);
+    }
+
+    const token = authHeader.substring(7);
+    const { data: { user }, error: userError } = await supabaseAdmin.auth.getUser(token);
+    
+    if (userError || !user) {
+      return c.json({ success: false, message: 'Invalid token' }, 401);
     }
 
     // Get user's role
     const { data: userProfile, error: roleError } = await supabaseAdmin
       .from('user_profiles')
       .select('role')
-      .eq('id', session.user.id)
+      .eq('id', user.id)
       .single();
 
     if (roleError) {

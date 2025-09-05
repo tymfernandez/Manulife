@@ -8,12 +8,20 @@ const app = new Hono();
 // Generate MFA secret and QR code
 app.post('/enroll', async (c) => {
   try {
-    const { supabase } = require('../supabase');
+    // Get current user from Authorization header
+    const authHeader = c.req.header('Authorization');
     
-    // Get current user session
-    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-    if (sessionError || !session?.user) {
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return c.json({ success: false, message: 'Not authenticated' }, 401);
+    }
+
+    const token = authHeader.substring(7);
+    const { supabaseAdmin } = require('../supabase');
+    
+    const { data: { user }, error: userError } = await supabaseAdmin.auth.getUser(token);
+    
+    if (userError || !user) {
+      return c.json({ success: false, message: 'Invalid token' }, 401);
     }
 
     // Generate secret for TOTP
@@ -26,9 +34,9 @@ app.post('/enroll', async (c) => {
     const qrCodeUrl = await QRCode.toDataURL(secret.otpauth_url);
 
     // Store secret in user metadata
-    const { error: updateError } = await supabase.auth.updateUser({
-      data: {
-        ...session.user.user_metadata,
+    const { error: updateError } = await supabaseAdmin.auth.admin.updateUserById(user.id, {
+      user_metadata: {
+        ...user.user_metadata,
         mfa_secret: secret.base32,
         mfa_enabled: false // Will be enabled after verification
       }

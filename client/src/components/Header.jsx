@@ -58,10 +58,21 @@ const Header = ({
         setIsLoading(true);
         console.log("🔍 Fetching user profile for:", user.email);
         
+        const storedSession = localStorage.getItem('supabase.auth.token');
+        if (!storedSession) {
+          throw new Error('No session available');
+        }
+        
+        const sessionData = JSON.parse(storedSession);
+        if (!sessionData.access_token) {
+          throw new Error('No access token available');
+        }
+        
         const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3000/api'}/auth/profile`, {
           credentials: "include",
           headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${sessionData.access_token}`
           }
         });
 
@@ -123,10 +134,21 @@ const Header = ({
     
     try {
       console.log("🌐 Making request to activity-logs API...");
+      const storedSession = localStorage.getItem('supabase.auth.token');
+      if (!storedSession) {
+        throw new Error('No session available');
+      }
+      
+      const sessionData = JSON.parse(storedSession);
+      if (!sessionData.access_token) {
+        throw new Error('No access token available');
+      }
+      
       const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3000/api'}/activity-logs`, {
         credentials: 'include',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${sessionData.access_token}`
         }
       });
 

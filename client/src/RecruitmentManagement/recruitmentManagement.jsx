@@ -37,7 +37,22 @@ const RecruitmentManagement = () => {
   const fetchRecruits = async () => {
     try {
       console.log('Fetching recruits from API...');
-      const response = await fetch('http://localhost:3000/api/recruitment');
+      
+      const storedSession = localStorage.getItem('supabase.auth.token');
+      if (!storedSession) {
+        throw new Error('No session available');
+      }
+      
+      const sessionData = JSON.parse(storedSession);
+      if (!sessionData.access_token) {
+        throw new Error('No access token available');
+      }
+      
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3000/api'}/recruitment`, {
+        headers: {
+          'Authorization': `Bearer ${sessionData.access_token}`
+        }
+      });
       const result = await response.json();
       
       console.log('API response:', result);
@@ -222,9 +237,22 @@ const RecruitmentManagement = () => {
     console.log('Save clicked for ID:', id);
     console.log('Edit data:', editData);
     try {
-      const response = await fetch(`http://localhost:3000/api/recruitment/${id}`, {
+      const storedSession = localStorage.getItem('supabase.auth.token');
+      if (!storedSession) {
+        throw new Error('No session available');
+      }
+      
+      const sessionData = JSON.parse(storedSession);
+      if (!sessionData.access_token) {
+        throw new Error('No access token available');
+      }
+      
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3000/api'}/recruitment/${id}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${sessionData.access_token}`
+        },
         body: JSON.stringify({
           fullName: editData.fullName,
           email: editData.email,
@@ -266,8 +294,21 @@ const RecruitmentManagement = () => {
     const deletedRecruit = recruits.find(r => r.id === deleteId);
     
     try {
-      const response = await fetch(`http://localhost:3000/api/recruitment/${deleteId}`, {
-        method: 'DELETE'
+      const storedSession = localStorage.getItem('supabase.auth.token');
+      if (!storedSession) {
+        throw new Error('No session available');
+      }
+      
+      const sessionData = JSON.parse(storedSession);
+      if (!sessionData.access_token) {
+        throw new Error('No access token available');
+      }
+      
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3000/api'}/recruitment/${deleteId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${sessionData.access_token}`
+        }
       });
       
       const result = await response.json();

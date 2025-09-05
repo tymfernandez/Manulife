@@ -184,20 +184,22 @@ const updateProfile = async (c) => {
 
 const getProfile = async (c) => {
   try {
-    const cookies = c.req.header('Cookie') || '';
-    const accessToken = cookies.match(/sb-access-token=([^;]+)/)?.[1];
-    const userId = cookies.match(/sb-user-id=([^;]+)/)?.[1];
+    const authHeader = c.req.header('Authorization');
     
-    if (!accessToken || !userId) {
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return c.json({ success: false, message: 'Not authenticated' }, 401);
     }
 
+    const token = authHeader.substring(7);
     const { supabaseAdmin } = require('../supabase');
-    const { data: { user }, error: userError } = await supabaseAdmin.auth.getUser(accessToken);
     
-    if (userError || !user || user.id !== userId) {
-      return c.json({ success: false, message: 'Invalid session' }, 401);
+    const { data: { user }, error: userError } = await supabaseAdmin.auth.getUser(token);
+    
+    if (userError || !user) {
+      return c.json({ success: false, message: 'Invalid token' }, 401);
     }
+    
+    const userId = user.id;
     
     // Get user data
     const { data: userData, error: userDataError } = await supabaseAdmin.auth.admin.getUserById(userId);
