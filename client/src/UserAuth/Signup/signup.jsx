@@ -148,6 +148,17 @@ export default function SignUp() {
               >
                 Password
               </label>
+              {/* Password requirements */}
+              <div className="text-xs text-gray-500 mb-2">
+                Password must contain:
+                <ul className="list-disc list-inside">
+                  <li>At least 8 characters long</li>
+                  <li>At least one uppercase letter (A-Z)</li>
+                  <li>At least one lowercase letter (a-z)</li>
+                  <li>At least one number (0-9)</li>
+                  <li>At least one special character (!@#$%^&*)</li>
+                </ul>
+              </div>
               <div className="relative">
                 <input
                   id="password"
@@ -155,6 +166,8 @@ export default function SignUp() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 text-gray-900 pr-12"
+                  pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$"
+                  title="Must contain at least 8 characters, one uppercase, one lowercase, one number and one special character"
                   required
                 />
                 <button
@@ -182,6 +195,8 @@ export default function SignUp() {
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 text-gray-900 pr-12"
+                  pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$"
+                  title="Must match password requirements"
                   required
                 />
                 <button
