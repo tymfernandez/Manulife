@@ -64,39 +64,39 @@ export default function SignUp() {
   };
 
   return (
-    <div className="min-h-screen flex p-20">
+    <div className="min-h-screen flex flex-col lg:flex-row p-4 sm:p-8 md:p-12 lg:p-20">
       {/* Left side - Form */}
-      <div className="flex-1 bg-gray-50 flex items-center justify-center p-8 rounded-l-2xl shadow-2xl">
+      <div className="flex-1 bg-gray-50 flex items-center justify-center p-4 sm:p-6 md:p-8 rounded-t-2xl lg:rounded-l-2xl lg:rounded-tr-none shadow-2xl">
         <div className="w-full max-w-md">
           {/* Header */}
-          <div className="text-center mb-8">
-            <h1 className="text-3xl font-semibold text-gray-900 mb-2">
+          <div className="text-center mb-6 sm:mb-8">
+            <h1 className="text-2xl sm:text-3xl font-semibold text-gray-900 mb-2">
               Create Account
             </h1>
-            <p className="text-gray-600">Join the Manulife team</p>
+            <p className="text-sm sm:text-base text-gray-600">Join the Manulife team</p>
           </div>
 
           {/* Sign in link */}
-          <div className="text-right mb-6">
-            <span className="text-sm text-gray-600">
+          <div className="text-center sm:text-right mb-4 sm:mb-6">
+            <span className="text-xs sm:text-sm text-gray-600">
               Already have account?{" "}
             </span>
             <Link
               to="/signin"
-              className="text-sm text-green-600 hover:text-green-700 font-medium"
+              className="text-xs sm:text-sm text-green-600 hover:text-green-700 font-medium"
             >
               Sign In
             </Link>
           </div>
 
           {error && (
-            <div className="bg-red-50 text-red-700 p-3 rounded-lg text-sm mb-6">
+            <div className="bg-red-50 text-red-700 p-3 rounded-lg text-xs sm:text-sm mb-4 sm:mb-6">
               {error}
             </div>
           )}
 
           {message && (
-            <div className="bg-green-50 text-green-700 p-3 rounded-lg text-sm mb-6">
+            <div className="bg-green-50 text-green-700 p-3 rounded-lg text-xs sm:text-sm mb-4 sm:mb-6">
               {message}
             </div>
           )}
@@ -106,7 +106,7 @@ export default function SignUp() {
             <div>
               <label
                 htmlFor="email"
-                className="block text-sm font-medium text-gray-700 mb-2"
+                className="block text-xs sm:text-sm font-medium text-gray-700 mb-2"
               >
                 Email
               </label>
@@ -125,7 +125,7 @@ export default function SignUp() {
             <div>
               <label
                 htmlFor="personalCode"
-                className="block text-sm font-medium text-gray-700 mb-2"
+                className="block text-xs sm:text-sm font-medium text-gray-700 mb-2"
               >
                 Personal Code
               </label>
@@ -144,7 +144,7 @@ export default function SignUp() {
             <div>
               <label
                 htmlFor="password"
-                className="block text-sm font-medium text-gray-700 mb-2"
+                className="block text-xs sm:text-sm font-medium text-gray-700 mb-2"
               >
                 Password
               </label>
@@ -184,7 +184,7 @@ export default function SignUp() {
             <div>
               <label
                 htmlFor="confirmPassword"
-                className="block text-sm font-medium text-gray-700 mb-2"
+                className="block text-xs sm:text-sm font-medium text-gray-700 mb-2"
               >
                 Confirm Password
               </label>
@@ -225,10 +225,10 @@ export default function SignUp() {
       </div>
 
       {/* Right side - Carousel */}
-      <div className="flex-1 relative overflow-hidden rounded-r-2xl shadow-2xl">
+      <div className="flex-1 relative overflow-hidden rounded-b-2xl lg:rounded-r-2xl lg:rounded-bl-none shadow-2xl min-h-[300px] lg:min-h-full">
         {/* Manulife logo */}
-        <div className="absolute top-6 right-6 z-10">
-          <div className="bg-green-600 text-white px-3 py-1 rounded text-sm font-medium flex items-center">
+        <div className="absolute top-4 right-4 sm:top-6 sm:right-6 z-10">
+          <div className="bg-green-600 text-white px-2 py-1 sm:px-3 sm:py-1 rounded text-xs sm:text-sm font-medium flex items-center">
             <div className="w-2 h-2 bg-white rounded-full mr-2"></div>
             Manulife
           </div>
@@ -253,12 +253,12 @@ export default function SignUp() {
           ))}
 
           {/* Content overlay */}
-          <div className="absolute bottom-0 left-0 right-0 p-8 text-white">
-            <div className="mb-6">
-              <h2 className="text-2xl font-semibold mb-4">
+          <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-6 md:p-8 text-white">
+            <div className="mb-4 sm:mb-6">
+              <h2 className="text-lg sm:text-xl md:text-2xl font-semibold mb-2 sm:mb-4">
                 {slides[currentSlide].title}
               </h2>
-              <p className="text-sm opacity-90 leading-relaxed max-w-md">
+              <p className="text-xs sm:text-sm opacity-90 leading-relaxed max-w-md">
                 {slides[currentSlide].description}
               </p>
             </div>
