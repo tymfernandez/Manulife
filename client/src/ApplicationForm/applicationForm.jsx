@@ -15,7 +15,7 @@ import {
 import { logActivity, ACTIVITY_TYPES } from "../utils/activityLogger";
 
 const ApplicationForm = () => {
-  const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
+  const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
   const [formData, setFormData] = useState({
     fullName: "",
     emailAddress: "",
@@ -198,7 +198,7 @@ const ApplicationForm = () => {
         submitData.append("resume", resumeFile);
       }
 
-      const res = await fetch(`${API_BASE}/api/Applications`, {
+      const res = await fetch(`${API_BASE}/Applications`, {
         method: 'POST',
         body: submitData,
       });
