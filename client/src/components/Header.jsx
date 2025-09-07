@@ -98,7 +98,8 @@ const Header = ({
           const fallbackProfile = {
             firstName: "",
             lastName: "",
-            email: user?.email || "",r
+            email: user?.email || "",
+            role: "Sys Admin",
           };
 
           setUserProfile(fallbackProfile);
@@ -515,10 +516,17 @@ const Header = ({
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
           <button
-            onClick={() => {
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
               setIsMobileMenuOpen && setIsMobileMenuOpen(!isMobileMenuOpen);
             }}
-            className="p-2 rounded-lg hover:bg-gray-100 lg:hidden relative z-50"
+            onTouchEnd={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              setIsMobileMenuOpen && setIsMobileMenuOpen(!isMobileMenuOpen);
+            }}
+            className="p-2 rounded-lg hover:bg-gray-100 lg:hidden relative z-50 touch-manipulation"
           >
             {isMobileMenuOpen ? (
               <X className="w-6 h-6" />

@@ -10,6 +10,7 @@ import { useAuth } from '../lib/AuthContext';
 const SettingsPage = () => {
   const { user } = useAuth();
   const [activeItem, setActiveItem] = useState("settings");
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const tabs = ["User Account", "Support & Help"];
   const [activeTab, setActiveTab] = useState("User Account");
   
@@ -91,9 +92,19 @@ const SettingsPage = () => {
 
   return (
     <div className="flex h-screen bg-gray-50 overflow-hidden">
-      <SideBar activeItem={activeItem} setActiveItem={setActiveItem} />
+      <SideBar 
+        activeItem={activeItem} 
+        setActiveItem={setActiveItem}
+        isMobileMenuOpen={isMobileMenuOpen}
+        setIsMobileMenuOpen={setIsMobileMenuOpen}
+      />
       <div className="flex-1 flex flex-col">
-        <Header activeItem={activeItem} setActiveItem={setActiveItem} />
+        <Header 
+          activeItem={activeItem} 
+          setActiveItem={setActiveItem}
+          isMobileMenuOpen={isMobileMenuOpen}
+          setIsMobileMenuOpen={setIsMobileMenuOpen}
+        />
         {/* Main Content */}
         <div className="flex-1 overflow-y-auto">
           {/* Top Header */}

@@ -9,6 +9,7 @@ import Sidebar from '../components/Sidebar';
 
 const AccountManagement = () => {
   const [activeItem, setActiveItem] = useState('accounts');
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [roleFilter, setRoleFilter] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
@@ -99,15 +100,25 @@ const AccountManagement = () => {
 
   return (
     <div className="flex h-screen bg-gray-50 overflow-hidden">
-      <Sidebar activeItem={activeItem} setActiveItem={setActiveItem} />
+      <Sidebar 
+        activeItem={activeItem} 
+        setActiveItem={setActiveItem}
+        isMobileMenuOpen={isMobileMenuOpen}
+        setIsMobileMenuOpen={setIsMobileMenuOpen}
+      />
       <div className="flex-1 flex flex-col">
-        <Header activeItem={activeItem} setActiveItem={setActiveItem} />
-        <main className="flex-1 overflow-y-auto p-6">
-          <div className="mb-6">
-            <div className="flex justify-between items-center">
+        <Header 
+          activeItem={activeItem} 
+          setActiveItem={setActiveItem}
+          isMobileMenuOpen={isMobileMenuOpen}
+          setIsMobileMenuOpen={setIsMobileMenuOpen}
+        />
+        <main className="flex-1 overflow-y-auto p-3 sm:p-6">
+          <div className="mb-4 sm:mb-6">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0">
               <div>
-                <h1 className="text-2xl font-semibold text-gray-900 mb-2">Account Management</h1>
-                <p className="text-gray-600">Manage, create, update, delete accounts.</p>
+                <h1 className="text-xl sm:text-2xl font-semibold text-gray-900 mb-2">Account Management</h1>
+                <p className="text-sm sm:text-base text-gray-600">Manage, create, update, delete accounts.</p>
               </div>
 
             </div>
