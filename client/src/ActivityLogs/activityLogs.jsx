@@ -11,6 +11,7 @@ import Sidebar from '../components/Sidebar';
 
 const ActivityLogs = () => {
   const [activeItem, setActiveItem] = useState('activity-logs');
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [roleFilter, setRoleFilter] = useState('');
   const [activityTypeFilter, setActivityTypeFilter] = useState('');
@@ -146,27 +147,37 @@ const ActivityLogs = () => {
 
   return (
     <div className="flex h-screen bg-gray-50 overflow-hidden">
-      <Sidebar activeItem={activeItem} setActiveItem={setActiveItem} />
+      <Sidebar 
+        activeItem={activeItem} 
+        setActiveItem={setActiveItem}
+        isMobileMenuOpen={isMobileMenuOpen}
+        setIsMobileMenuOpen={setIsMobileMenuOpen}
+      />
       <div className="flex-1 flex flex-col">
-        <Header activeItem={activeItem} setActiveItem={setActiveItem} />
-        <main className="flex-1 overflow-y-auto p-6">
-          <div className="mb-6">
-            <div className="flex justify-between items-center">
+        <Header 
+          activeItem={activeItem} 
+          setActiveItem={setActiveItem}
+          isMobileMenuOpen={isMobileMenuOpen}
+          setIsMobileMenuOpen={setIsMobileMenuOpen}
+        />
+        <main className="flex-1 overflow-y-auto p-3 sm:p-6">
+          <div className="mb-4 sm:mb-6">
+            <div className="flex flex-col space-y-4 sm:space-y-0 sm:flex-row sm:justify-between sm:items-center">
               <div>
-                <h1 className="text-2xl font-semibold text-gray-900 mb-2">Activity Logs</h1>
-                <p className="text-gray-600">Track and monitor user activities across the platform.</p>
+                <h1 className="text-xl sm:text-2xl font-semibold text-gray-900 mb-2">Activity Logs</h1>
+                <p className="text-sm sm:text-base text-gray-600">Track and monitor user activities across the platform.</p>
               </div>
-              <div className="flex space-x-3">
+              <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3">
                 <button
                   onClick={handleExport}
-                  className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                  className="flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm"
                 >
                   <Download className="w-4 h-4 mr-2" />
                   Export
                 </button>
                 <button
                   onClick={() => setIsModalOpen(true)}
-                  className="flex items-center px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors"
+                  className="flex items-center justify-center px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors text-sm"
                 >
                   <Plus className="w-4 h-4 mr-2" />
                   Add Log

@@ -28,7 +28,7 @@ const HelpSupport = () => {
           Contact IT/Admin Support
         </h3>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
           {/* Left Side - Submit Support Ticket */}
           <div>
             <h4 className="font-medium text-gray-900 mb-4">
@@ -169,51 +169,57 @@ const HelpSupport = () => {
             <h4 className="font-medium text-gray-900 mb-4">Direct Contact</h4>
 
             <div className="space-y-4">
-              {/* Help Desk */}
-              <div className="flex items-start space-x-3">
-                <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
-                  <Phone size={16} className="text-green-600" />
-                </div>
-                <div>
-                  <h5 className="font-medium text-gray-900">Help Desk</h5>
-                  <p className="text-sm text-gray-500">
-                    Available 24/7 For Urgent Issues
-                  </p>
-                  <p className="text-sm text-green-600 font-medium">
-                    +1 (800) 123-4567
-                  </p>
-                </div>
-              </div>
-
-              {/* Email Support */}
-              <div className="flex items-start space-x-3">
-                <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-                  <Mail size={16} className="text-blue-600" />
-                </div>
-                <div>
-                  <h5 className="font-medium text-gray-900">Email Support</h5>
-                  <p className="text-sm text-gray-500">
-                    Response Within 24 Hours
-                  </p>
-                  <p className="text-sm text-blue-600 font-medium">
-                    Support@Company.Com
-                  </p>
+              {/* Help Desk Card */}
+              <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                <div className="flex items-start space-x-3">
+                  <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
+                    <Phone size={20} className="text-green-600" />
+                  </div>
+                  <div className="flex-1">
+                    <h5 className="font-semibold text-gray-900 mb-1">Help Desk</h5>
+                    <p className="text-sm text-gray-600 mb-2">
+                      Available 24/7 For Urgent Issues
+                    </p>
+                    <a href="tel:+18001234567" className="text-sm text-green-700 font-semibold hover:text-green-800 transition-colors">
+                      +1 (800) 123-4567
+                    </a>
+                  </div>
                 </div>
               </div>
 
-              {/* Live Chat */}
-              <div className="flex items-start space-x-3">
-                <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center flex-shrink-0">
-                  <MessageCircle size={16} className="text-purple-600" />
+              {/* Email Support Card */}
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <div className="flex items-start space-x-3">
+                  <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+                    <Mail size={20} className="text-blue-600" />
+                  </div>
+                  <div className="flex-1">
+                    <h5 className="font-semibold text-gray-900 mb-1">Email Support</h5>
+                    <p className="text-sm text-gray-600 mb-2">
+                      Response Within 24 Hours
+                    </p>
+                    <a href="mailto:support@company.com" className="text-sm text-blue-700 font-semibold hover:text-blue-800 transition-colors break-all">
+                      support@company.com
+                    </a>
+                  </div>
                 </div>
-                <div>
-                  <h5 className="font-medium text-gray-900">Live Chat</h5>
-                  <p className="text-sm text-gray-500">
-                    Available Monday-Friday, 9am-5pm
-                  </p>
-                  <button className="text-sm text-purple-600 font-medium hover:text-purple-700">
-                    Start Chat
-                  </button>
+              </div>
+
+              {/* Live Chat Card */}
+              <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
+                <div className="flex items-start space-x-3">
+                  <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center flex-shrink-0">
+                    <MessageCircle size={20} className="text-purple-600" />
+                  </div>
+                  <div className="flex-1">
+                    <h5 className="font-semibold text-gray-900 mb-1">Live Chat</h5>
+                    <p className="text-sm text-gray-600 mb-3">
+                      Available Monday-Friday, 9am-5pm
+                    </p>
+                    <button className="text-sm bg-purple-600 text-white px-3 py-1.5 rounded-md font-medium hover:bg-purple-700 transition-colors">
+                      Start Chat
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>

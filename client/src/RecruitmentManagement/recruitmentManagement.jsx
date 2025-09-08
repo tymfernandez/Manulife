@@ -403,18 +403,29 @@ const RecruitmentManagement = () => {
   );
 
   const [activeItem, setActiveItem] = useState('recruits');
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
     <div className="flex min-h-screen bg-white">
-      <Sidebar activeItem={activeItem} setActiveItem={setActiveItem} />
+      <Sidebar 
+        activeItem={activeItem} 
+        setActiveItem={setActiveItem}
+        isMobileMenuOpen={isMobileMenuOpen}
+        setIsMobileMenuOpen={setIsMobileMenuOpen}
+      />
       <div className="flex-1 flex flex-col">
-        <Header activeItem={activeItem} setActiveItem={setActiveItem} />
-        <div className="flex-1 p-6 bg-white">
+        <Header 
+          activeItem={activeItem} 
+          setActiveItem={setActiveItem}
+          isMobileMenuOpen={isMobileMenuOpen}
+          setIsMobileMenuOpen={setIsMobileMenuOpen}
+        />
+        <div className="flex-1 p-3 sm:p-6 bg-white">
         <div className="max-w-7xl mx-auto">
-          <h1 className="text-2xl font-bold text-gray-800 mb-6">Recruitment Management</h1>
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-800 mb-4 sm:mb-6">Recruitment Management</h1>
         
-        <div className="mb-6 flex flex-wrap gap-4 items-center">
-          <div className="relative flex-1 min-w-64">
+        <div className="mb-4 sm:mb-6 space-y-4">
+          <div className="relative">
             <svg className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
@@ -427,7 +438,7 @@ const RecruitmentManagement = () => {
             />
           </div>
           
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
             <div className="relative">
               <button
                 onClick={() => setShowPositionDropdown(!showPositionDropdown)}
@@ -557,7 +568,8 @@ const RecruitmentManagement = () => {
         </div>
 
         <div className="bg-white shadow overflow-x-auto rounded-lg">
-          <table className="w-full divide-y divide-gray-200">
+          <div className="min-w-full">
+          <table className="w-full divide-y divide-gray-200 min-w-[1200px]">
             <thead className="bg-emerald-800">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase cursor-pointer hover:bg-opacity-80 w-48" onClick={() => handleSort('fullName')}>
@@ -818,11 +830,12 @@ const RecruitmentManagement = () => {
               ))}
             </tbody>
           </table>
+          </div>
         </div>
 
-        <div className="mt-6 flex items-center justify-between">
+        <div className="mt-4 sm:mt-6 flex flex-col sm:flex-row items-center justify-between space-y-4 sm:space-y-0">
           <div className="flex items-center space-x-2">
-            <span className="text-sm text-gray-700">Rows per page:</span>
+            <span className="text-xs sm:text-sm text-gray-700">Rows per page:</span>
             <CustomDropdown
               value={rowsPerPage.toString()}
               options={rowOptions.map(String)}
@@ -836,8 +849,8 @@ const RecruitmentManagement = () => {
             />
           </div>
           
-          <div className="flex items-center space-x-2">
-            <span className="text-sm text-gray-700">
+          <div className="flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-2">
+            <span className="text-xs sm:text-sm text-gray-700 text-center">
               Showing {startIndex + 1} to {Math.min(startIndex + rowsPerPage, sortedAndFilteredRecruits.length)} of {sortedAndFilteredRecruits.length} entries
             </span>
             

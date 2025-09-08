@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../lib/AuthContext";
 import Header from "../components/Header";
-import SideBar from "../components/Sidebar";
+import Sidebar from "../components/Sidebar";
 
 const Profile = () => {
   const { user } = useAuth();
@@ -18,6 +18,7 @@ const Profile = () => {
   });
   const [loading, setLoading] = useState(false);
   const [activeItem, setActiveItem] = useState("profile");
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -400,9 +401,19 @@ const Profile = () => {
 
   return (
     <div className="flex h-screen bg-gray-50 overflow-hidden">
-      <SideBar activeItem={activeItem} setActiveItem={setActiveItem} />
+      <Sidebar 
+        activeItem={activeItem} 
+        setActiveItem={setActiveItem}
+        isMobileMenuOpen={isMobileMenuOpen}
+        setIsMobileMenuOpen={setIsMobileMenuOpen}
+      />
       <div className="flex-1 flex flex-col">
-        <Header activeItem={activeItem} setActiveItem={setActiveItem} />
+        <Header 
+          activeItem={activeItem} 
+          setActiveItem={setActiveItem}
+          isMobileMenuOpen={isMobileMenuOpen}
+          setIsMobileMenuOpen={setIsMobileMenuOpen}
+        />
         <main className="flex-1 overflow-y-auto p-6">{renderContent()}</main>
       </div>
     </div>
