@@ -60,19 +60,17 @@ const RoyalEaglesTemplate = () => {
   return (
     <div className="min-h-screen">
       {/* Header */}
-      <header className="bg-white shadow-lg border-b border-gray-200">
-        <div className="py-1 mx-auto px-4 max-w-7xl">
-          <div className="flex justify-between items-center">
-            <div className="flex items-center pb-2">
-              <img src="/Dark-Logo-Name.png" className="w-24 h-20 sm:w-32 sm:h-24 md:w-36 md:h-28 lg:w-40 lg:h-32" alt="Logo" />
-            </div>
-            <button
-              className="bg-emerald-800 hover:bg-orange-500 text-white px-3 py-2 sm:px-4 sm:py-2 md:px-6 md:py-2 rounded-lg font-medium text-sm sm:text-md transition-colors duration-200 shadow-md hover:shadow-lg"
-              onClick={() => navigate("/signin")}
-            >
-              Sign In
-            </button>
+      <header className="bg-white border-b border-gray-200 px-6 py-2 flex-shrink-0">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-3">
+            <img src="/Dark-Logo-Name.png" width={120} height={100} alt="Logo" />
           </div>
+          <button
+            className="bg-emerald-800 hover:bg-orange-500 text-white px-6 py-2 rounded-lg font-medium transition-colors duration-200 shadow-md hover:shadow-lg"
+            onClick={() => navigate("/signin")}
+          >
+            Sign In
+          </button>
         </div>
       </header>
 

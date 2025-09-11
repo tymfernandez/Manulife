@@ -406,23 +406,26 @@ const RecruitmentManagement = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
-    <div className="flex min-h-screen bg-white">
+    <div className="flex h-screen bg-gray-50">
       <Sidebar 
         activeItem={activeItem} 
         setActiveItem={setActiveItem}
         isMobileMenuOpen={isMobileMenuOpen}
         setIsMobileMenuOpen={setIsMobileMenuOpen}
       />
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col min-w-0">
         <Header 
+          onMenuClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           activeItem={activeItem} 
           setActiveItem={setActiveItem}
           isMobileMenuOpen={isMobileMenuOpen}
           setIsMobileMenuOpen={setIsMobileMenuOpen}
         />
-        <div className="flex-1 p-3 sm:p-6 bg-white">
-        <div className="max-w-7xl mx-auto">
-          <h1 className="text-xl sm:text-2xl font-bold text-gray-800 mb-4 sm:mb-6">Recruitment Management</h1>
+        <main className="flex-1 overflow-y-auto p-3 sm:p-6">
+          <div className="mb-4 sm:mb-6">
+            <h1 className="text-xl sm:text-2xl font-semibold text-gray-900 mb-2">Recruitment Management</h1>
+            <p className="text-sm sm:text-base text-gray-600">Manage and track recruitment applications and candidates.</p>
+          </div>
         
         <div className="mb-4 sm:mb-6 space-y-4">
           <div className="relative">
@@ -567,9 +570,9 @@ const RecruitmentManagement = () => {
           </div>
         </div>
 
-        <div className="bg-white shadow overflow-x-auto rounded-lg">
-          <div className="min-w-full">
-          <table className="w-full divide-y divide-gray-200 min-w-[1200px]">
+        <div className="bg-white shadow overflow-hidden rounded-lg">
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-emerald-800">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase cursor-pointer hover:bg-opacity-80 w-48" onClick={() => handleSort('fullName')}>
@@ -831,65 +834,74 @@ const RecruitmentManagement = () => {
             </tbody>
           </table>
           </div>
-        </div>
-
-        <div className="mt-4 sm:mt-6 flex flex-col sm:flex-row items-center justify-between space-y-4 sm:space-y-0">
-          <div className="flex items-center space-x-2">
-            <span className="text-xs sm:text-sm text-gray-700">Rows per page:</span>
-            <CustomDropdown
-              value={rowsPerPage.toString()}
-              options={rowOptions.map(String)}
-              onChange={(value) => {
-                setRowsPerPage(parseInt(value));
-                setCurrentPage(1);
-              }}
-              show={showRowsDropdown}
-              setShow={setShowRowsDropdown}
-              placeholder="5"
-            />
-          </div>
           
-          <div className="flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-2">
-            <span className="text-xs sm:text-sm text-gray-700 text-center">
-              Showing {startIndex + 1} to {Math.min(startIndex + rowsPerPage, sortedAndFilteredRecruits.length)} of {sortedAndFilteredRecruits.length} entries
-            </span>
+          <div className="flex items-center justify-between px-6 py-4 border-t border-gray-200">
+            <div className="flex items-center space-x-2">
+              <span className="text-sm text-gray-600">Rows per page</span>
+              <select 
+                value={rowsPerPage}
+                onChange={(e) => {
+                  setRowsPerPage(parseInt(e.target.value));
+                  setCurrentPage(1);
+                }}
+                className="border border-gray-200 rounded px-2 py-1 text-sm"
+              >
+                {rowOptions.map(option => (
+                  <option key={option} value={option}>{option}</option>
+                ))}
+              </select>
+              <span className="text-sm text-gray-600">of {sortedAndFilteredRecruits.length} rows</span>
+            </div>
             
-            <div className="flex space-x-1">
+            <div className="flex items-center space-x-2">
               <button
                 onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
                 disabled={currentPage === 1}
-                className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center text-sm disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+                className="px-3 py-1 border border-gray-200 rounded text-sm disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
               >
                 ‹
               </button>
               
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
-                <button
-                  key={page}
-                  onClick={() => setCurrentPage(page)}
-                  className={`w-8 h-8 rounded-full flex items-center justify-center text-sm ${
-                    currentPage === page
-                      ? 'text-white'
-                      : 'border border-gray-300 hover:bg-gray-50'
-                  }`}
-                  style={currentPage === page ? {backgroundColor: '#065f46'} : {}}
-                >
-                  {page}
-                </button>
-              ))}
+              {[...Array(Math.min(5, totalPages))].map((_, i) => {
+                const pageNum = i + 1;
+                return (
+                  <button
+                    key={pageNum}
+                    onClick={() => setCurrentPage(pageNum)}
+                    className={`px-3 py-1 border rounded text-sm ${
+                      currentPage === pageNum
+                        ? 'bg-emerald-600 text-white border-emerald-600'
+                        : 'border-gray-200 hover:bg-gray-50'
+                    }`}
+                  >
+                    {pageNum}
+                  </button>
+                );
+              })}
+              
+              {totalPages > 5 && (
+                <>
+                  <span className="px-2 text-gray-400">...</span>
+                  <button
+                    onClick={() => setCurrentPage(totalPages)}
+                    className="px-3 py-1 border border-gray-200 rounded text-sm hover:bg-gray-50"
+                  >
+                    {totalPages}
+                  </button>
+                </>
+              )}
               
               <button
                 onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
                 disabled={currentPage === totalPages}
-                className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center text-sm disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+                className="px-3 py-1 border border-gray-200 rounded text-sm disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
               >
                 ›
               </button>
             </div>
           </div>
-          </div>
         </div>
-        </div>
+        </main>
       </div>
 
       {showDeleteModal && (
