@@ -8,6 +8,7 @@ const signUp = async (c) => {
       email, 
       password,
       options: {
+        emailRedirectTo: `${process.env.CLIENT_URL || 'http://localhost:5173'}/signin`,
         data: {
           full_name: fullName || null,
           contact_number: contactNumber || null,

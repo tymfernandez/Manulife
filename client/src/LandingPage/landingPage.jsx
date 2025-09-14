@@ -55,6 +55,13 @@ const RoyalEaglesTemplate = () => {
         "Specialized group insurance and benefits for organizations and businesses.",
       image: "/GroupProducts.png",
     },
+    {
+      id: 8,
+      title: "UITF",
+      description:
+        "Avail of pure investments with access to global markets and regular cash payouts.",
+      image: "/Investment.png",
+    },
   ];
 
   return (
@@ -66,7 +73,7 @@ const RoyalEaglesTemplate = () => {
             <img src="/Dark-Logo-Name.png" width={120} height={100} alt="Logo" />
           </div>
           <button
-            className="bg-emerald-800 hover:bg-orange-500 text-white px-6 py-2 rounded-lg font-medium transition-colors duration-200 shadow-md hover:shadow-lg"
+            className="bg-emerald-800 hover:bg-orange-500 text-white px-3 py-2 sm:px-4 sm:py-2 md:px-6 md:py-2 rounded-lg font-medium text-sm sm:text-md transition-colors duration-200 shadow-md hover:shadow-lg"
             onClick={() => navigate("/signin")}
           >
             Sign In
@@ -90,24 +97,36 @@ const RoyalEaglesTemplate = () => {
                   <span>With Us</span>
                 </h1>
                 <p className="text-base sm:text-lg md:text-xl text-gray-600 leading-relaxed max-w-lg mx-auto lg:mx-0">
-                  Join the Royal Eagles Region and become part of a winning team
-                  that transforms lives through financial security and
-                  protection.
+                  Join thousands of successful Financial Advisors who have built
+                  thriving careers with us. Your journey to financial
+                  independence starts here.
                 </p>
               </div>
 
               <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start space-y-4 sm:space-y-0 sm:space-x-6 md:space-x-8 pt-4">
                 <div className="text-center">
-                  <div className="text-xl sm:text-2xl font-bold text-gray-900">500+</div>
-                  <div className="text-xs sm:text-sm text-gray-600">Active Agents</div>
+                  <div className="text-xl sm:text-2xl font-bold text-gray-900">
+                    300+
+                  </div>
+                  <div className="text-xs sm:text-sm text-gray-600">
+                    Active Agents
+                  </div>
                 </div>
                 <div className="text-center">
-                  <div className="text-xl sm:text-2xl font-bold text-gray-900">₱2.5B</div>
-                  <div className="text-xs sm:text-sm text-gray-600">Assets Protected</div>
+                  <div className="text-xl sm:text-2xl font-bold text-gray-900">
+                    ₱500M+
+                  </div>
+                  <div className="text-xs sm:text-sm text-gray-600">
+                    Assets Protected
+                  </div>
                 </div>
                 <div className="text-center">
-                  <div className="text-xl sm:text-2xl font-bold text-gray-900">15+</div>
-                  <div className="text-xs sm:text-sm text-gray-600">Years Excellence</div>
+                  <div className="text-xl sm:text-2xl font-bold text-gray-900">
+                    17+
+                  </div>
+                  <div className="text-xs sm:text-sm text-gray-600">
+                    Years Excellence
+                  </div>
                 </div>
               </div>
             </div>
@@ -141,19 +160,25 @@ const RoyalEaglesTemplate = () => {
                     <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
                       <Phone className="w-4 h-4 text-green-600" />
                     </div>
-                    <span className="font-medium text-sm sm:text-base">+63 917 123 4567</span>
+                    <span className="font-medium text-sm sm:text-base">
+                      +63 917 123 4567
+                    </span>
                   </div>
                   <div className="flex items-center justify-center sm:justify-start space-x-3 text-gray-600">
                     <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
                       <Mail className="w-4 h-4 text-green-600" />
                     </div>
-                    <span className="font-medium text-sm sm:text-base">aquila@royaleagles.ph</span>
+                    <span className="font-medium text-sm sm:text-base">
+                      aquila@royaleagles.ph
+                    </span>
                   </div>
                   <div className="flex items-center justify-center sm:justify-start space-x-3 text-gray-600">
                     <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
                       <Instagram className="w-4 h-4 text-green-600" />
                     </div>
-                    <span className="font-medium text-sm sm:text-base">@royaleagles_aquila</span>
+                    <span className="font-medium text-sm sm:text-base">
+                      @royaleagles_aquila
+                    </span>
                   </div>
                 </div>
               </div>
@@ -174,9 +199,9 @@ const RoyalEaglesTemplate = () => {
               Ready to Become a Life Champion?
             </h2>
             <p className="text-green-100 text-base sm:text-lg mb-6 sm:mb-8 leading-relaxed px-4">
-              Join thousands of successful financial advisors who have built
-              thriving careers with Manulife. Your journey to financial
-              independence starts here.
+              Join thousands of successful Financial Advisors who have built
+              thriving careers with us. Your journey to financial independence
+              starts here.
             </p>
             <button
               className="bg-white text-orange-500 hover:bg-gray-50 px-6 py-3 sm:px-8 sm:py-4 md:px-10 md:py-4 rounded-lg font-bold text-base sm:text-lg transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-1 w-full sm:w-auto"
@@ -199,7 +224,7 @@ const RoyalEaglesTemplate = () => {
             OUR PRODUCTS
           </h2>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
             {products.map((product) => (
               <div
                 key={product.id}
@@ -230,7 +255,7 @@ const RoyalEaglesTemplate = () => {
       <footer className="bg-gray-900 text-white py-8">
         <div className="container mx-auto px-4 text-center">
           <p className="text-gray-400">
-            © 2024 Royal Eagles Insurance. All rights reserved.
+            © 2025 Royal Eagles Region. All rights reserved.
           </p>
         </div>
       </footer>

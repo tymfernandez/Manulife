@@ -13,6 +13,7 @@ export default function SignUp() {
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [passwordValid, setPasswordValid] = useState(false);
   const { signUp } = useAuth();
   const navigate = useNavigate();
 
@@ -46,11 +47,23 @@ export default function SignUp() {
     return () => clearInterval(timer);
   }, [slides.length]);
 
+  // Password validation function
+  const validatePassword = (pwd) => {
+    const minLength = pwd.length >= 8;
+    const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(pwd);
+    return minLength && hasSpecialChar;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (password !== confirmPassword) {
       setError("Passwords do not match");
+      return;
+    }
+
+    if (!validatePassword(password)) {
+      setError("Password must be at least 8 characters long and contain at least one special character");
       return;
     }
 
@@ -152,11 +165,8 @@ export default function SignUp() {
               <div className="text-xs text-gray-500 mb-2">
                 Password must contain:
                 <ul className="list-disc list-inside">
-                  <li>At least 8 characters long</li>
-                  <li>At least one uppercase letter (A-Z)</li>
-                  <li>At least one lowercase letter (a-z)</li>
-                  <li>At least one number (0-9)</li>
-                  <li>At least one special character (!@#$%^&*)</li>
+                  <li className={password.length >= 8 ? "text-green-600" : "text-gray-500"}>At least 8 characters long</li>
+                  <li className={/[!@#$%^&*(),.?":{}|<>]/.test(password) ? "text-green-600" : "text-gray-500"}>At least one special character (!@#$%^&*)</li>
                 </ul>
               </div>
               <div className="relative">
@@ -164,10 +174,19 @@ export default function SignUp() {
                   id="password"
                   type={showPassword ? "text" : "password"}
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 text-gray-900 pr-12"
-                  pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$"
-                  title="Must contain at least 8 characters, one uppercase, one lowercase, one number and one special character"
+                  onChange={(e) => {
+                    const newPassword = e.target.value;
+                    setPassword(newPassword);
+                    setPasswordValid(validatePassword(newPassword));
+                  }}
+                  className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 text-gray-900 pr-12 ${
+                    password && passwordValid 
+                      ? "border-green-500 focus:ring-green-500 focus:border-green-500 bg-green-50" 
+                      : password 
+                      ? "border-red-300 focus:ring-red-500 focus:border-red-500" 
+                      : "border-gray-300 focus:ring-green-500 focus:border-green-500"
+                  }`}
+                  title="Must contain at least 8 characters and one special character"
                   required
                 />
                 <button
@@ -194,9 +213,14 @@ export default function SignUp() {
                   type={showConfirmPassword ? "text" : "password"}
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 text-gray-900 pr-12"
-                  pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$"
-                  title="Must match password requirements"
+                  className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 text-gray-900 pr-12 ${
+                    confirmPassword && password === confirmPassword && passwordValid
+                      ? "border-green-500 focus:ring-green-500 focus:border-green-500 bg-green-50" 
+                      : confirmPassword && password !== confirmPassword
+                      ? "border-red-300 focus:ring-red-500 focus:border-red-500" 
+                      : "border-gray-300 focus:ring-green-500 focus:border-green-500"
+                  }`}
+                  title="Must match password"
                   required
                 />
                 <button
