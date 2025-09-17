@@ -42,9 +42,10 @@ const Profile = () => {
     if (!user?.id) return;
     
     try {
-      const response = await fetch("http://localhost:3000/api/auth/profile", {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3000/api'}/auth/profile`, {
         headers: {
-          'user-id': user.id
+          'user-id': user.id,
+          'Authorization': `Bearer ${JSON.parse(localStorage.getItem('supabase.auth.token') || '{}').access_token}`
         }
       });
       const result = await response.json();
@@ -77,7 +78,7 @@ const Profile = () => {
     setLoading(true);
     try {
       const response = await fetch(
-        "http://localhost:3000/api/auth/update-profile",
+        `${import.meta.env.VITE_API_URL || 'http://localhost:3000/api'}/auth/update-profile`,
         {
           method: "POST",
           headers: { 
