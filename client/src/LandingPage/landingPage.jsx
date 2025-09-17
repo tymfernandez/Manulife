@@ -1,5 +1,5 @@
 import React from "react";
-import { Phone, Instagram, Mail, Link } from "lucide-react";
+import { Link } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 const RoyalEaglesTemplate = () => {
@@ -97,9 +97,8 @@ const RoyalEaglesTemplate = () => {
                   <span>With Us</span>
                 </h1>
                 <p className="text-base sm:text-lg md:text-xl text-gray-600 leading-relaxed max-w-lg mx-auto lg:mx-0">
-                  Join thousands of successful Financial Advisors who have built
-                  thriving careers with us. Your journey to financial
-                  independence starts here.
+                     Join the Royal Eagles Region and become part of a winning team
+                  that transform lives through financial security and peace of mind. 
                 </p>
               </div>
 
@@ -117,7 +116,7 @@ const RoyalEaglesTemplate = () => {
                     ₱500M+
                   </div>
                   <div className="text-xs sm:text-sm text-gray-600">
-                    Assets Protected
+                    Assets under Management
                   </div>
                 </div>
                 <div className="text-center">
@@ -125,7 +124,7 @@ const RoyalEaglesTemplate = () => {
                     17+
                   </div>
                   <div className="text-xs sm:text-sm text-gray-600">
-                    Years Excellence
+                    Years of Excellence
                   </div>
                 </div>
               </div>
@@ -155,32 +154,7 @@ const RoyalEaglesTemplate = () => {
                   services industry.
                 </p>
 
-                <div className="space-y-3">
-                  <div className="flex items-center justify-center sm:justify-start space-x-3 text-gray-600">
-                    <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
-                      <Phone className="w-4 h-4 text-green-600" />
-                    </div>
-                    <span className="font-medium text-sm sm:text-base">
-                      +63 917 123 4567
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-center sm:justify-start space-x-3 text-gray-600">
-                    <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
-                      <Mail className="w-4 h-4 text-green-600" />
-                    </div>
-                    <span className="font-medium text-sm sm:text-base">
-                      aquila@royaleagles.ph
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-center sm:justify-start space-x-3 text-gray-600">
-                    <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
-                      <Instagram className="w-4 h-4 text-green-600" />
-                    </div>
-                    <span className="font-medium text-sm sm:text-base">
-                      @royaleagles_aquila
-                    </span>
-                  </div>
-                </div>
+
               </div>
 
               {/* Decorative elements */}

@@ -302,7 +302,7 @@ const ApplicationForm = () => {
                 <span className="text-white text-xs font-bold">1</span>
               </div>
               <span className="text-gray-700">
-                Our HR team will review your application within 2-3 business
+                Our management team will review your application within 2-3 business
                 days
               </span>
             </div>
