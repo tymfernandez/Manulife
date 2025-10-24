@@ -116,7 +116,7 @@ const RoyalEaglesTemplate = () => {
                     ₱500M+
                   </div>
                   <div className="text-xs sm:text-sm text-gray-600">
-                    Assets under Management
+                    Assets Under Management
                   </div>
                 </div>
                 <div className="text-center">
