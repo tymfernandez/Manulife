@@ -15,7 +15,7 @@ import {
 import { logActivity, ACTIVITY_TYPES } from "../utils/activityLogger";
 
 const ApplicationForm = () => {
-  const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
+  const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:3000/api";
   const [formData, setFormData] = useState({
     fullName: "",
     emailAddress: "",
@@ -30,6 +30,7 @@ const ApplicationForm = () => {
   const [completedFields, setCompletedFields] = useState({});
   const [fieldErrors, setFieldErrors] = useState({});
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [showValidation, setShowValidation] = useState(false);
 
   const positionOptions = [
     {
@@ -70,22 +71,22 @@ const ApplicationForm = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    
+
     // Clear existing errors for this field
     setFieldErrors({
       ...fieldErrors,
       [name]: "",
     });
-    
+
     // Validation for fullName - only letters and spaces, minimum 3 letters
-    if (name === 'fullName') {
+    if (name === "fullName") {
       const lettersOnly = /^[a-zA-Z\s]*$/;
       if (!lettersOnly.test(value)) {
         return; // Don't update if invalid characters
       }
-      
+
       // Check minimum length (excluding spaces)
-      const lettersCount = value.replace(/\s/g, '').length;
+      const lettersCount = value.replace(/\s/g, "").length;
       if (value.length > 0 && lettersCount < 3) {
         setFieldErrors({
           ...fieldErrors,
@@ -93,12 +94,12 @@ const ApplicationForm = () => {
         });
       }
     }
-    
+
     // Validation for emailAddress - must be a valid email format
-    if (name === 'emailAddress') {
+    if (name === "emailAddress") {
       // Basic email validation pattern
       const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-      
+
       if (value.length > 0 && !emailPattern.test(value)) {
         setFieldErrors({
           ...fieldErrors,
@@ -106,15 +107,15 @@ const ApplicationForm = () => {
         });
       }
     }
-    
+
     // Validation for contactNumber - only 11 digits
-    if (name === 'contactNumber') {
+    if (name === "contactNumber") {
       const numbersOnly = /^[0-9]*$/;
       if (!numbersOnly.test(value) || value.length > 11) {
         return; // Don't update if invalid characters or more than 11 digits
       }
     }
-    
+
     setFormData({
       ...formData,
       [name]: value,
@@ -122,20 +123,20 @@ const ApplicationForm = () => {
 
     // Mark field as completed if it has value and meets requirements
     const isCompleted = () => {
-      if (name === 'contactNumber') {
+      if (name === "contactNumber") {
         return value.length === 11;
       }
-      if (name === 'fullName') {
-        const lettersCount = value.replace(/\s/g, '').length;
+      if (name === "fullName") {
+        const lettersCount = value.replace(/\s/g, "").length;
         return lettersCount >= 3;
       }
-      if (name === 'emailAddress') {
+      if (name === "emailAddress") {
         const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
         return emailPattern.test(value);
       }
       return value.length > 0;
     };
-    
+
     setCompletedFields({
       ...completedFields,
       [name]: isCompleted(),
@@ -169,22 +170,31 @@ const ApplicationForm = () => {
   const canProceedToStep = (step) => {
     if (step <= 1) return true;
     const prevStep = steps.find((s) => s.id === step - 1);
-    let requiredFields = prevStep.fields.filter(
-      (field) => field !== "referralName"
-    );
+    let requiredFields = prevStep.fields;
 
     // Resume not required for Financial Advisor
     if (formData.positionAppliedFor === "Financial Advisor") {
       requiredFields = requiredFields.filter((field) => field !== "resume");
     }
 
-    return requiredFields.every((field) => completedFields[field]);
+    return requiredFields.every((field) => {
+      if (field === "referralName") return formData.referralName.trim() !== "";
+      if (field === "resume") return !!resumeFile;
+      return completedFields[field];
+    });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
     setMessage("");
+
+    if (!formData.referralName.trim()) {
+      setMessage("Error: Recruiter name is required");
+      setShowValidation(true);
+      setIsSubmitting(false);
+      return;
+    }
 
     try {
       const submitData = new FormData();
@@ -199,26 +209,40 @@ const ApplicationForm = () => {
       }
 
       const res = await fetch(`${API_BASE}/Applications`, {
-        method: 'POST',
+        method: "POST",
         body: submitData,
       });
 
-      const result = await res.json().catch(() => ({ success: false, message: 'Invalid server response' }));
+      const result = await res
+        .json()
+        .catch(() => ({ success: false, message: "Invalid server response" }));
 
       if (!res.ok || !result.success) {
-        throw new Error(result.message || `Request failed with status ${res.status}`);
+        throw new Error(
+          result.message || `Request failed with status ${res.status}`
+        );
       }
 
       // Log application submission (anonymous user)
       try {
         await logActivity(
           ACTIVITY_TYPES.CREATE,
-          `New application submitted: ${formData.fullName} for ${formData.positionAppliedFor}${formData.referralName ? ` (Referred by: ${formData.referralName})` : ''}`,
-          { id: 'anonymous', email: formData.emailAddress },
-          { firstName: formData.fullName.split(' ')[0], lastName: formData.fullName.split(' ').slice(1).join(' '), role: 'Applicant' }
+          `New application submitted: ${formData.fullName} for ${
+            formData.positionAppliedFor
+          }${
+            formData.referralName
+              ? ` (Referred by: ${formData.referralName})`
+              : ""
+          }`,
+          { id: "anonymous", email: formData.emailAddress },
+          {
+            firstName: formData.fullName.split(" ")[0],
+            lastName: formData.fullName.split(" ").slice(1).join(" "),
+            role: "Applicant",
+          }
         );
       } catch (logError) {
-        console.error('Failed to log application activity:', logError);
+        console.error("Failed to log application activity:", logError);
       }
 
       setIsSubmitted(true);
@@ -254,7 +278,9 @@ const ApplicationForm = () => {
             {currentStep > step.id ? (
               <CheckCircle size={16} className="sm:w-5 sm:h-5" />
             ) : (
-              <span className="font-semibold text-sm sm:text-base">{step.id}</span>
+              <span className="font-semibold text-sm sm:text-base">
+                {step.id}
+              </span>
             )}
           </div>
           <div className="ml-3 flex-1">
@@ -302,8 +328,8 @@ const ApplicationForm = () => {
                 <span className="text-white text-xs font-bold">1</span>
               </div>
               <span className="text-gray-700">
-                Our management team will review your application within 2-3 business
-                days
+                Our management team will review your application within 2-3
+                business days
               </span>
             </div>
             <div className="flex items-center">
@@ -373,9 +399,9 @@ const ApplicationForm = () => {
           pattern="[a-zA-Z\s]+"
           title="Please enter only letters and spaces, minimum 3 letters"
           className={`w-full pl-12 pr-4 py-3 border-2 rounded-xl focus:ring-0 transition-all duration-200 text-gray-700 placeholder-gray-400 ${
-            fieldErrors.fullName 
-              ? 'border-red-500 focus:border-red-500' 
-              : 'border-gray-200 focus:border-green-500'
+            fieldErrors.fullName
+              ? "border-red-500 focus:border-red-500"
+              : "border-gray-200 focus:border-green-500"
           }`}
         />
         {completedFields.fullName && !fieldErrors.fullName && (
@@ -404,9 +430,9 @@ const ApplicationForm = () => {
           pattern="[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}"
           title="Please enter a valid email address"
           className={`w-full pl-12 pr-4 py-3 border-2 rounded-xl focus:ring-0 transition-all duration-200 text-gray-700 placeholder-gray-400 ${
-            fieldErrors.emailAddress 
-              ? 'border-red-500 focus:border-red-500' 
-              : 'border-gray-200 focus:border-green-500'
+            fieldErrors.emailAddress
+              ? "border-red-500 focus:border-red-500"
+              : "border-gray-200 focus:border-green-500"
           }`}
         />
         {completedFields.emailAddress && !fieldErrors.emailAddress && (
@@ -471,7 +497,9 @@ const ApplicationForm = () => {
             }`}
           >
             <div className="flex items-center">
-              <span className="text-xl sm:text-2xl mr-3 sm:mr-4">{position.icon}</span>
+              <span className="text-xl sm:text-2xl mr-3 sm:mr-4">
+                {position.icon}
+              </span>
               <div className="flex-1">
                 <h4 className="font-semibold text-sm sm:text-base text-gray-800">
                   {position.value}
@@ -549,8 +577,12 @@ const ApplicationForm = () => {
   const renderStep3 = () => (
     <div className="space-y-4 sm:space-y-6 animate-fadeIn">
       <div className="text-center mb-6 sm:mb-8">
-        <h3 className="text-xl sm:text-2xl font-bold text-gray-800 mb-2">Almost done!</h3>
-        <p className="text-sm sm:text-base text-gray-600">Just one more optional detail</p>
+        <h3 className="text-xl sm:text-2xl font-bold text-gray-800 mb-2">
+          Almost done!
+        </h3>
+        <p className="text-sm sm:text-base text-gray-600">
+          Just one more optional detail
+        </p>
       </div>
 
       <div className="relative">
@@ -560,31 +592,58 @@ const ApplicationForm = () => {
           name="referralName"
           value={formData.referralName}
           onChange={handleInputChange}
-          placeholder="Recruiter Name"
+          placeholder="Recruiter Name (Required)"
           required
-          className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:ring-0 transition-all duration-200 text-gray-700 placeholder-gray-400"
+          pattern=".+"
+          title="Please enter recruiter name"
+          className={`w-full pl-12 pr-4 py-3 border-2 rounded-xl focus:ring-0 transition-all duration-200 text-gray-700 placeholder-gray-400 ${
+            showValidation && !formData.referralName
+              ? "border-red-500 focus:border-red-500"
+              : "border-gray-200 focus:border-green-500"
+          }`}
         />
+        {formData.referralName && (
+          <CheckCircle className="absolute right-3 top-3 h-5 w-5 text-green-500" />
+        )}
+        {showValidation && !formData.referralName && (
+          <AlertCircle className="absolute right-3 top-3 h-5 w-5 text-red-500" />
+        )}
       </div>
-
+      {showValidation && !formData.referralName && (
+        <div className="mt-1 text-sm text-red-600 flex items-center">
+          <AlertCircle className="h-4 w-4 mr-1" />
+          Recruiter name is required
+        </div>
+      )}
       <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-4 sm:p-6 mt-6 sm:mt-8">
         <h4 className="font-semibold text-base sm:text-lg text-gray-800 mb-3">
           Application Summary
         </h4>
         <div className="space-y-2 text-xs sm:text-sm">
           <div className="flex flex-col sm:flex-row sm:justify-between">
-            <span className="text-gray-600 font-medium sm:font-normal">Name:</span>
+            <span className="text-gray-600 font-medium sm:font-normal">
+              Name:
+            </span>
             <span className="font-medium break-words">{formData.fullName}</span>
           </div>
           <div className="flex flex-col sm:flex-row sm:justify-between">
-            <span className="text-gray-600 font-medium sm:font-normal">Email:</span>
-            <span className="font-medium break-all">{formData.emailAddress}</span>
+            <span className="text-gray-600 font-medium sm:font-normal">
+              Email:
+            </span>
+            <span className="font-medium break-all">
+              {formData.emailAddress}
+            </span>
           </div>
           <div className="flex flex-col sm:flex-row sm:justify-between">
-            <span className="text-gray-600 font-medium sm:font-normal">Position:</span>
+            <span className="text-gray-600 font-medium sm:font-normal">
+              Position:
+            </span>
             <span className="font-medium">{formData.positionAppliedFor}</span>
           </div>
           <div className="flex flex-col sm:flex-row sm:justify-between">
-            <span className="text-gray-600 font-medium sm:font-normal">Resume:</span>
+            <span className="text-gray-600 font-medium sm:font-normal">
+              Resume:
+            </span>
             <span className="font-medium break-words">
               {resumeFile ? resumeFile.name : "Not uploaded"}
             </span>
