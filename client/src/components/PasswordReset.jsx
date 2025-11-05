@@ -82,22 +82,28 @@ const PasswordReset = () => {
       setLoading(true);
       setError('');
       
-      // Use server endpoint with token hash
-      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3000/api'}/auth/reset-password-confirm`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ 
-          token: accessToken,
-          password: password 
-        })
+      // Use Supabase client directly with verifyOtp
+      const { supabase } = await import('../supabaseClient');
+      
+      // Verify the OTP token and update password
+      const { data, error } = await supabase.auth.verifyOtp({
+        token_hash: accessToken,
+        type: 'recovery'
       });
       
-      const result = await response.json();
+      if (error) {
+        console.error('Token verification error:', error);
+        throw new Error('Invalid or expired reset token');
+      }
       
-      if (!result.success) {
-        throw new Error(result.message);
+      // Now update the password
+      const { error: updateError } = await supabase.auth.updateUser({
+        password: password
+      });
+      
+      if (updateError) {
+        console.error('Password update error:', updateError);
+        throw new Error('Failed to update password');
       }
       
       alert('Password updated successfully! You can now log in with your new password.');
