@@ -47,14 +47,16 @@ const PasswordReset = () => {
       console.log('Token:', !!token);
       
       if (type === 'recovery' && token) {
+        console.log('Found recovery tokens:', { token: token.substring(0, 20) + '...', refresh: refresh ? refresh.substring(0, 20) + '...' : 'none' });
         setAccessToken(token);
         if (refresh) setRefreshToken(refresh);
         setIsValidSession(true);
-        // Clear the URL parameters
-        window.history.replaceState(null, null, window.location.pathname);
+        // Don't clear URL yet - keep for debugging
+        // window.history.replaceState(null, null, window.location.pathname);
       } else if (!hash && !search) {
         setError('Please use the reset link from your email.');
       } else {
+        console.log('Invalid tokens found:', { type, hasToken: !!token, hash, search });
         setError('Invalid reset link. Please request a new password reset.');
       }
     };
@@ -83,11 +85,20 @@ const PasswordReset = () => {
       // Use Supabase client to update password directly
       const { supabase } = await import('../supabaseClient');
       
+      console.log('Setting session with tokens:', { hasAccess: !!accessToken, hasRefresh: !!refreshToken });
+      
       // Set the session with the tokens
-      await supabase.auth.setSession({
+      const { data: sessionData, error: sessionError } = await supabase.auth.setSession({
         access_token: accessToken,
-        refresh_token: refreshToken || accessToken
+        refresh_token: refreshToken || 'dummy-refresh-token'
       });
+      
+      if (sessionError) {
+        console.error('Session error:', sessionError);
+        throw new Error('Failed to establish session: ' + sessionError.message);
+      }
+      
+      console.log('Session set successfully:', !!sessionData.session);
       
       // Update the password
       const { error } = await supabase.auth.updateUser({
@@ -95,6 +106,7 @@ const PasswordReset = () => {
       });
       
       if (error) {
+        console.error('Update user error:', error);
         throw new Error(error.message);
       }
       
