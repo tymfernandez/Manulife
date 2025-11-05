@@ -23,12 +23,18 @@ const PasswordReset = () => {
   useEffect(() => {
     const handleAuthStateChange = async () => {
       // Check if this is a password recovery callback
-      const hashParams = new URLSearchParams(window.location.hash.substring(1));
+      const hash = window.location.hash.substring(1);
+      const hashParams = new URLSearchParams(hash);
       const type = hashParams.get('type');
+      
+      console.log('Hash:', hash);
+      console.log('Type:', type);
       
       if (type === 'recovery') {
         const token = hashParams.get('access_token');
         const refresh = hashParams.get('refresh_token');
+        
+        console.log('Tokens found:', { hasToken: !!token, hasRefresh: !!refresh });
         
         if (token && refresh) {
           setAccessToken(token);
@@ -39,6 +45,9 @@ const PasswordReset = () => {
         } else {
           setError('Invalid reset link. Please request a new password reset.');
         }
+      } else if (!hash) {
+        // No hash at all - direct access
+        setError('Please use the reset link from your email.');
       } else {
         setError('Invalid reset link. Please request a new password reset.');
       }

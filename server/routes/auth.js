@@ -290,7 +290,7 @@ const resetPassword = async (c) => {
     }
     
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${process.env.CLIENT_URL || 'http://localhost:5173'}/reset-password`
+      redirectTo: `${process.env.CLIENT_URL || 'http://localhost:5174'}/reset-password`
     });
     
     if (error) {

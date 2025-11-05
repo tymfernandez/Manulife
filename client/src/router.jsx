@@ -15,6 +15,7 @@ const RecruitmentManagement = lazy(() => import("./RecruitmentManagement/recruit
 const ActivityLogs = lazy(() => import("./ActivityLogs/activityLogs"));
 const Settings = lazy(() => import("./Settings/settings"));
 const PasswordReset = lazy(() => import("./components/PasswordReset"));
+const DebugReset = lazy(() => import("./components/DebugReset"));
 const LandingPage = lazy(() => import("./LandingPage/landingPage"));
 
 // Loading component
@@ -50,6 +51,11 @@ const PublicRoute = () => {
   return user ? <Navigate to="/dashboard" /> : <Outlet />;
 };
 
+const ResetPasswordRoute = () => {
+  // Always allow access to reset password page regardless of auth state
+  return <PasswordReset />;
+};
+
 export const router = createBrowserRouter([
   {
     path: "/",
@@ -68,6 +74,14 @@ export const router = createBrowserRouter([
         element: (
           <Suspense fallback={<LoadingSpinner />}>
             <SignIn />
+          </Suspense>
+        ),
+      },
+      {
+        path: "reset-password",
+        element: (
+          <Suspense fallback={<LoadingSpinner />}>
+            <ResetPasswordRoute />
           </Suspense>
         ),
       },
@@ -103,7 +117,19 @@ export const router = createBrowserRouter([
   },
   {
     path: "/reset-password",
-    element: <PasswordReset />,
+    element: (
+      <Suspense fallback={<LoadingSpinner />}>
+        <ResetPasswordRoute />
+      </Suspense>
+    ),
+  },
+  {
+    path: "/debug-reset",
+    element: (
+      <Suspense fallback={<LoadingSpinner />}>
+        <DebugReset />
+      </Suspense>
+    ),
   },
   {
     path: "/dashboard",
