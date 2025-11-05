@@ -80,20 +80,22 @@ const PasswordReset = () => {
       setLoading(true);
       setError('');
       
-      // Use the server endpoint to update password
-      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3000/api'}/auth/update-password`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${accessToken}`
-        },
-        body: JSON.stringify({ password })
+      // Use Supabase client to update password directly
+      const { supabase } = await import('../supabaseClient');
+      
+      // Set the session with the tokens
+      await supabase.auth.setSession({
+        access_token: accessToken,
+        refresh_token: refreshToken || accessToken
       });
       
-      const result = await response.json();
+      // Update the password
+      const { error } = await supabase.auth.updateUser({
+        password: password
+      });
       
-      if (!result.success) {
-        throw new Error(result.message);
+      if (error) {
+        throw new Error(error.message);
       }
       
       alert('Password updated successfully! You can now log in with your new password.');
