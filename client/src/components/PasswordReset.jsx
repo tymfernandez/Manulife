@@ -22,31 +22,37 @@ const PasswordReset = () => {
 
   useEffect(() => {
     const handleAuthStateChange = async () => {
-      // Check if this is a password recovery callback
+      // Check both hash and query parameters
       const hash = window.location.hash.substring(1);
-      const hashParams = new URLSearchParams(hash);
-      const type = hashParams.get('type');
+      const search = window.location.search.substring(1);
+      
+      let params;
+      let type, token, refresh;
+      
+      if (hash) {
+        params = new URLSearchParams(hash);
+        type = params.get('type');
+        token = params.get('access_token');
+        refresh = params.get('refresh_token');
+      } else if (search) {
+        params = new URLSearchParams(search);
+        type = params.get('type');
+        token = params.get('token') || params.get('access_token');
+        refresh = params.get('refresh_token');
+      }
       
       console.log('Hash:', hash);
+      console.log('Search:', search);
       console.log('Type:', type);
+      console.log('Token:', !!token);
       
-      if (type === 'recovery') {
-        const token = hashParams.get('access_token');
-        const refresh = hashParams.get('refresh_token');
-        
-        console.log('Tokens found:', { hasToken: !!token, hasRefresh: !!refresh });
-        
-        if (token && refresh) {
-          setAccessToken(token);
-          setRefreshToken(refresh);
-          setIsValidSession(true);
-          // Clear the hash from URL
-          window.history.replaceState(null, null, window.location.pathname);
-        } else {
-          setError('Invalid reset link. Please request a new password reset.');
-        }
-      } else if (!hash) {
-        // No hash at all - direct access
+      if (type === 'recovery' && token) {
+        setAccessToken(token);
+        if (refresh) setRefreshToken(refresh);
+        setIsValidSession(true);
+        // Clear the URL parameters
+        window.history.replaceState(null, null, window.location.pathname);
+      } else if (!hash && !search) {
         setError('Please use the reset link from your email.');
       } else {
         setError('Invalid reset link. Please request a new password reset.');
