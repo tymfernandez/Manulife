@@ -358,19 +358,26 @@ const resetPasswordConfirm = async (c) => {
       return c.json({ success: false, message: 'Token and password are required' }, 400);
     }
     
-    // Use Supabase to verify and update password with token hash
-    const { error } = await supabase.auth.verifyOtp({
-      token_hash: token,
-      type: 'recovery'
+    // Create a temporary Supabase client with the token
+    const { createClient } = require('@supabase/supabase-js');
+    const tempClient = createClient(
+      process.env.SUPABASE_URL,
+      process.env.SUPABASE_ANON_KEY
+    );
+    
+    // Set session with the token
+    const { data: sessionData, error: sessionError } = await tempClient.auth.setSession({
+      access_token: token,
+      refresh_token: token // Use same token as refresh for recovery
     });
     
-    if (error) {
-      console.error('Token verification error:', error);
+    if (sessionError) {
+      console.error('Session error:', sessionError);
       return c.json({ success: false, message: 'Invalid or expired reset token' }, 401);
     }
     
-    // If verification successful, update password
-    const { error: updateError } = await supabase.auth.updateUser({
+    // Update password
+    const { error: updateError } = await tempClient.auth.updateUser({
       password: password
     });
     
