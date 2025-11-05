@@ -293,15 +293,61 @@ const resetPassword = async (c) => {
       redirectTo: `${process.env.CLIENT_URL || 'http://localhost:5173'}/reset-password`
     });
     
-    if (error) throw error;
+    if (error) {
+      console.error('Reset password error:', error);
+      throw error;
+    }
     
     return c.json({ 
       success: true, 
       message: 'Password reset email sent successfully'
     });
   } catch (error) {
+    console.error('Reset password catch error:', error);
     return c.json({ success: false, message: error.message }, 500);
   }
 };
 
-module.exports = { signUp, signIn, signOut, updateProfile, getProfile, changePassword, resetPassword };
+const updatePassword = async (c) => {
+  try {
+    const { password } = await c.req.json();
+    const authHeader = c.req.header('Authorization');
+    
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return c.json({ success: false, message: 'Not authenticated' }, 401);
+    }
+
+    const token = authHeader.substring(7);
+    const { supabaseAdmin } = require('../supabase');
+    
+    if (!password) {
+      return c.json({ success: false, message: 'Password is required' }, 400);
+    }
+    
+    // Get user from token
+    const { data: { user }, error: userError } = await supabaseAdmin.auth.getUser(token);
+    
+    if (userError || !user) {
+      return c.json({ success: false, message: 'Invalid token' }, 401);
+    }
+    
+    // Update password
+    const { error } = await supabaseAdmin.auth.admin.updateUserById(user.id, {
+      password: password
+    });
+    
+    if (error) {
+      throw error;
+    }
+    
+    return c.json({ 
+      success: true, 
+      message: 'Password updated successfully'
+    });
+  } catch (error) {
+    console.error('Update password error:', error);
+    return c.json({ success: false, message: error.message }, 500);
+  }
+};
+
+module.exports = { signUp, signIn, signOut, updateProfile, getProfile, changePassword, resetPassword, updatePassword };

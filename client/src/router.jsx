@@ -6,6 +6,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 // Lazy load components for better performance
 const SignIn = lazy(() => import("./UserAuth/Login/SignIn"));
 const SignUp = lazy(() => import("./UserAuth/Signup/signup"));
+const ForgotPassword = lazy(() => import("./UserAuth/Login/ForgotPassword"));
 const Dashboard = lazy(() => import("./Dashboard/dashboard"));
 const Profile = lazy(() => import("./Profile/Profile"));
 const ApplicationForm = lazy(() => import("./ApplicationForm/applicationForm"));
@@ -81,6 +82,20 @@ export const router = createBrowserRouter([
         element: (
           <Suspense fallback={<LoadingSpinner />}>
             <SignUp />
+          </Suspense>
+        ),
+      },
+    ],
+  },
+  {
+    path: "/forgot-password",
+    element: <PublicRoute />,
+    children: [
+      {
+        index: true,
+        element: (
+          <Suspense fallback={<LoadingSpinner />}>
+            <ForgotPassword />
           </Suspense>
         ),
       },

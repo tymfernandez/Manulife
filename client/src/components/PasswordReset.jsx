@@ -1,8 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { supabase } from '../supabaseClient';
 import { passwordService } from '../services/passwordService';
 import { Eye, EyeOff } from 'lucide-react';
+
+// Import images directly
+import carousel01 from "/Carousel01.png";
+import carousel02 from "/Carousel02.png";
+import carousel03 from "/Carousel03.png";
 
 const PasswordReset = () => {
   const navigate = useNavigate();
@@ -12,6 +16,9 @@ const PasswordReset = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState('');
+  const [accessToken, setAccessToken] = useState('');
+  const [refreshToken, setRefreshToken] = useState('');
+  const [isValidSession, setIsValidSession] = useState(false);
 
   useEffect(() => {
     const handleAuthStateChange = async () => {
@@ -20,20 +27,15 @@ const PasswordReset = () => {
       const type = hashParams.get('type');
       
       if (type === 'recovery') {
-        const accessToken = hashParams.get('access_token');
-        const refreshToken = hashParams.get('refresh_token');
+        const token = hashParams.get('access_token');
+        const refresh = hashParams.get('refresh_token');
         
-        if (accessToken && refreshToken) {
-          try {
-            await supabase.auth.setSession({
-              access_token: accessToken,
-              refresh_token: refreshToken
-            });
-            // Clear the hash from URL
-            window.history.replaceState(null, null, window.location.pathname);
-          } catch (error) {
-            setError('Invalid reset link. Please request a new password reset.');
-          }
+        if (token && refresh) {
+          setAccessToken(token);
+          setRefreshToken(refresh);
+          setIsValidSession(true);
+          // Clear the hash from URL
+          window.history.replaceState(null, null, window.location.pathname);
         } else {
           setError('Invalid reset link. Please request a new password reset.');
         }
@@ -55,7 +57,7 @@ const PasswordReset = () => {
     
     const validation = passwordService.validatePassword(password);
     if (!validation.isValid) {
-      setError(validation.errors[0]); // Show first error
+      setError(validation.errors[0]);
       return;
     }
 
@@ -63,12 +65,20 @@ const PasswordReset = () => {
       setLoading(true);
       setError('');
       
-      const { data, error } = await supabase.auth.updateUser({
-        password: password
+      // Use the server endpoint to update password
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3000/api'}/auth/update-password`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${accessToken}`
+        },
+        body: JSON.stringify({ password })
       });
       
-      if (error) {
-        throw new Error(error.message);
+      const result = await response.json();
+      
+      if (!result.success) {
+        throw new Error(result.message);
       }
       
       alert('Password updated successfully! You can now log in with your new password.');
@@ -81,93 +91,147 @@ const PasswordReset = () => {
     }
   };
 
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
-        <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Reset Your Password
-          </h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
-            Enter your new password below
-          </p>
+  if (!isValidSession) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-md w-full space-y-8 text-center">
+          <div>
+            <h2 className="text-3xl font-extrabold text-gray-900">Invalid Reset Link</h2>
+            <p className="mt-2 text-sm text-gray-600">
+              {error || 'This password reset link is invalid or has expired.'}
+            </p>
+            <button
+              onClick={() => navigate('/forgot-password')}
+              className="mt-4 text-green-600 hover:text-green-500 underline"
+            >
+              Request a new reset link
+            </button>
+          </div>
         </div>
-        
-        <form className="mt-8 space-y-6" onSubmit={handlePasswordReset}>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen flex flex-col lg:flex-row p-4 sm:p-8 md:p-12 lg:p-20">
+      {/* Left side - Form */}
+      <div className="flex-1 bg-gray-50 flex items-center justify-center p-4 sm:p-6 md:p-8 rounded-t-2xl lg:rounded-l-2xl lg:rounded-tr-none shadow-2xl">
+        <div className="w-full max-w-md">
+          <div className="text-center mb-6 sm:mb-8">
+            <h1 className="text-2xl sm:text-3xl font-semibold text-gray-900 mb-2">
+              Create New Password
+            </h1>
+            <p className="text-sm sm:text-base text-gray-600">
+              Enter your new password below
+            </p>
+          </div>
+          
           {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
+            <div className="bg-red-50 text-red-700 p-3 rounded-lg text-xs sm:text-sm mb-4 sm:mb-6">
               {error}
             </div>
           )}
           
-          <div className="space-y-4">
-            <div className="relative">
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+          <form onSubmit={handlePasswordReset} className="space-y-4">
+            <div>
+              <label htmlFor="password" className="block text-xs sm:text-sm font-medium text-gray-700 mb-2">
                 New Password
               </label>
-              <input
-                id="password"
-                name="password"
-                type={showPassword ? 'text' : 'password'}
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="appearance-none relative block w-full px-3 py-2 pr-10 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-green-500 focus:border-green-500"
-                placeholder="Enter new password"
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-8 text-gray-400 hover:text-gray-600"
-              >
-                {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-              </button>
+              <div className="relative">
+                <input
+                  id="password"
+                  type={showPassword ? 'text' : 'password'}
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 text-gray-900 pr-12"
+                  placeholder="Enter new password"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                >
+                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                </button>
+              </div>
             </div>
             
-            <div className="relative">
-              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-1">
+            <div>
+              <label htmlFor="confirmPassword" className="block text-xs sm:text-sm font-medium text-gray-700 mb-2">
                 Confirm New Password
               </label>
-              <input
-                id="confirmPassword"
-                name="confirmPassword"
-                type={showConfirmPassword ? 'text' : 'password'}
-                required
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                className="appearance-none relative block w-full px-3 py-2 pr-10 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-green-500 focus:border-green-500"
-                placeholder="Confirm new password"
-              />
-              <button
-                type="button"
-                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                className="absolute right-3 top-8 text-gray-400 hover:text-gray-600"
-              >
-                {showConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-              </button>
+              <div className="relative">
+                <input
+                  id="confirmPassword"
+                  type={showConfirmPassword ? 'text' : 'password'}
+                  required
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 text-gray-900 pr-12"
+                  placeholder="Confirm new password"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                >
+                  {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                </button>
+              </div>
             </div>
-          </div>
 
-          <div>
             <button
               type="submit"
               disabled={loading || !password || !confirmPassword}
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full bg-green-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? 'Updating Password...' : 'Update Password'}
             </button>
-          </div>
+          </form>
           
-          <div className="text-center">
+          <div className="text-center mt-6">
             <button
               type="button"
               onClick={() => navigate('/signin')}
-              className="text-green-600 hover:text-green-500 text-sm"
+              className="text-xs sm:text-sm text-green-600 hover:text-green-700"
             >
               Back to Login
             </button>
           </div>
-        </form>
+        </div>
+      </div>
+
+      {/* Right side - Carousel */}
+      <div className="flex-1 relative overflow-hidden rounded-b-2xl lg:rounded-r-2xl lg:rounded-bl-none shadow-2xl min-h-[300px] lg:min-h-full">
+        <div className="absolute top-4 right-4 sm:top-6 sm:right-6 z-10">
+          <div className="bg-green-600 text-white px-2 py-1 sm:px-3 sm:py-1 rounded text-xs sm:text-sm font-medium flex items-center">
+            <div className="w-2 h-2 bg-white rounded-full mr-2"></div>
+            Royal Eagles
+          </div>
+        </div>
+
+        <div className="relative h-full bg-gray-200">
+          <div className="absolute inset-0">
+            <img
+              src={carousel01}
+              alt="Password Reset"
+              className="w-full h-full object-cover"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+          </div>
+
+          <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-6 md:p-8 text-white">
+            <div className="mb-4 sm:mb-6">
+              <h2 className="text-lg sm:text-xl md:text-2xl font-semibold mb-2 sm:mb-4">
+                Secure Password Update
+              </h2>
+              <p className="text-xs sm:text-sm opacity-90 leading-relaxed max-w-md">
+                Create a strong password to secure your Life Champion account.
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
