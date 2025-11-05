@@ -350,4 +350,43 @@ const updatePassword = async (c) => {
   }
 };
 
-module.exports = { signUp, signIn, signOut, updateProfile, getProfile, changePassword, resetPassword, updatePassword };
+const resetPasswordConfirm = async (c) => {
+  try {
+    const { token, password } = await c.req.json();
+    
+    if (!token || !password) {
+      return c.json({ success: false, message: 'Token and password are required' }, 400);
+    }
+    
+    // Use Supabase to verify and update password with token hash
+    const { error } = await supabase.auth.verifyOtp({
+      token_hash: token,
+      type: 'recovery'
+    });
+    
+    if (error) {
+      console.error('Token verification error:', error);
+      return c.json({ success: false, message: 'Invalid or expired reset token' }, 401);
+    }
+    
+    // If verification successful, update password
+    const { error: updateError } = await supabase.auth.updateUser({
+      password: password
+    });
+    
+    if (updateError) {
+      console.error('Password update error:', updateError);
+      return c.json({ success: false, message: 'Failed to update password' }, 500);
+    }
+    
+    return c.json({ 
+      success: true, 
+      message: 'Password updated successfully'
+    });
+  } catch (error) {
+    console.error('Reset password confirm error:', error);
+    return c.json({ success: false, message: error.message }, 500);
+  }
+};
+
+module.exports = { signUp, signIn, signOut, updateProfile, getProfile, changePassword, resetPassword, updatePassword, resetPasswordConfirm };

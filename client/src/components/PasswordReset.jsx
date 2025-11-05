@@ -82,32 +82,22 @@ const PasswordReset = () => {
       setLoading(true);
       setError('');
       
-      // Use Supabase client to update password directly
-      const { supabase } = await import('../supabaseClient');
-      
-      console.log('Setting session with tokens:', { hasAccess: !!accessToken, hasRefresh: !!refreshToken });
-      
-      // Set the session with the tokens
-      const { data: sessionData, error: sessionError } = await supabase.auth.setSession({
-        access_token: accessToken,
-        refresh_token: refreshToken || 'dummy-refresh-token'
+      // Use server endpoint with token hash
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3000/api'}/auth/reset-password-confirm`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ 
+          token: accessToken,
+          password: password 
+        })
       });
       
-      if (sessionError) {
-        console.error('Session error:', sessionError);
-        throw new Error('Failed to establish session: ' + sessionError.message);
-      }
+      const result = await response.json();
       
-      console.log('Session set successfully:', !!sessionData.session);
-      
-      // Update the password
-      const { error } = await supabase.auth.updateUser({
-        password: password
-      });
-      
-      if (error) {
-        console.error('Update user error:', error);
-        throw new Error(error.message);
+      if (!result.success) {
+        throw new Error(result.message);
       }
       
       alert('Password updated successfully! You can now log in with your new password.');
