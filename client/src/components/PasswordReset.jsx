@@ -37,7 +37,7 @@ const PasswordReset = () => {
       } else if (search) {
         params = new URLSearchParams(search);
         type = params.get('type');
-        token = params.get('token') || params.get('access_token');
+        token = params.get('token') || params.get('TokenHash') || params.get('access_token');
         refresh = params.get('refresh_token');
       }
       
@@ -85,37 +85,18 @@ const PasswordReset = () => {
       // Use Supabase client directly with verifyOtp
       const { supabase } = await import('../supabaseClient');
       
-      // Try different token verification approaches
-      let sessionSet = false;
+      // Use verifyOtp with the TokenHash from query parameters
+      const { data, error } = await supabase.auth.verifyOtp({
+        token_hash: accessToken,
+        type: 'recovery'
+      });
       
-      // First try: verifyOtp with token_hash
-      try {
-        const { data, error } = await supabase.auth.verifyOtp({
-          token_hash: accessToken,
-          type: 'recovery'
-        });
-        
-        if (!error && data.session) {
-          sessionSet = true;
-        }
-      } catch (e) {
-        console.log('verifyOtp failed, trying setSession');
+      if (error) {
+        console.error('Token verification error:', error);
+        throw new Error('Invalid or expired reset token');
       }
       
-      // Second try: setSession directly
-      if (!sessionSet) {
-        const { data, error } = await supabase.auth.setSession({
-          access_token: accessToken,
-          refresh_token: refreshToken || accessToken
-        });
-        
-        if (error) {
-          throw new Error('Invalid or expired reset token');
-        }
-        sessionSet = true;
-      }
-      
-      // Now update the password
+      // The verifyOtp should automatically set the session and allow password update
       const { error: updateError } = await supabase.auth.updateUser({
         password: password
       });
